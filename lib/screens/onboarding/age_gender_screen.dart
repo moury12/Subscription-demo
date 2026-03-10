@@ -49,46 +49,58 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
               onSkip: () => widget.onContinue(25, 'Male'), // Default skip values
             ),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Tell us about yourself', style: AppTextStyles.h1),
-                    const SizedBox(height: 8),
-                    Text(
-                      'This helps us personalize your experience',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Tell us about yourself', style: AppTextStyles.h1),
+                              const SizedBox(height: 8),
+                              Text(
+                                'This helps us personalize your experience',
+                                style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                              ),
+                              const SizedBox(height: 48),
+                              const Text('Age', style: AppTextStyles.labelMedium),
+                              const SizedBox(height: 12),
+                              AppTextInput(
+                                hint: 'Enter your age',
+                                controller: _ageController,
+                              ),
+                              const SizedBox(height: 32),
+                              const Text('Gender', style: AppTextStyles.labelMedium),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  _buildGenderButton('Male', Icons.male),
+                                  const SizedBox(width: 12),
+                                  _buildGenderButton('Female', Icons.female),
+                                  const SizedBox(width: 12),
+                                  _buildGenderButton('Other', Icons.transgender),
+                                ],
+                              ),
+                              const Spacer(),
+                              const SizedBox(height: 24),
+                              PrimaryGlowButton(
+                                label: 'Continue',
+                                onPressed: () {
+                                  final age = int.tryParse(_ageController.text) ?? 25;
+                                  widget.onContinue(age, _selectedGender);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 48),
-                    const Text('Age', style: AppTextStyles.labelMedium),
-                    const SizedBox(height: 12),
-                    AppTextInput(
-                      hint: 'Enter your age',
-                      controller: _ageController,
-                    ),
-                    const SizedBox(height: 32),
-                    const Text('Gender', style: AppTextStyles.labelMedium),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        _buildGenderButton('Male', Icons.male),
-                        const SizedBox(width: 12),
-                        _buildGenderButton('Female', Icons.female),
-                        const SizedBox(width: 12),
-                        _buildGenderButton('Other', Icons.transgender),
-                      ],
-                    ),
-                    const Spacer(),
-                    PrimaryGlowButton(
-                      label: 'Continue',
-                      onPressed: () {
-                        final age = int.tryParse(_ageController.text) ?? 25;
-                        widget.onContinue(age, _selectedGender);
-                      },
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],

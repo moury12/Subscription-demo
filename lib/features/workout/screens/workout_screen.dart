@@ -48,9 +48,9 @@ class WorkoutScreen extends StatelessWidget {
 
   Widget _buildWorkoutHeader(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 250,
+      expandedHeight: 380,
       backgroundColor: Colors.transparent,
-      pinned: true,
+      pinned: false,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
@@ -84,7 +84,7 @@ class WorkoutScreen extends StatelessWidget {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -105,16 +105,32 @@ class WorkoutScreen extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildHeaderStat('0', 'Completed'),
-                          _buildHeaderStat('2', 'Total'),
-                          _buildHeaderStat('0%', 'Progress'),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(child: _buildHeaderStat('0', 'Completed')),
+                            Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
+                            Expanded(child: _buildHeaderStat('2', 'Total')),
+                            Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
+                            Expanded(child: _buildHeaderStat('0%', 'Progress')),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'This Week',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       _buildDatePicker(),
                       const SizedBox(height: 10),
                     ],
@@ -133,11 +149,18 @@ class WorkoutScreen extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 14,
+          ),
         ),
       ],
     );
@@ -147,20 +170,37 @@ class WorkoutScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white30),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20),
+        Column(
+          children: [
+            Text(
+              'Mon',
+              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white54,
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.calendar_today_outlined, color: AppColors.workoutPurple, size: 20),
+            ),
+          ],
         ),
-        _buildDateItem('3', 'Mon', false),
-        _buildDateItem('4', 'Tue', false),
-        _buildDateItem('5', 'Wed', false),
-        _buildDateItem('6', 'Thu', false),
-        _buildDateItem('7', 'Fri', false),
-        _buildDateItem('8', 'Sat', false),
+        _buildDateItem('3', 'Tue', false),
+        _buildDateItem('4', 'Wed', false),
+        _buildDateItem('5', 'Thu', false),
+        _buildDateItem('6', 'Fri', false),
+        _buildDateItem('7', 'Sat', false),
+        _buildDateItem('8', 'Sun', false),
       ],
     );
   }
@@ -170,15 +210,18 @@ class WorkoutScreen extends StatelessWidget {
       children: [
         Text(
           weekday,
-          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
+          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.all(8),
-          decoration: isSelected ? BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-          ) : null,
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withOpacity(0.3)),
+            color: isSelected ? Colors.white : Colors.transparent,
+          ),
           child: Text(
             day,
             style: TextStyle(
@@ -216,7 +259,7 @@ class WorkoutScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('🧘', style: TextStyle(fontSize: 16)),
+      
               const SizedBox(width: 8),
               Text(
                 'Workout in Progress',

@@ -15,64 +15,74 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: OnboardingBackground(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: onSkip,
-                  child: Text(
-                    'Skip',
-                    style: AppTextStyles.label.copyWith(color: AppColors.textSecondary),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: TextButton(
+                          onPressed: onSkip,
+                          child: Text(
+                            'Skip',
+                            style: AppTextStyles.label.copyWith(color: AppColors.textSecondary),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      const GradientLogo(size: 100),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Welcome to FitnessPro!',
+                        style: AppTextStyles.splashTitle,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Let's personalize your fitness journey",
+                        style: AppTextStyles.splashSubtitle.copyWith(color: AppColors.textSecondary),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 48),
+                      _buildFeatureItem(
+                        context,
+                        icon: Icons.track_changes,
+                        title: 'Personalized Plans',
+                        subtitle: 'Get custom workouts and nutrition plans tailored to your goals',
+                      ),
+                      const SizedBox(height: 24),
+                      _buildFeatureItem(
+                        context,
+                        icon: Icons.trending_up,
+                        title: 'Track Progress',
+                        subtitle: 'Monitor your fitness journey with detailed analytics',
+                      ),
+                      const SizedBox(height: 24),
+                      _buildFeatureItem(
+                        context,
+                        icon: Icons.bolt,
+                        title: 'AI-Powered',
+                        subtitle: 'Smart recommendations that adapt to your progress',
+                      ),
+                      const Spacer(flex: 2),
+                      const SizedBox(height: 32),
+                      PrimaryGlowButton(
+                        label: 'Get Started',
+                        onPressed: onStart,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
               ),
-              const Spacer(),
-              const GradientLogo(size: 100),
-              const SizedBox(height: 32),
-              const Text(
-                'Welcome to FitnessPro!',
-                style: AppTextStyles.splashTitle,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "Let's personalize your fitness journey",
-                style: AppTextStyles.splashSubtitle.copyWith(color: AppColors.textSecondary),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              _buildFeatureItem(
-                context,
-                icon: Icons.track_changes,
-                title: 'Personalized Plans',
-                subtitle: 'Get custom workouts and nutrition plans tailored to your goals',
-              ),
-              const SizedBox(height: 24),
-              _buildFeatureItem(
-                context,
-                icon: Icons.trending_up,
-                title: 'Track Progress',
-                subtitle: 'Monitor your fitness journey with detailed analytics',
-              ),
-              const SizedBox(height: 24),
-              _buildFeatureItem(
-                context,
-                icon: Icons.bolt,
-                title: 'AI-Powered',
-                subtitle: 'Smart recommendations that adapt to your progress',
-              ),
-              const Spacer(flex: 2),
-              PrimaryGlowButton(
-                label: 'Get Started',
-                onPressed: onStart,
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
