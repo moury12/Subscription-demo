@@ -62,11 +62,11 @@ class _GoalScreenState extends State<GoalScreen> {
           children: [
             StepHeader(
               currentStep: 3,
-              totalSteps: 7,
+              totalSteps: 8,
               onBack: widget.onBack,
             ),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,14 +78,13 @@ class _GoalScreenState extends State<GoalScreen> {
                       style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: _goals.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          final goal = _goals[index];
-                          final isSelected = _selectedGoal == goal['title'];
-                          return OptionCard(
+                    Column(
+                      children: List.generate(_goals.length, (index) {
+                        final goal = _goals[index];
+                        final isSelected = _selectedGoal == goal['title'];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: OptionCard(
                             title: goal['title'],
                             icon: Icon(
                               goal['icon'],
@@ -94,15 +93,16 @@ class _GoalScreenState extends State<GoalScreen> {
                             ),
                             isSelected: isSelected,
                             onTap: () => setState(() => _selectedGoal = goal['title']),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      }),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 48),
                     PrimaryGlowButton(
                       label: 'Continue',
                       onPressed: () => widget.onContinue(_selectedGoal),
                     ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),

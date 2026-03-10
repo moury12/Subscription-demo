@@ -4,7 +4,8 @@ import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysis_result_screen.dart';
 
 class AiFoodAnalysingScreen extends StatefulWidget {
-  const AiFoodAnalysingScreen({super.key});
+  final String mealType;
+  const AiFoodAnalysingScreen({super.key, required this.mealType});
 
   @override
   State<AiFoodAnalysingScreen> createState() => _AiFoodAnalysingScreenState();
@@ -31,7 +32,7 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const AiFoodAnalysisResultScreen()),
+        MaterialPageRoute(builder: (_) => AiFoodAnalysisResultScreen(mealType: widget.mealType)),
       );
     }
   }

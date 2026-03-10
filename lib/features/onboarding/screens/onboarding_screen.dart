@@ -54,9 +54,9 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
 
-          // Main content - centered with intrinsic sizing
+          // Main content - centered
           Center(
-            child: IntrinsicHeight(
+            child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
@@ -65,7 +65,6 @@ class OnboardingScreen extends StatelessWidget {
                   const GradientLogo(
                     size: AppSpacing.splashLogoSize,
                     borderRadius: AppSpacing.splashLogoRadius,
-                    // Use Flutter-native gradient instead of SVG with unsupported filters
                   ),
 
                   const SizedBox(height: AppSpacing.splashLogoToTitle),

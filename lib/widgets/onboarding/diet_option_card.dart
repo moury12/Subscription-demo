@@ -5,6 +5,7 @@ import '../../core/theme/app_text_styles.dart';
 class DietOptionCard extends StatelessWidget {
   final String title;
   final String iconAsset;
+  final String? emoji;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -12,6 +13,7 @@ class DietOptionCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.iconAsset,
+    this.emoji,
     required this.isSelected,
     required this.onTap,
   });
@@ -42,13 +44,19 @@ class DietOptionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              iconAsset,
-              width: 32,
-              height: 32,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.restaurant, color: Colors.white, size: 32),
-            ),
+            if (emoji != null && emoji!.isNotEmpty)
+              Text(
+                emoji!,
+                style: const TextStyle(fontSize: 32),
+              )
+            else
+              Image.asset(
+                iconAsset,
+                width: 32,
+                height: 32,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.restaurant, color: Colors.white, size: 32),
+              ),
             const SizedBox(height: 12),
             Text(
               title,

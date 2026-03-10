@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/buttons/primary_glow_button.dart';
 import '../../../widgets/cards/app_surface_card.dart';
-import '../../nutrition/screens/add_meal_screen.dart';
+import '../../nutrition/widgets/meal_logging_options.dart';
 
 class CalorieOverviewCard extends StatelessWidget {
   const CalorieOverviewCard({
@@ -81,11 +81,7 @@ class CalorieOverviewCard extends StatelessWidget {
           PrimaryGlowButton(
             label: 'Add Meal',
             height: 56,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AddMealScreen()),
-              );
-            },
+            onPressed: () => MealLoggingOptions.showAddOptions(context),
           ),
           const SizedBox(height: 1),
         ],

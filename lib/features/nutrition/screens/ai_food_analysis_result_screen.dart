@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../controllers/nutrition_controller.dart';
+import '../models/food.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 
 class AiFoodAnalysisResultScreen extends StatelessWidget {
-  const AiFoodAnalysisResultScreen({super.key});
+  final String mealType;
+  const AiFoodAnalysisResultScreen({super.key, required this.mealType});
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +225,19 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () => Navigator.of(context).popUntil((route) => route.isFirst),
+              onTap: () {
+                // Add the identified meal to the controller
+                final food = Food(
+                  name: 'Chicken Rice Bowl',
+                  servingSize: '1 bowl',
+                  calories: 640,
+                  protein: 34,
+                  carbs: 75,
+                  fat: 23,
+                );
+                NutritionController().addMeal(mealType, food, 1.0);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

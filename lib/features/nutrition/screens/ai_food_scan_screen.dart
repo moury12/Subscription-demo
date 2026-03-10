@@ -4,7 +4,8 @@ import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysing_screen.dart';
 
 class AiFoodScanScreen extends StatelessWidget {
-  const AiFoodScanScreen({super.key});
+  final String mealType;
+  const AiFoodScanScreen({super.key, required this.mealType});
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +178,7 @@ class AiFoodScanScreen extends StatelessWidget {
 
   void _startAnalysis(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AiFoodAnalysingScreen()),
+      MaterialPageRoute(builder: (_) => AiFoodAnalysingScreen(mealType: mealType)),
     );
   }
 }

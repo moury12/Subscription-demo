@@ -62,11 +62,11 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
           children: [
             StepHeader(
               currentStep: 4,
-              totalSteps: 7,
+              totalSteps: 8,
               onBack: widget.onBack,
             ),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,27 +78,27 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
                       style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: _levels.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          final level = _levels[index];
-                          final isSelected = _selectedLevel == level['title'];
-                          return OptionCard(
+                    Column(
+                      children: List.generate(_levels.length, (index) {
+                        final level = _levels[index];
+                        final isSelected = _selectedLevel == level['title'];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: OptionCard(
                             title: level['title']!,
                             subtitle: level['subtitle']!,
                             isSelected: isSelected,
                             onTap: () => setState(() => _selectedLevel = level['title']!),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      }),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 48),
                     PrimaryGlowButton(
                       label: 'Continue',
                       onPressed: () => widget.onContinue(_selectedLevel),
                     ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),

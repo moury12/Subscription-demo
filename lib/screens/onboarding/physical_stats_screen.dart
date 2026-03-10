@@ -44,78 +44,67 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
           children: [
             StepHeader(
               currentStep: 2,
-              totalSteps: 7,
+              totalSteps: 8,
               onBack: widget.onBack,
             ),
             Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: IntrinsicHeight(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Physical Stats', style: AppTextStyles.h1),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Help us calculate your calorie needs',
-                                style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-                              ),
-                              const SizedBox(height: 32),
-                              // Metric/Imperial Toggle
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppColors.inputBorder),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildUnitToggle('Metric', _isMetric, () => setState(() => _isMetric = true)),
-                                    ),
-                                    Expanded(
-                                      child: _buildUnitToggle('Imperial', !_isMetric, () => setState(() => _isMetric = false)),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-                              Text('Height (${_isMetric ? 'cm' : 'ft'})', style: AppTextStyles.labelMedium),
-                              const SizedBox(height: 12),
-                              AppTextInput(
-                                hint: _isMetric ? 'e.g., 175' : 'e.g., 5.9',
-                                controller: _heightController,
-                              ),
-                              const SizedBox(height: 24),
-                              Text('Current Weight (${_isMetric ? 'kg' : 'lbs'})', style: AppTextStyles.labelMedium),
-                              const SizedBox(height: 12),
-                              AppTextInput(
-                                hint: _isMetric ? 'e.g., 70' : 'e.g., 154',
-                                controller: _weightController,
-                              ),
-                              const Spacer(),
-                              const SizedBox(height: 24),
-                              PrimaryGlowButton(
-                                label: 'Continue',
-                                onPressed: () {
-                                  final h = double.tryParse(_heightController.text) ?? 170.0;
-                                  final w = double.tryParse(_weightController.text) ?? 70.0;
-                                  widget.onContinue(h, w);
-                                },
-                              ),
-                            ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Physical Stats', style: AppTextStyles.h1),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Help us calculate your calorie needs',
+                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 32),
+                    // Metric/Imperial Toggle
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.inputBorder),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildUnitToggle('Metric', _isMetric, () => setState(() => _isMetric = true)),
                           ),
-                        ),
+                          Expanded(
+                            child: _buildUnitToggle('Imperial', !_isMetric, () => setState(() => _isMetric = false)),
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 32),
+                    Text('Height (${_isMetric ? 'cm' : 'ft'})', style: AppTextStyles.labelMedium),
+                    const SizedBox(height: 12),
+                    AppTextInput(
+                      hint: _isMetric ? 'e.g., 175' : 'e.g., 5.9',
+                      controller: _heightController,
+                    ),
+                    const SizedBox(height: 24),
+                    Text('Current Weight (${_isMetric ? 'kg' : 'lbs'})', style: AppTextStyles.labelMedium),
+                    const SizedBox(height: 12),
+                    AppTextInput(
+                      hint: _isMetric ? 'e.g., 70' : 'e.g., 154',
+                      controller: _weightController,
+                    ),
+                    const SizedBox(height: 64),
+                    PrimaryGlowButton(
+                      label: 'Continue',
+                      onPressed: () {
+                        final h = double.tryParse(_heightController.text) ?? 170.0;
+                        final w = double.tryParse(_weightController.text) ?? 70.0;
+                        widget.onContinue(h, w);
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ],

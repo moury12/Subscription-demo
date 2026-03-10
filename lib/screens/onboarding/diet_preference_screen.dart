@@ -26,12 +26,12 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
   late String _selectedDiet;
 
   final List<Map<String, String>> _diets = [
-    {'title': 'Everything', 'icon': 'assets/icons/diet_all.svg'},
-    {'title': 'Vegetarian', 'icon': 'assets/icons/diet_veg.svg'},
-    {'title': 'Vegan', 'icon': 'assets/icons/diet_vegan.svg'},
-    {'title': 'Pescatarian', 'icon': 'assets/icons/diet_fish.svg'},
-    {'title': 'Keto', 'icon': 'assets/icons/diet_keto.svg'},
-    {'title': 'Paleo', 'icon': 'assets/icons/diet_paleo.svg'},
+    {'title': 'Everything', 'emoji': '🍽️'},
+    {'title': 'Vegetarian', 'emoji': '🥗'},
+    {'title': 'Vegan', 'emoji': '🌱'},
+    {'title': 'Pescatarian', 'emoji': '🐟'},
+    {'title': 'Keto', 'emoji': '🥑'},
+    {'title': 'Paleo', 'emoji': '🥩'},
   ];
 
   @override
@@ -47,12 +47,12 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
         child: Column(
           children: [
             StepHeader(
-              currentStep: 6,
-              totalSteps: 7,
+              currentStep: 7,
+              totalSteps: 8,
               onBack: widget.onBack,
             ),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,27 +64,28 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
                       style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
-                    Expanded(
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.1,
-                        ),
-                        itemCount: _diets.length,
-                        itemBuilder: (context, index) {
-                          final diet = _diets[index];
-                          return DietOptionCard(
-                            title: diet['title']!,
-                            iconAsset: '', // I'll use default icons in DietOptionCard
-                            isSelected: _selectedDiet == diet['title'],
-                            onTap: () => setState(() => _selectedDiet = diet['title']!),
-                          );
-                        },
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.1,
                       ),
+                      itemCount: _diets.length,
+                      itemBuilder: (context, index) {
+                        final diet = _diets[index];
+                        return DietOptionCard(
+                          title: diet['title']!,
+                          iconAsset: '',
+                          emoji: diet['emoji'],
+                          isSelected: _selectedDiet == diet['title'],
+                          onTap: () => setState(() => _selectedDiet = diet['title']!),
+                        );
+                      },
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 64),
                     PrimaryGlowButton(
                       label: 'Continue',
                       onPressed: () => widget.onContinue(_selectedDiet),

@@ -8,6 +8,7 @@ import 'goal_screen.dart';
 import 'activity_level_screen.dart';
 import 'workout_schedule_screen.dart';
 import 'diet_preference_screen.dart';
+import 'timezone_screen.dart';
 import 'target_weight_screen.dart';
 import 'review_profile_screen.dart';
 import 'creating_plan_screen.dart';
@@ -67,8 +68,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               gender: _data.gender ?? 'Male',
               onBack: _previousPage,
               onContinue: (age, gender) {
-                _data.age = age;
-                _data.gender = gender;
+                setState(() {
+                  _data.age = age;
+                  _data.gender = gender;
+                });
                 _nextPage();
               },
             ),
@@ -77,8 +80,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               weight: _data.currentWeight ?? 0,
               onBack: _previousPage,
               onContinue: (h, w) {
-                _data.height = h;
-                _data.currentWeight = w;
+                setState(() {
+                  _data.height = h;
+                  _data.currentWeight = w;
+                });
                 _nextPage();
               },
             ),
@@ -86,7 +91,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               goal: _data.goal ?? 'Lose Weight',
               onBack: _previousPage,
               onContinue: (goal) {
-                _data.goal = goal;
+                setState(() {
+                  _data.goal = goal;
+                });
                 _nextPage();
               },
             ),
@@ -94,7 +101,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               activityLevel: _data.activityLevel ?? 'Moderately Active',
               onBack: _previousPage,
               onContinue: (level) {
-                _data.activityLevel = level;
+                setState(() {
+                  _data.activityLevel = level;
+                });
+                _nextPage();
+              },
+            ),
+            TimezoneScreen(
+              selectedTimezone: _data.timezone,
+              onBack: _previousPage,
+              onContinue: (tz) {
+                setState(() {
+                  _data.timezone = tz;
+                });
                 _nextPage();
               },
             ),
@@ -102,7 +121,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               daysPerWeek: _data.workoutDays,
               onBack: _previousPage,
               onContinue: (days) {
-                _data.workoutDays = days;
+                setState(() {
+                  _data.workoutDays = days;
+                });
                 _nextPage();
               },
             ),
@@ -110,7 +131,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               diet: _data.dietPreference ?? 'Everything',
               onBack: _previousPage,
               onContinue: (diet) {
-                _data.dietPreference = diet;
+                setState(() {
+                  _data.dietPreference = diet;
+                });
                 _nextPage();
               },
             ),
@@ -119,7 +142,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               targetWeight: _data.targetWeight ?? 0,
               onBack: _previousPage,
               onContinue: (tw) {
-                _data.targetWeight = tw;
+                setState(() {
+                  _data.targetWeight = tw;
+                });
                 _nextPage();
               },
             ),

@@ -42,67 +42,56 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
         child: Column(
           children: [
             StepHeader(
-              currentStep: 7,
-              totalSteps: 7,
+              currentStep: 8,
+              totalSteps: 8,
               onBack: widget.onBack,
             ),
             Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: IntrinsicHeight(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Target Weight', style: AppTextStyles.h1),
-                              const SizedBox(height: 8),
-                              Text(
-                                "What's your goal weight?",
-                                style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-                              ),
-                              const SizedBox(height: 32),
-                              const Text('Current Weight', style: AppTextStyles.labelMedium),
-                              const SizedBox(height: 12),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.inputBorder),
-                                ),
-                                child: Text(
-                                  '${widget.currentWeight} kg',
-                                  style: AppTextStyles.inputText,
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-                              const Text('Target Weight (kg)', style: AppTextStyles.labelMedium),
-                              const SizedBox(height: 12),
-                              AppTextInput(
-                                hint: 'Enter your target weight',
-                                controller: _targetWeightController,
-                              ),
-                              const Spacer(),
-                              const SizedBox(height: 24),
-                              PrimaryGlowButton(
-                                label: 'Continue',
-                                onPressed: () {
-                                  final tw = double.tryParse(_targetWeightController.text) ?? widget.currentWeight;
-                                  widget.onContinue(tw);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Target Weight', style: AppTextStyles.h1),
+                    const SizedBox(height: 8),
+                    Text(
+                      "What's your goal weight?",
+                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text('Current Weight', style: AppTextStyles.labelMedium),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.inputBorder),
+                      ),
+                      child: Text(
+                        '${widget.currentWeight} kg',
+                        style: AppTextStyles.inputText,
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 32),
+                    const Text('Target Weight (kg)', style: AppTextStyles.labelMedium),
+                    const SizedBox(height: 12),
+                    AppTextInput(
+                      hint: 'Enter your target weight',
+                      controller: _targetWeightController,
+                    ),
+                    const SizedBox(height: 64),
+                    PrimaryGlowButton(
+                      label: 'Continue',
+                      onPressed: () {
+                        final tw = double.tryParse(_targetWeightController.text) ?? widget.currentWeight;
+                        widget.onContinue(tw);
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ],

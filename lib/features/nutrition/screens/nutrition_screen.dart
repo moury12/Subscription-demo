@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../controllers/nutrition_controller.dart';
 import 'add_meal_screen.dart';
-import 'ai_food_scan_screen.dart';
+import '../widgets/meal_logging_options.dart';
 
 class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
@@ -61,7 +61,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
             bottom: 110,
             right: 20,
             child: FloatingActionButton(
-              onPressed: () => _showAddOptions(),
+              onPressed: () => MealLoggingOptions.showAddOptions(context),
               backgroundColor: const Color(0xFF2E6FFC),
               elevation: 8,
               child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -70,103 +70,6 @@ class _NutritionScreenState extends State<NutritionScreen> {
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
-    );
-  }
-
-  void _showAddOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF111111),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(50),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Add Meal',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildOptionItem(
-              icon: Icons.edit_note,
-              title: 'Manual Entry',
-              subtitle: 'Log your meal by searching or manually',
-              onTap: () {
-                Navigator.pop(context);
-                _openAddMeal('Dinner');
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildOptionItem(
-              icon: Icons.camera_alt,
-              title: 'AI Scan',
-              subtitle: 'Scan your food for instant nutritional info',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AiFoodScanScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOptionItem({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withAlpha(5)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.accentGreen.withAlpha(20),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: AppColors.accentGreen, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 12)),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Colors.white24),
-          ],
-        ),
-      ),
     );
   }
 
