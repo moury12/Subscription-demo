@@ -4,7 +4,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/buttons/primary_glow_button.dart';
 import '../../../widgets/inputs/app_text_input.dart';
-import '../../main/screens/main_shell_screen.dart';
+import '../../../screens/onboarding/onboarding_flow_screen.dart';
 import 'forgot_password_screen.dart';
 import 'sign_up_screen.dart';
 import '../widgets/auth_header.dart';
@@ -52,7 +52,7 @@ class SignInScreen extends StatelessWidget {
             label: 'Sign In',
             onPressed: () {
               Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const MainShellScreen()));
+                  MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()));
             },
           ),
           const SizedBox(height: AppSpacing.lg),

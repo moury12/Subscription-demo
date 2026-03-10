@@ -21,9 +21,36 @@ abstract final class AppColors {
   static const Color brandPrimary = Color(0xFF2E6FFC);
   static const Color accentBlue = Color(0xFF60A5FA);
   static const Color accentBlueDark = Color(0xFF3B82F6);
-  static const Color accentGreen = Color(0xFF34D399);
+  static const Color accentGreen = Color(0xFF00C853);
+  static const Color accentGreenLight = Color(0xFF00E676);
+  static const Color darkCard = Color(0xFF1A1A1A);
+  static const Color darkBackground = Color(0xFF0A0A0A);
+
+  static const LinearGradient nutritionGreenGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [accentGreen, accentGreenLight],
+  );
+
   static const Color accentPurple = Color(0xFFA78BFA);
+  static const Color workoutPurple = Color(0xFF8B5CF6);
+  static const Color workoutPurpleLight = Color(0xFFA78BFA);
+
+  static const LinearGradient workoutPurpleGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [workoutPurple, workoutPurpleLight],
+  );
+
   static const Color accentOrange = Color(0xFFFB923C);
+  static const Color progressOrange = Color(0xFFFFA726);
+  static const Color progressYellow = Color(0xFFFFB74D);
+
+  static const LinearGradient progressOrangeGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [progressOrange, progressYellow],
+  );
 
   static const LinearGradient headerGradient = LinearGradient(
     begin: Alignment.topCenter,
@@ -35,5 +62,14 @@ abstract final class AppColors {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [accentBlue, accentPurple],
+  );
+
+  static const Color profileBlue = Color(0xFF423BCF);
+  static const Color profileBlueDark = Color(0xFF312BB5);
+
+  static const LinearGradient profileBlueGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [profileBlue, profileBlueDark],
   );
 }

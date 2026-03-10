@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../widgets/workout_plan_card.dart';
+import 'single_workout_screen.dart';
 
 class WorkoutScreen extends StatelessWidget {
   const WorkoutScreen({super.key});
@@ -11,33 +8,326 @@ class WorkoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Workout Schedule', style: AppTextStyles.h1),
-              const SizedBox(height: AppSpacing.xs),
-              Text('Choose your plan and keep consistent', style: AppTextStyles.body.copyWith(color: AppColors.textPrimary90)),
-              const SizedBox(height: AppSpacing.md),
-              Expanded(
-                child: ListView(
-                  children: [
-                    const WorkoutPlanCard(title: 'Beginner Plan', subtitle: 'Exercise 1-3 days/week', icon: Icons.self_improvement),
-                    const SizedBox(height: AppSpacing.sm),
-                    const WorkoutPlanCard(title: 'Intermediate Plan', subtitle: 'Exercise 3-5 days/week', icon: Icons.fitness_center),
-                    const SizedBox(height: AppSpacing.sm),
-                    const WorkoutPlanCard(title: 'Advanced Plan', subtitle: 'Exercise 6-7 days/week', icon: Icons.local_fire_department),
-                    const SizedBox(height: AppSpacing.sm),
-                    const WorkoutPlanCard(title: 'Today\'s Workout', subtitle: 'Exercise 1 of 5', icon: Icons.timer_outlined),
+      backgroundColor: AppColors.darkBackground,
+      body: CustomScrollView(
+        slivers: [
+          _buildWorkoutHeader(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInProgressSection(context),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'This Week',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildWorkoutCard(context, 'Push Up', '35 min • 0/5 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWorkoutHeader(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 250,
+      backgroundColor: Colors.transparent,
+      pinned: true,
+      automaticallyImplyLeading: false,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          children: [
+            // Header Glow
+            Positioned(
+              bottom: 0,
+              left: 40,
+              right: 40,
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.workoutPurple.withOpacity(0.4),
+                      blurRadius: 40,
+                      spreadRadius: 20,
+                    ),
                   ],
                 ),
               ),
-            ],
+            ),
+            Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: AppColors.workoutPurpleGradient,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Workouts',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Your personalized training plan',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildHeaderStat('0', 'Completed'),
+                          _buildHeaderStat('2', 'Total'),
+                          _buildHeaderStat('0%', 'Progress'),
+                        ],
+                      ),
+                      const Spacer(),
+                      _buildDatePicker(),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderStat(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          label,
+          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white30),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20),
+        ),
+        _buildDateItem('3', 'Mon', false),
+        _buildDateItem('4', 'Tue', false),
+        _buildDateItem('5', 'Wed', false),
+        _buildDateItem('6', 'Thu', false),
+        _buildDateItem('7', 'Fri', false),
+        _buildDateItem('8', 'Sat', false),
+      ],
+    );
+  }
+
+  Widget _buildDateItem(String day, String weekday, bool isSelected) {
+    return Column(
+      children: [
+        Text(
+          weekday,
+          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 10),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: isSelected ? BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ) : null,
+          child: Text(
+            day,
+            style: TextStyle(
+              color: isSelected ? AppColors.workoutPurple : Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildInProgressSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFF97316), Color(0xFFFB923C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('🧘', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 8),
+              Text(
+                'Workout in Progress',
+                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Upper Body Strength',
+                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Exercise 1 of 5',
+                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Colors.white24,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SingleWorkoutScreen(workoutName: 'Upper Body Strength')),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.orange,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text('Resume Workout', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWorkoutCard(BuildContext context, String title, String subtitle, String day) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  day,
+                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.access_time, color: Colors.white.withOpacity(0.5), size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => SingleWorkoutScreen(workoutName: title)),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                color: Color(0xFF8B5CF6),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+            ),
+          ),
+        ],
       ),
     );
   }

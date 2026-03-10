@@ -37,12 +37,21 @@ class HomeBottomNav extends StatelessWidget {
                 icon: items[i].icon,
                 label: items[i].label,
                 selected: i == selectedIndex,
+                accentColor: _getIndicatorColor(i),
                 onTap: () => onTap(i),
               ),
             ),
         ],
       ),
     );
+  }
+
+  Color _getIndicatorColor(int index) {
+    switch (index) {
+      case 2: return AppColors.accentGreen;
+      case 3: return AppColors.progressOrange;
+      default: return AppColors.accentBlue;
+    }
   }
 }
 
@@ -51,12 +60,14 @@ class _NavItem extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.selected,
+    required this.accentColor,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
   final bool selected;
+  final Color accentColor;
   final VoidCallback onTap;
 
   @override
@@ -76,11 +87,11 @@ class _NavItem extends StatelessWidget {
                 child: Container(
                   width: 48,
                   height: 4,
-                  decoration: const BoxDecoration(
-                    color: AppColors.accentBlue,
+                  decoration: BoxDecoration(
+                    color: accentColor,
                     boxShadow: [
-                      BoxShadow(color: Color.fromRGBO(96, 165, 250, 0.5), blurRadius: 32),
-                      BoxShadow(color: Color.fromRGBO(96, 165, 250, 1), blurRadius: 16),
+                      BoxShadow(color: accentColor.withOpacity(0.5), blurRadius: 32),
+                      BoxShadow(color: accentColor.withOpacity(1), blurRadius: 16),
                     ],
                   ),
                 ),
@@ -88,10 +99,10 @@ class _NavItem extends StatelessWidget {
             if (selected)
               Positioned.fill(
                 child: DecoratedBox(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      colors: [Color.fromRGBO(96, 165, 250, 0.08), Color.fromRGBO(0, 0, 0, 0)],
-                      stops: [0, 0.7],
+                      colors: [accentColor.withOpacity(0.08), Color.fromRGBO(0, 0, 0, 0)],
+                      stops: const [0, 0.7],
                     ),
                   ),
                 ),

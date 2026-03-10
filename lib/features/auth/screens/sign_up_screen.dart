@@ -7,6 +7,7 @@ import '../../../widgets/buttons/primary_glow_button.dart';
 import '../../../widgets/inputs/app_text_input.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_scaffold.dart';
+import '../../../screens/onboarding/onboarding_flow_screen.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -52,7 +53,10 @@ class SignUpScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             PrimaryGlowButton(
-                label: 'Sign Up', onPressed: () => Navigator.of(context).pop()),
+                label: 'Sign Up',
+                onPressed: () => Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()),
+                    )),
             const SizedBox(height: AppSpacing.md),
             // Terms text
             Padding(
