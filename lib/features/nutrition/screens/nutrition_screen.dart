@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/app_settings.dart';
 import '../controllers/nutrition_controller.dart';
 import 'add_meal_screen.dart';
 import '../widgets/meal_logging_options.dart';
@@ -164,8 +165,10 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   Widget _buildCalorieCard() {
     final total = _controller.totalCalories.toInt();
-    final progress = (total / 2000).clamp(0.0, 1.0);
+    final target = AppSettings().targetCalories;
+    final progress = (total / target).clamp(0.0, 1.0);
     final percent = (progress * 100).toInt();
+    final remaining = target - total;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -202,9 +205,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '0 cal remaining',
-                    style: TextStyle(color: Colors.white38, fontSize: 14),
+                   Text(
+                    '${remaining.clamp(0, target)} cal remaining',
+                    style: const TextStyle(color: Colors.white38, fontSize: 14),
                   ),
                 ],
               ),

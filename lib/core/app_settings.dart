@@ -15,4 +15,5 @@ class AppSettings {
   double? targetWeight;
   String? timezone;
   String weekStartDay = 'Monday';
+  int targetCalories = 2000;
 }
