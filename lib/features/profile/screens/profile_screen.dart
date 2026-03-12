@@ -9,35 +9,47 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _pushNotifications = true;
-  bool _workoutReminders = true;
-  bool _mealReminders = false;
+  int? _expandedIndex;
+  bool _isEditingWeight = false;
+  
+  // Controllers
+  final TextEditingController _nameController = TextEditingController(text: 'masum');
+  final TextEditingController _ageController = TextEditingController(text: '25');
+  final TextEditingController _heightController = TextEditingController(text: '175');
+  final TextEditingController _targetWeightController = TextEditingController(text: '75');
+  final TextEditingController _currentWeightController = TextEditingController(text: '52.2');
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _targetWeightController.dispose();
+    _currentWeightController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: Colors.black,
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildProfileHeader(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Profile Information'),
-                  _buildProfileInfoCard(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Update Weight'),
-                  _buildUpdateWeightCard(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Notifications'),
-                  _buildNotificationsCard(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Settings'),
-                  _buildSettingsCard(),
+                  _buildWeightCard(),
+                  const SizedBox(height: 16),
+                  _buildPersonalInformationSection(),
+                  const SizedBox(height: 16),
+                  _buildFitnessGoalsSection(),
+                  const SizedBox(height: 16),
+                  _buildNotificationsSection(),
+                  const SizedBox(height: 16),
+                  _buildPrivacySecuritySection(),
                   const SizedBox(height: 32),
                   _buildLogOutButton(),
                   const SizedBox(height: 100),
@@ -138,175 +150,325 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatDivider() {
-    return Container(
-      width: 1,
-      height: 20,
-      color: Colors.white10,
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileInfoCard() {
+  Widget _buildWeightCard() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161616),
+        color: const Color(0xFF0D0D0D),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.scale_outlined, color: Colors.blueAccent, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'CURRENT WEIGHT',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const Text(
+                      '52 kg',
+                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () => setState(() => _isEditingWeight = !_isEditingWeight),
+                child: Text(
+                  _isEditingWeight ? 'Cancel' : 'Update',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_isEditingWeight) ...[
+            const SizedBox(height: 24),
+            Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              alignment: Alignment.center,
+              child: TextField(
+                controller: _currentWeightController,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() => _isEditingWeight = false);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Text('Save New Weight', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCollapsibleCard({
+    required int index,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Widget child,
+  }) {
+    final bool isExpanded = _expandedIndex == index;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D0D0D),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expandedIndex = isExpanded ? null : index),
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: Colors.white.withOpacity(0.4), size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.3),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    color: Colors.white.withOpacity(0.6),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              child: child,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonalInformationSection() {
+    return _buildCollapsibleCard(
+      index: 0,
+      icon: Icons.person_outline,
+      title: 'Personal Information',
+      subtitle: _nameController.text.toUpperCase(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 16),
+          _buildInputLabel('FULL NAME'),
+          _buildTextField(_nameController),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Name', style: TextStyle(color: Colors.white70, fontSize: 14)),
-              const Icon(Icons.edit_square, color: Colors.blueAccent, size: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInputLabel('AGE'),
+                    _buildTextField(_ageController),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInputLabel('HEIGHT (CM)'),
+                    _buildTextField(_heightController),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          const Text('Email', style: TextStyle(color: Colors.white70, fontSize: 14)),
-          const SizedBox(height: 16),
-          const Text('Fitness Goal', style: TextStyle(color: Colors.white70, fontSize: 14)),
-          const SizedBox(height: 16),
-          const Text('Target Weight', style: TextStyle(color: Colors.white70, fontSize: 14)),
-          const Text('kg', style: TextStyle(color: Colors.white70, fontSize: 14)),
+          const SizedBox(height: 24),
+          _buildDoneButton(),
         ],
       ),
     );
   }
 
-  Widget _buildUpdateWeightCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF161616),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.scale_outlined, color: Colors.black, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Log Weight', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                Text('Current: kg', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.white38),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationsCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF161616),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
+  Widget _buildFitnessGoalsSection() {
+    return _buildCollapsibleCard(
+      index: 1,
+      icon: Icons.settings_outlined,
+      title: 'Fitness Goals',
+      subtitle: 'LOSE WEIGHT',
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSwitchRow('Push Notifications', _pushNotifications, (v) => setState(() => _pushNotifications = v), showInfo: true),
+          const Divider(color: Colors.white10),
           const SizedBox(height: 16),
-          _buildSwitchRow('Workout Reminders', _workoutReminders, (v) => setState(() => _workoutReminders = v)),
+          _buildInputLabel('PRIMARY GOAL'),
+          _buildTextField(TextEditingController(text: 'Lose Weight')),
           const SizedBox(height: 16),
-          _buildSwitchRow('Meal Reminders', _mealReminders, (v) => setState(() => _mealReminders = v)),
+          _buildInputLabel('TARGET WEIGHT (KG)'),
+          _buildTextField(_targetWeightController),
+          const SizedBox(height: 24),
+          _buildDoneButton(),
         ],
       ),
     );
   }
 
-  Widget _buildSwitchRow(String title, bool value, ValueChanged<bool> onChanged, {bool showInfo = false}) {
-    return Row(
-      children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
-        if (showInfo) ...[
-          const SizedBox(width: 8),
-          const Icon(Icons.info_outline, color: Colors.white38, size: 16),
-        ],
-        const Spacer(),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeColor: Colors.white,
-          activeTrackColor: Colors.blueAccent,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSettingsCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF161616),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
+  Widget _buildNotificationsSection() {
+    return _buildCollapsibleCard(
+      index: 2,
+      icon: Icons.notifications_none,
+      title: 'Notifications',
+      subtitle: 'DISABLED',
+      child: const Column(
         children: [
-          _buildSettingsRow(Icons.lock_outline, 'Privacy & Security', showInfo: true),
-          const Divider(color: Colors.white10, height: 1),
-          _buildSettingsRow(Icons.settings_outlined, 'App Settings'),
-          const Divider(color: Colors.white10, height: 1),
-          _buildSettingsRow(Icons.help_outline, 'Help & Support'),
+          Divider(color: Colors.white10),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text('Notification settings will appear here', style: TextStyle(color: Colors.white38)),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsRow(IconData icon, String title, {bool showInfo = false}) {
+  Widget _buildPrivacySecuritySection() {
+    return _buildCollapsibleCard(
+      index: 3,
+      icon: Icons.security,
+      title: 'Privacy & Security',
+      subtitle: 'BLOCKCHAIN PROTECTED',
+      child: const Column(
+        children: [
+          Divider(color: Colors.white10),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text('Security settings will appear here', style: TextStyle(color: Colors.white38)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white70, size: 22),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Row(
-              children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                if (showInfo) ...[
-                  const SizedBox(width: 8),
-                  const Icon(Icons.info_outline, color: Colors.white38, size: 16),
-                ],
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.white38),
-        ],
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.3),
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
 
+  Widget _buildTextField(TextEditingController controller) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: TextField(
+        controller: controller,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoneButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: () => setState(() => _expandedIndex = null),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF161616),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 0,
+        ),
+        child: const Text('Done', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
   Widget _buildLogOutButton() {
     return Container(
       width: double.infinity,
@@ -320,9 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            // Log out logic
-          },
+          onTap: () {},
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -336,6 +496,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildStatDivider() {
+    return Container(
+      width: 1,
+      height: 20,
+      color: Colors.white10,
     );
   }
 }

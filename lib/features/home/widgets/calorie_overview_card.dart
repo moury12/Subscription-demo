@@ -36,7 +36,7 @@ class CalorieOverviewCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Daily Calories', style: AppTextStyles.h3),
+                      Text('Daily Logs', style: AppTextStyles.h3),
                       const SizedBox(height: AppSpacing.xxs),
                       Text('$consumed/', style: AppTextStyles.valueLarge),
                       const SizedBox(height: AppSpacing.xxs),
@@ -79,11 +79,11 @@ class CalorieOverviewCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           PrimaryGlowButton(
-            label: 'Add Meal',
+            label: 'Log Activity',
             height: 56,
             onPressed: () => MealLoggingOptions.showAddOptions(context),
           ),
-          const SizedBox(height: 1),
+          const SizedBox(height: 10),
         ],
       ),
     );
