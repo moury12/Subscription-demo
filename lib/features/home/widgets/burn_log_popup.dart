@@ -73,16 +73,25 @@ class _BurnLogPopupState extends State<BurnLogPopup>
   }
 
   Future<void> _initSpeech() async {
-    _speechAvailable = await _speech.initialize(
-      onStatus: (status) {
-        if (mounted && (status == 'done' || status == 'notListening')) {
+    try {
+      _speechAvailable = await _speech.initialize(
+        onStatus: (status) {
+          if (!mounted) return;
+          // 'done' & 'notListening' both signal the end of a listening session
+          if (status == stt.SpeechToText.doneStatus ||
+              status == stt.SpeechToText.notListeningStatus) {
+            setState(() => _isListening = false);
+          }
+        },
+        onError: (error) {
+          if (!mounted) return;
           setState(() => _isListening = false);
-        }
-      },
-      onError: (error) {
-        if (mounted) setState(() => _isListening = false);
-      },
-    );
+        },
+        debugLogging: false,
+      );
+    } catch (_) {
+      _speechAvailable = false;
+    }
     if (mounted) setState(() {});
   }
 

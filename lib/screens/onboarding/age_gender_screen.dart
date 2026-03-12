@@ -49,7 +49,7 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
               onSkip: () => widget.onContinue(25, 'Male'), // Default skip values
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

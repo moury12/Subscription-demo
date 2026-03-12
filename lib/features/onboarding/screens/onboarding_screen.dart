@@ -83,7 +83,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // Main content - centered
           Center(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,

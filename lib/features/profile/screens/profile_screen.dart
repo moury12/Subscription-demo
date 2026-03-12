@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
+      body: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             _buildProfileHeader(),
@@ -688,6 +688,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: TextField(
         controller: controller,
         style: const TextStyle(color: Colors.white, fontSize: 16),
+        textInputAction: TextInputAction.done,
+        onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
+        onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         decoration: const InputDecoration(
           border: InputBorder.none,
         ),

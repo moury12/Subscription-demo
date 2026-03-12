@@ -45,7 +45,7 @@ class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [

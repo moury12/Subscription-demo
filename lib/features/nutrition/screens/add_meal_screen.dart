@@ -52,7 +52,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
         children: [
           _buildMealTypeSelector(),
           Expanded(
-            child: SingleChildScrollView(
+            child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,6 +128,9 @@ class _AddMealScreenState extends State<AddMealScreen> {
       child: TextField(
         controller: _searchController,
         style: const TextStyle(color: Colors.white),
+        textInputAction: TextInputAction.done,
+        onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
+        onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         decoration: InputDecoration(
           icon: const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
           hintText: 'Search for food...',

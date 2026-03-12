@@ -78,7 +78,7 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,6 +93,9 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
                     TextField(
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white),
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
+                      onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                       decoration: InputDecoration(
                         hintText: 'Search timezones...',
                         hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),

@@ -12,6 +12,9 @@ class AppTextInput extends StatelessWidget {
     this.prefixIcon,
     this.svgIcon,
     this.obscureText = false,
+    this.textInputAction,
+    this.onSubmitted,
+    this.keyboardType,
     super.key,
   });
 
@@ -20,6 +23,9 @@ class AppTextInput extends StatelessWidget {
   final Widget? prefixIcon;
   final String? svgIcon;
   final bool obscureText;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +72,13 @@ class AppTextInput extends StatelessWidget {
               controller: controller,
               obscureText: obscureText,
               style: AppTextStyles.inputText,
+              textInputAction: textInputAction ?? TextInputAction.done,
+              keyboardType: keyboardType,
+              onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
+              onSubmitted: (value) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                if (onSubmitted != null) onSubmitted!(value);
+              },
               decoration: InputDecoration(
                 isDense: true,
                 hintText: hint,

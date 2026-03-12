@@ -48,7 +48,7 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(
+              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
