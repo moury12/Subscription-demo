@@ -9,6 +9,7 @@ class OnboardingData {
   String? dietPreference;
   double? targetWeight;
   String? timezone;
+  String weekStartDay = 'Monday';
 
   Map<String, dynamic> toJson() {
     return {
@@ -22,6 +23,7 @@ class OnboardingData {
       'dietPreference': dietPreference,
       'targetWeight': targetWeight,
       'timezone': timezone,
+      'weekStartDay': weekStartDay,
     };
   }
 }

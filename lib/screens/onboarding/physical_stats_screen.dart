@@ -44,7 +44,7 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
           children: [
             StepHeader(
               currentStep: 2,
-              totalSteps: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

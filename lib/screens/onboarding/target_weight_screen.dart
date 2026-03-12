@@ -42,8 +42,8 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
         child: Column(
           children: [
             StepHeader(
-              currentStep: 8,
-              totalSteps: 8,
+              currentStep: 9,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

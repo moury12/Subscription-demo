@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../features/onboarding/models/onboarding_data.dart';
 import '../../features/main/screens/main_shell_screen.dart';
+import '../../core/app_settings.dart';
 import 'welcome_screen.dart';
 import 'age_gender_screen.dart';
 import 'physical_stats_screen.dart';
@@ -9,6 +10,7 @@ import 'activity_level_screen.dart';
 import 'workout_schedule_screen.dart';
 import 'diet_preference_screen.dart';
 import 'timezone_screen.dart';
+import 'week_starts_screen.dart';
 import 'target_weight_screen.dart';
 import 'review_profile_screen.dart';
 import 'creating_plan_screen.dart';
@@ -39,6 +41,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
   }
 
   void _finish() {
+    // Save preferences
+    AppSettings().weekStartDay = _data.weekStartDay;
+    
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainShellScreen()),
     );
@@ -113,6 +118,16 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               onContinue: (tz) {
                 setState(() {
                   _data.timezone = tz;
+                });
+                _nextPage();
+              },
+            ),
+            WeekStartsScreen(
+              selectedDay: _data.weekStartDay,
+              onBack: _previousPage,
+              onContinue: (day) {
+                setState(() {
+                  _data.weekStartDay = day;
                 });
                 _nextPage();
               },

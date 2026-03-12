@@ -64,6 +64,8 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildSummaryCard('Timezone', '${data.timezone}'),
                     const SizedBox(height: 16),
+                    _buildSummaryCard('Week Starts', '${data.weekStartDay}'),
+                    const SizedBox(height: 16),
                     _buildSummaryCard('Workout Schedule', '${data.workoutDays} days per week'),
                     const SizedBox(height: 16),
                     _buildSummaryCard('Dietary Preference', '${data.dietPreference}'),

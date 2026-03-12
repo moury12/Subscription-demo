@@ -37,8 +37,8 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
         child: Column(
           children: [
             StepHeader(
-              currentStep: 6,
-              totalSteps: 8,
+              currentStep: 7,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

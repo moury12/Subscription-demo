@@ -62,7 +62,7 @@ class _GoalScreenState extends State<GoalScreen> {
           children: [
             StepHeader(
               currentStep: 3,
-              totalSteps: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

@@ -47,8 +47,8 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
         child: Column(
           children: [
             StepHeader(
-              currentStep: 7,
-              totalSteps: 8,
+              currentStep: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

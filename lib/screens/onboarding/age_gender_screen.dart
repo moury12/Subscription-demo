@@ -43,7 +43,7 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
           children: [
             StepHeader(
               currentStep: 1,
-              totalSteps: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
               showSkip: true,
               onSkip: () => widget.onContinue(25, 'Male'), // Default skip values

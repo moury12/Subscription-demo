@@ -62,7 +62,7 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
           children: [
             StepHeader(
               currentStep: 4,
-              totalSteps: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(

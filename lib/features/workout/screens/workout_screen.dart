@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/app_settings.dart';
 import 'single_workout_screen.dart';
 
 class WorkoutScreen extends StatelessWidget {
@@ -7,6 +9,17 @@ class WorkoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final weekStartDay = AppSettings().weekStartDay;
+    final now = DateTime.now();
+    final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    int currentWeekday = now.weekday; // 1 = Mon, 7 = Sun
+    int targetWeekdayIndex = daysOfWeek.indexOf(weekStartDay) + 1;
+
+    int daysToBack = (currentWeekday - targetWeekdayIndex) % 7;
+    if (daysToBack < 0) daysToBack += 7;
+
+    DateTime weekStart = now.subtract(Duration(days: daysToBack));
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: CustomScrollView(
@@ -29,13 +42,17 @@ class WorkoutScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildWorkoutCard(context, 'Push Up', '35 min • 0/5 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
-                  _buildWorkoutCard(context, 'Rest Day', '0 0/0 completed', 'Sunday'),
+                  ...List.generate(7, (index) {
+                    final date = weekStart.add(Duration(days: index));
+                    final dayName = DateFormat('EEEE').format(date);
+                    final isRestDay = index > 0; // Simple dummy logic: first day is workout, others rest
+                    return _buildWorkoutCard(
+                      context,
+                      isRestDay ? 'Rest Day' : 'Push Up',
+                      isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
+                      dayName,
+                    );
+                  }),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -167,41 +184,61 @@ class WorkoutScreen extends StatelessWidget {
   }
 
   Widget _buildDatePicker() {
+    final weekStartDay = AppSettings().weekStartDay;
+    final now = DateTime.now();
+
+    final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    int currentWeekday = now.weekday; // 1 = Mon, 7 = Sun
+    int targetWeekdayIndex = daysOfWeek.indexOf(weekStartDay) + 1;
+
+    int daysToBack = (currentWeekday - targetWeekdayIndex) % 7;
+    if (daysToBack < 0) daysToBack += 7;
+
+    DateTime weekStart = now.subtract(Duration(days: daysToBack));
+
+    List<Widget> dateItems = [];
+    for (int i = 0; i < 7; i++) {
+      DateTime date = weekStart.add(Duration(days: i));
+      bool isToday = date.day == now.day && date.month == now.month && date.year == now.year;
+      String dayName = DateFormat('E').format(date);
+
+      if (isToday) {
+        dateItems.add(
+          Column(
+            children: [
+              Text(
+                dayName,
+                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white54,
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.calendar_today_outlined, color: AppColors.workoutPurple, size: 20),
+              ),
+            ],
+          ),
+        );
+      } else {
+        dateItems.add(_buildDateItem(date.day.toString(), dayName, false));
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          children: [
-            Text(
-              'Mon',
-              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white54,
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.calendar_today_outlined, color: AppColors.workoutPurple, size: 20),
-            ),
-          ],
-        ),
-        _buildDateItem('3', 'Tue', false),
-        _buildDateItem('4', 'Wed', false),
-        _buildDateItem('5', 'Thu', false),
-        _buildDateItem('6', 'Fri', false),
-        _buildDateItem('7', 'Sat', false),
-        _buildDateItem('8', 'Sun', false),
-      ],
+      children: dateItems,
     );
   }
 

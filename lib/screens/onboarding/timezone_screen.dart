@@ -74,7 +74,7 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
           children: [
             StepHeader(
               currentStep: 5,
-              totalSteps: 8,
+              totalSteps: 9,
               onBack: widget.onBack,
             ),
             Expanded(
