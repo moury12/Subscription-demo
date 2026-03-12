@@ -7,6 +7,8 @@ import '../../profile/screens/profile_screen.dart';
 import '../../progress/screens/progress_screen.dart';
 import '../../workout/screens/workout_screen.dart';
 
+import '../controllers/navigation_controller.dart';
+
 class MainShellScreen extends StatefulWidget {
   const MainShellScreen({super.key});
 
@@ -15,7 +17,23 @@ class MainShellScreen extends StatefulWidget {
 }
 
 class _MainShellScreenState extends State<MainShellScreen> {
-  int _index = 0;
+  final NavigationController _navController = NavigationController();
+
+  @override
+  void initState() {
+    super.initState();
+    _navController.addListener(_updateIndex);
+  }
+
+  @override
+  void dispose() {
+    _navController.removeListener(_updateIndex);
+    super.dispose();
+  }
+
+  void _updateIndex() {
+    if (mounted) setState(() {});
+  }
 
   static const List<Widget> _screens = [
     HomeScreen(),
@@ -31,13 +49,13 @@ class _MainShellScreenState extends State<MainShellScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: IndexedStack(index: _index, children: _screens),
+            child: IndexedStack(index: _navController.currentIndex, children: _screens),
           ),
           Align(
             alignment: Alignment.bottomCenter,
             child: HomeBottomNav(
-              selectedIndex: _index,
-              onTap: (value) => setState(() => _index = value),
+              selectedIndex: _navController.currentIndex,
+              onTap: (value) => _navController.setIndex(value),
             ),
           ),
         ],

@@ -5,7 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/buttons/primary_glow_button.dart';
 import '../../../widgets/cards/app_surface_card.dart';
-import '../../nutrition/widgets/meal_logging_options.dart';
+import 'log_activity_options.dart';
 
 class CalorieOverviewCard extends StatelessWidget {
   const CalorieOverviewCard({
@@ -81,7 +81,7 @@ class CalorieOverviewCard extends StatelessWidget {
           PrimaryGlowButton(
             label: 'Log Activity',
             height: 56,
-            onPressed: () => MealLoggingOptions.showAddOptions(context),
+            onPressed: () => LogActivityOptions.show(context),
           ),
           const SizedBox(height: 10),
         ],
