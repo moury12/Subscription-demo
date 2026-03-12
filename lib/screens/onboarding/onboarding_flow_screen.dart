@@ -42,7 +42,18 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
 
   void _finish() {
     // Save preferences
-    AppSettings().weekStartDay = _data.weekStartDay;
+    final settings = AppSettings();
+    settings.age = _data.age;
+    settings.gender = _data.gender;
+    settings.height = _data.height;
+    settings.currentWeight = _data.currentWeight;
+    settings.goal = _data.goal;
+    settings.activityLevel = _data.activityLevel;
+    settings.workoutDays = _data.workoutDays;
+    settings.dietPreference = _data.dietPreference;
+    settings.targetWeight = _data.targetWeight;
+    settings.timezone = _data.timezone;
+    settings.weekStartDay = _data.weekStartDay;
     
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainShellScreen()),

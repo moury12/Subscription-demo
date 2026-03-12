@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/app_settings.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,13 +12,25 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int? _expandedIndex;
   bool _isEditingWeight = false;
+  late final AppSettings _settings;
   
   // Controllers
-  final TextEditingController _nameController = TextEditingController(text: 'masum');
-  final TextEditingController _ageController = TextEditingController(text: '25');
-  final TextEditingController _heightController = TextEditingController(text: '175');
-  final TextEditingController _targetWeightController = TextEditingController(text: '75');
-  final TextEditingController _currentWeightController = TextEditingController(text: '52.2');
+  late final TextEditingController _nameController;
+  late final TextEditingController _ageController;
+  late final TextEditingController _heightController;
+  late final TextEditingController _targetWeightController;
+  late final TextEditingController _currentWeightController;
+
+  @override
+  void initState() {
+    super.initState();
+    _settings = AppSettings();
+    _nameController = TextEditingController(text: _settings.userName ?? '');
+    _ageController = TextEditingController(text: _settings.age?.toString() ?? '');
+    _heightController = TextEditingController(text: _settings.height?.toString() ?? '');
+    _targetWeightController = TextEditingController(text: _settings.targetWeight?.toString() ?? '');
+    _currentWeightController = TextEditingController(text: _settings.currentWeight?.toString() ?? '');
+  }
 
   @override
   void dispose() {
@@ -38,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             _buildProfileHeader(),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: const EdgeInsets.fromLTRB(20, 35, 20, 24),
               child: Column(
                 children: [
                   _buildWeightCard(),
@@ -91,9 +104,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 48),
                   ),
                   const SizedBox(width: 20),
-                  const Text(
-                    'Nur Hasan Masum',
-                    style: TextStyle(
+                  Text(
+                    _settings.userName ?? 'User',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -118,11 +131,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildQuickStat('75', 'kg'),
+                _buildQuickStat('${_settings.currentWeight ?? 0}', 'kg'),
                 _buildStatDivider(),
-                _buildQuickStat('125', 'cm'),
+                _buildQuickStat('${_settings.height ?? 0}', 'cm'),
                 _buildStatDivider(),
-                _buildQuickStat('23', 'years'),
+                _buildQuickStat('${_settings.age ?? 0}', 'years'),
               ],
             ),
           ),
@@ -176,24 +189,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'CURRENT WEIGHT',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                      Text(
+                        'CURRENT WEIGHT',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
-                    const Text(
-                      '52 kg',
-                      style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
+                      Text(
+                        '${_settings.currentWeight ?? 0} kg',
+                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
                   ],
                 ),
               ),
               TextButton(
-                onPressed: () => setState(() => _isEditingWeight = !_isEditingWeight),
+                onPressed: () {
+                  if (_isEditingWeight) {
+                    // Update settings when saving
+                    setState(() {
+                      _settings.currentWeight = double.tryParse(_currentWeightController.text) ?? _settings.currentWeight;
+                      _isEditingWeight = false;
+                    });
+                  } else {
+                    setState(() => _isEditingWeight = true);
+                  }
+                },
                 child: Text(
                   _isEditingWeight ? 'Cancel' : 'Update',
                   style: TextStyle(
@@ -230,7 +253,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  setState(() => _isEditingWeight = false);
+                  setState(() {
+                    _settings.currentWeight = double.tryParse(_currentWeightController.text) ?? _settings.currentWeight;
+                    _isEditingWeight = false;
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -355,7 +381,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          _buildDoneButton(),
+          _buildDoneButton(onPressed: () {
+            setState(() {
+              _settings.userName = _nameController.text;
+              _settings.age = int.tryParse(_ageController.text) ?? _settings.age;
+              _settings.height = double.tryParse(_heightController.text) ?? _settings.height;
+              _expandedIndex = null;
+            });
+          }),
         ],
       ),
     );
@@ -366,19 +399,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       index: 1,
       icon: Icons.settings_outlined,
       title: 'Fitness Goals',
-      subtitle: 'LOSE WEIGHT',
+      subtitle: (_settings.goal ?? 'LOSE WEIGHT').toUpperCase(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 16),
           _buildInputLabel('PRIMARY GOAL'),
-          _buildTextField(TextEditingController(text: 'Lose Weight')),
+          _buildTextField(TextEditingController(text: _settings.goal ?? 'Lose Weight')),
           const SizedBox(height: 16),
           _buildInputLabel('TARGET WEIGHT (KG)'),
           _buildTextField(_targetWeightController),
           const SizedBox(height: 24),
-          _buildDoneButton(),
+          _buildDoneButton(onPressed: () {
+            setState(() {
+              _settings.targetWeight = double.tryParse(_targetWeightController.text) ?? _settings.targetWeight;
+              _expandedIndex = null;
+            });
+          }),
         ],
       ),
     );
@@ -453,12 +491,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildDoneButton() {
+  Widget _buildDoneButton({VoidCallback? onPressed}) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () => setState(() => _expandedIndex = null),
+        onPressed: onPressed ?? () => setState(() => _expandedIndex = null),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF161616),
           foregroundColor: Colors.white,
