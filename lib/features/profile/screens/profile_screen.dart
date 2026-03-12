@@ -13,6 +13,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int? _expandedIndex;
   bool _isEditingWeight = false;
   late final AppSettings _settings;
+
+  // Notification toggles
+  bool _pushNotifications = true;
+  bool _drinkWaterNotification = false;
+  bool _mealLogNotification = false;
+  bool _workoutNotification = false;
   
   // Controllers
   late final TextEditingController _nameController;
@@ -395,19 +401,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildFitnessGoalsSection() {
+    final goals = [
+      {'title': 'Lose Weight',       'icon': Icons.trending_down, 'color': const Color(0xFFFC5C7D)},
+      {'title': 'Gain Muscle',       'icon': Icons.trending_up,   'color': const Color(0xFF34D399)},
+      {'title': 'Maintain Weight',   'icon': Icons.sync,          'color': const Color(0xFF60A5FA)},
+      {'title': 'Improve Endurance', 'icon': Icons.bolt,          'color': const Color(0xFFA78BFA)},
+    ];
+
+    final selectedGoal = _settings.goal ?? 'Lose Weight';
+
     return _buildCollapsibleCard(
       index: 1,
       icon: Icons.settings_outlined,
       title: 'Fitness Goals',
-      subtitle: (_settings.goal ?? 'LOSE WEIGHT').toUpperCase(),
+      subtitle: selectedGoal.toUpperCase(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 16),
           _buildInputLabel('PRIMARY GOAL'),
-          _buildTextField(TextEditingController(text: _settings.goal ?? 'Lose Weight')),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          // Goal selector cards
+          ...goals.map((goal) {
+            final isSelected = selectedGoal == goal['title'];
+            final color = goal['color'] as Color;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: GestureDetector(
+                onTap: () => setState(() => _settings.goal = goal['title'] as String),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? color.withOpacity(0.08)
+                        : Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? color.withOpacity(0.5) : Colors.white.withOpacity(0.05),
+                      width: 1.5,
+                    ),
+                    boxShadow: isSelected
+                        ? [BoxShadow(color: color.withOpacity(0.15), blurRadius: 12, spreadRadius: 1)]
+                        : [],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        goal['icon'] as IconData,
+                        color: isSelected ? color : Colors.white38,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 14),
+                      Text(
+                        goal['title'] as String,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white60,
+                          fontSize: 15,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
+                        ),
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        opacity: isSelected ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 8),
           _buildInputLabel('TARGET WEIGHT (KG)'),
           _buildTextField(_targetWeightController),
           const SizedBox(height: 24),
@@ -423,17 +497,147 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildNotificationsSection() {
+    // subtitle reflects overall state
+    final anyEnabled = _pushNotifications || _drinkWaterNotification ||
+        _mealLogNotification || _workoutNotification;
     return _buildCollapsibleCard(
       index: 2,
       icon: Icons.notifications_none,
       title: 'Notifications',
-      subtitle: 'DISABLED',
-      child: const Column(
+      subtitle: anyEnabled ? 'ENABLED' : 'DISABLED',
+      child: Column(
         children: [
-          Divider(color: Colors.white10),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('Notification settings will appear here', style: TextStyle(color: Colors.white38)),
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 8),
+          _buildNotificationToggle(
+            title: 'Push Notifications',
+            subtitle: 'Reminders for workouts and meals',
+            icon: Icons.notifications_active_outlined,
+            iconColor: const Color(0xFF60A5FA),
+            value: _pushNotifications,
+            onChanged: (v) => setState(() {
+              _pushNotifications = v;
+              // If master is turned off, turn all sub-options off too
+              if (!v) {
+                _drinkWaterNotification = false;
+                _mealLogNotification = false;
+                _workoutNotification = false;
+              }
+            }),
+            isMain: true,
+          ),
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 300),
+            crossFadeState: _pushNotifications
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            firstChild: Column(
+              children: [
+                const SizedBox(height: 4),
+                _buildNotificationToggle(
+                  title: 'Drink Water',
+                  subtitle: 'Hydration reminders throughout the day',
+                  icon: Icons.water_drop_outlined,
+                  iconColor: const Color(0xFF34D399),
+                  value: _drinkWaterNotification,
+                  onChanged: (v) => setState(() => _drinkWaterNotification = v),
+                ),
+                _buildNotificationToggle(
+                  title: 'Meal Log',
+                  subtitle: 'Remind me to log my meals',
+                  icon: Icons.restaurant_outlined,
+                  iconColor: const Color(0xFFFBBF24),
+                  value: _mealLogNotification,
+                  onChanged: (v) => setState(() => _mealLogNotification = v),
+                ),
+                _buildNotificationToggle(
+                  title: 'Workout',
+                  subtitle: 'Daily workout schedule reminders',
+                  icon: Icons.fitness_center_outlined,
+                  iconColor: const Color(0xFFFB923C),
+                  value: _workoutNotification,
+                  onChanged: (v) => setState(() => _workoutNotification = v),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+            secondChild: const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationToggle({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    bool isMain = false,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(
+        top: 8,
+        left: isMain ? 0 : 8,
+        right: isMain ? 0 : 8,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: isMain
+            ? Colors.white.withOpacity(0.04)
+            : Colors.white.withOpacity(0.02),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: value
+              ? iconColor.withOpacity(0.2)
+              : Colors.white.withOpacity(0.04),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 18),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isMain ? 15 : 14,
+                    fontWeight:
+                        isMain ? FontWeight.bold : FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.35),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: Colors.white,
+            activeTrackColor: iconColor,
+            inactiveTrackColor: Colors.white.withOpacity(0.08),
+            inactiveThumbColor: Colors.white38,
+            trackOutlineColor:
+                WidgetStateProperty.all(Colors.transparent),
           ),
         ],
       ),
@@ -445,7 +649,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       index: 3,
       icon: Icons.security,
       title: 'Privacy & Security',
-      subtitle: 'BLOCKCHAIN PROTECTED',
+      subtitle: 'PROTECTED WITH SSL ENCRYPTION',
       child: const Column(
         children: [
           Divider(color: Colors.white10),

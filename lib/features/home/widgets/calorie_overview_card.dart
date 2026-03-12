@@ -79,7 +79,7 @@ class CalorieOverviewCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           PrimaryGlowButton(
-            label: 'Log Activity',
+            label: '+ Log Activity',
             height: 56,
             onPressed: () => LogActivityOptions.show(context),
           ),
