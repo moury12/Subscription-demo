@@ -88,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
             color: AppColors.surfaceRaised,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.brandPrimary, size: 24),
+          child: Icon(icon, color: AppColors.textPrimary, size: 24),
         ),
         const SizedBox(width: 16),
         Expanded(
