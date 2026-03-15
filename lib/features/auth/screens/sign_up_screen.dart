@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_colors.dart';
@@ -60,11 +62,34 @@ class SignUpScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             // Terms text
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                'By signing up, you agree to our Terms and Privacy Policy',
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: RichText(
                 textAlign: TextAlign.center,
-                style: AppTextStyles.label.copyWith(color: AppColors.textMuted),
+                text: TextSpan(
+                  style: AppTextStyles.label.copyWith(color: AppColors.textMuted),
+                  children: [
+                    const TextSpan(text: 'By signing up, you agree to our '),
+                    TextSpan(
+                      text: 'Terms',
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.brandPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => launchUrl(Uri.parse('https://github.com')),
+                    ),
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.brandPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => launchUrl(Uri.parse('https://github.com')),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
