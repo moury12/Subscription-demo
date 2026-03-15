@@ -86,9 +86,14 @@ class _AddMealScreenState extends State<AddMealScreen> {
   Widget _buildMealTypeSelector() {
     final types = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        children: types.map((type) {
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Meal Type', style: AppTextStyles.labelMedium),
+          const SizedBox(height: 12),
+          Row(
+            children: types.map((type) {
           final isSelected = _selectedMealType == type;
           return Expanded(
             child: GestureDetector(
@@ -113,7 +118,9 @@ class _AddMealScreenState extends State<AddMealScreen> {
               ),
             ),
           );
-        }).toList(),
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -143,6 +150,7 @@ class _AddMealScreenState extends State<AddMealScreen> {
 
   Widget _buildSelectedFoodCard() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.darkCard,
