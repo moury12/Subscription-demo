@@ -2,6 +2,8 @@
 
 Ramsai is a premium, feature-rich health and fitness application built with Flutter. It combines personalized workout planning, intelligent nutrition tracking via AI, and a modern, high-performance UI designed for a seamless user experience.
 
+**Last updated:** April 5, 2026
+
 ---
 
 ## 🚀 Key Features
