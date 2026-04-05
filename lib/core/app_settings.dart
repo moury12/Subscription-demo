@@ -1,8 +1,11 @@
+import '../features/workout/models/ai_workout_plan.dart';
+
 class AppSettings {
   static final AppSettings _instance = AppSettings._internal();
   factory AppSettings() => _instance;
   AppSettings._internal();
 
+  AiWeeklyWorkoutPlan? currentPlan;
   String? userName = 'Nur Hasan Masum';
   int? age;
   String? gender;

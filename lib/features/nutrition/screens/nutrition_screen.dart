@@ -239,9 +239,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildGlowingMacro('6g', 'Protein', '/g'),
-              _buildGlowingMacro('6g', 'Carbs', '/g'),
-              _buildGlowingMacro('14g', 'Fat', '/g'),
+              _buildGlowingMacro('${_controller.totalProtein.toInt()}g', 'Protein', '/g'),
+              _buildGlowingMacro('${_controller.totalCarbs.toInt()}g', 'Carbs', '/g'),
+              _buildGlowingMacro('${_controller.totalFat.toInt()}g', 'Fat', '/g'),
             ],
           ),
         ],

@@ -3,11 +3,19 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/onboarding/onboarding_background.dart';
+import '../../core/app_settings.dart';
+import '../../features/onboarding/models/onboarding_data.dart';
+import '../../features/workout/controllers/ai_workout_service.dart';
 
 class CreatingPlanScreen extends StatefulWidget {
+  final OnboardingData data;
   final VoidCallback onFinish;
 
-  const CreatingPlanScreen({super.key, required this.onFinish});
+  const CreatingPlanScreen({
+    super.key, 
+    required this.data,
+    required this.onFinish,
+  });
 
   @override
   State<CreatingPlanScreen> createState() => _CreatingPlanScreenState();
@@ -16,26 +24,47 @@ class CreatingPlanScreen extends StatefulWidget {
 class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
   int _completedSteps = 0;
   final List<String> _steps = [
-    'Calculating calorie targets',
-    'Designing workout routine',
-    'Preparing nutrition guidelines',
+    'Analyzing your profile',
+    'Generating personalized workout routine',
+    'Optimizing exercises for your goal',
+    'Finalizing your weekly plan',
   ];
+  
+  final AiWorkoutService _workoutService = AiWorkoutService();
 
   @override
   void initState() {
     super.initState();
-    _startLoading();
+    _generatePlan();
   }
 
-  void _startLoading() {
-    Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (_completedSteps < _steps.length) {
-        setState(() => _completedSteps++);
+  void _generatePlan() async {
+    // Phase 1: Wait 1s and set step 1
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) setState(() => _completedSteps = 1);
+
+    // Phase 2: Call AI API and set step 2
+    final plan = await _workoutService.generateMyPlan(widget.data.toJson());
+    if (mounted) setState(() => _completedSteps = 2);
+
+    // Phase 3 & 4: Fake delay for smooth UI
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) setState(() => _completedSteps = 3);
+    
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) setState(() => _completedSteps = 4);
+
+    // Done
+    if (mounted) {
+      if (plan == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to generate plan. Using default template.')),
+        );
       } else {
-        timer.cancel();
-        Future.delayed(const Duration(milliseconds: 500), widget.onFinish);
+        AppSettings().currentPlan = plan;
       }
-    });
+      widget.onFinish();
+    }
   }
 
   @override

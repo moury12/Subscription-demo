@@ -34,7 +34,9 @@ class ReviewProfileScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
@@ -44,33 +46,57 @@ class ReviewProfileScreen extends StatelessWidget {
                         color: Colors.green,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.check, color: Colors.white, size: 32),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     const Text('Review Your Profile', style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
                       'Make sure everything looks good',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: 32),
-                    _buildSummaryCard('Personal Info', '${data.age} years old • ${data.gender}'),
+                    _buildSummaryCard(
+                      'Personal Info',
+                      '${data.age} years old • ${data.gender}',
+                    ),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Physical Stats', '${data.height} cm • ${data.currentWeight} kg'),
+                    _buildSummaryCard(
+                      'Physical Stats',
+                      '${data.height} cm • ${data.currentWeight} kg',
+                    ),
                     const SizedBox(height: 16),
                     _buildSummaryCard('Fitness Goal', '${data.goal}'),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Activity Level', '${data.activityLevel}'),
+                    _buildSummaryCard(
+                      'Activity Level',
+                      '${data.activityLevel}',
+                    ),
                     const SizedBox(height: 16),
                     _buildSummaryCard('Timezone', '${data.timezone}'),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Week Starts', '${data.weekStartDay}'),
+                    _buildSummaryCard('Week Starts', data.weekStartDay),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Workout Schedule', '${data.workoutDays} days per week'),
+                    _buildSummaryCard(
+                      'Workout Schedule',
+                      '${data.workoutDays} days per week',
+                    ),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Dietary Preference', '${data.dietPreference}'),
+                    _buildSummaryCard(
+                      'Dietary Preference',
+                      '${data.dietPreference}',
+                    ),
                     const SizedBox(height: 16),
-                    _buildSummaryCard('Target Weight', '${data.targetWeight} kg'),
+                    _buildSummaryCard(
+                      'Target Weight',
+                      '${data.targetWeight} kg',
+                    ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(
                       label: 'Generate My Plan',
@@ -99,7 +125,10 @@ class ReviewProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextStyles.label.copyWith(color: AppColors.textSecondary)),
+          Text(
+            title,
+            style: AppTextStyles.label.copyWith(color: AppColors.textSecondary),
+          ),
           const SizedBox(height: 4),
           Text(value, style: AppTextStyles.bodyMedium),
         ],

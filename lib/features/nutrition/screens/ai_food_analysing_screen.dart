@@ -1,11 +1,21 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysis_result_screen.dart';
+import '../controllers/ai_food_service.dart';
 
 class AiFoodAnalysingScreen extends StatefulWidget {
   final String mealType;
-  const AiFoodAnalysingScreen({super.key, required this.mealType});
+  final XFile imageFile;
+
+  const AiFoodAnalysingScreen({
+    super.key, 
+    required this.mealType,
+    required this.imageFile,
+  });
 
   @override
   State<AiFoodAnalysingScreen> createState() => _AiFoodAnalysingScreenState();
@@ -13,26 +23,48 @@ class AiFoodAnalysingScreen extends StatefulWidget {
 
 class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
   int _currentStep = 0;
+  final AiFoodService _aiService = AiFoodService();
 
   @override
   void initState() {
     super.initState();
-    _startSteps();
+    _performAnalysis();
   }
 
-  void _startSteps() async {
-    for (int i = 0; i < 3; i++) {
-      await Future.delayed(const Duration(milliseconds: 1200));
+  void _performAnalysis() async {
+    // Phase 1: Processing
+    setState(() => _currentStep = 1);
+    await Future.delayed(const Duration(milliseconds: 1000));
+
+    // Phase 2: Identifying (Trigger AI Call)
+    setState(() => _currentStep = 2);
+    
+    final result = await _aiService.analyzeFood(widget.imageFile);
+
+    if (result == null) {
       if (mounted) {
-        setState(() {
-          _currentStep = i + 1;
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to analyze image. Please check backend connection.')),
+        );
+        Navigator.of(context).pop();
       }
+      return;
     }
-    await Future.delayed(const Duration(milliseconds: 800));
+
+    // Phase 3: Calculating
+    if (mounted) {
+      setState(() => _currentStep = 3);
+      await Future.delayed(const Duration(milliseconds: 800));
+    }
+
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => AiFoodAnalysisResultScreen(mealType: widget.mealType)),
+        MaterialPageRoute(
+          builder: (_) => AiFoodAnalysisResultScreen(
+            mealType: widget.mealType,
+            analysisResult: result,
+          ),
+        ),
       );
     }
   }
@@ -61,13 +93,19 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Static food image with blur
-                        Image.network(
-                          'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60',
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                        kIsWeb 
+                          ? Image.network(
+                              widget.imageFile.path,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(widget.imageFile.path),
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                         Container(
                           height: 200,
                           width: double.infinity,

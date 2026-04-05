@@ -20,7 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _drinkWaterNotification = false;
   bool _mealLogNotification = false;
   bool _workoutNotification = false;
-  
+
   // Controllers
   late final TextEditingController _nameController;
   late final TextEditingController _ageController;
@@ -33,10 +33,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _settings = AppSettings();
     _nameController = TextEditingController(text: _settings.userName ?? '');
-    _ageController = TextEditingController(text: _settings.age?.toString() ?? '');
-    _heightController = TextEditingController(text: _settings.height?.toString() ?? '');
-    _targetWeightController = TextEditingController(text: _settings.targetWeight?.toString() ?? '');
-    _currentWeightController = TextEditingController(text: _settings.currentWeight?.toString() ?? '');
+    _ageController = TextEditingController(
+      text: _settings.age?.toString() ?? '',
+    );
+    _heightController = TextEditingController(
+      text: _settings.height?.toString() ?? '',
+    );
+    _targetWeightController = TextEditingController(
+      text: _settings.targetWeight?.toString() ?? '',
+    );
+    _currentWeightController = TextEditingController(
+      text: _settings.currentWeight?.toString() ?? '',
+    );
   }
 
   @override
@@ -53,7 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             _buildProfileHeader(),
@@ -108,7 +117,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 48),
+                    child: const Icon(
+                      Icons.person,
+                      color: Color(0xFF94A3B8),
+                      size: 48,
+                    ),
                   ),
                   const SizedBox(width: 20),
                   Text(
@@ -159,7 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           value,
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(width: 4),
         Text(
@@ -189,26 +206,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: Colors.white.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.scale_outlined, color: Colors.blueAccent, size: 24),
+                child: const Icon(
+                  Icons.scale_outlined,
+                  color: Colors.blueAccent,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                      Text(
-                        'CURRENT WEIGHT',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
+                    Text(
+                      'CURRENT WEIGHT',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
-                      Text(
-                        '${_settings.currentWeight ?? 0} kg',
-                        style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '${_settings.currentWeight ?? 0} kg',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
                   ],
                 ),
               ),
@@ -217,7 +242,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (_isEditingWeight) {
                     // Update settings when saving
                     setState(() {
-                      _settings.currentWeight = double.tryParse(_currentWeightController.text) ?? _settings.currentWeight;
+                      _settings.currentWeight =
+                          double.tryParse(_currentWeightController.text) ??
+                          _settings.currentWeight;
                       _isEditingWeight = false;
                     });
                   } else {
@@ -247,11 +274,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: TextField(
                 controller: _currentWeightController,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(border: InputBorder.none),
               ),
             ),
             const SizedBox(height: 16),
@@ -261,16 +290,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _settings.currentWeight = double.tryParse(_currentWeightController.text) ?? _settings.currentWeight;
+                    _settings.currentWeight =
+                        double.tryParse(_currentWeightController.text) ??
+                        _settings.currentWeight;
                     _isEditingWeight = false;
                   });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-                child: const Text('Save New Weight', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Save New Weight',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -297,7 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           InkWell(
-            onTap: () => setState(() => _expandedIndex = isExpanded ? null : index),
+            onTap: () =>
+                setState(() => _expandedIndex = isExpanded ? null : index),
             borderRadius: BorderRadius.circular(24),
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -310,7 +347,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.white.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: Colors.white.withOpacity(0.4), size: 24),
+                    child: Icon(
+                      icon,
+                      color: Colors.white.withOpacity(0.4),
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -319,7 +360,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           subtitle,
@@ -333,7 +378,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   Icon(
-                    isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
                     color: Colors.white.withOpacity(0.6),
                   ),
                 ],
@@ -388,14 +435,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          _buildDoneButton(onPressed: () {
-            setState(() {
-              _settings.userName = _nameController.text;
-              _settings.age = int.tryParse(_ageController.text) ?? _settings.age;
-              _settings.height = double.tryParse(_heightController.text) ?? _settings.height;
-              _expandedIndex = null;
-            });
-          }),
+          _buildDoneButton(
+            onPressed: () {
+              setState(() {
+                _settings.userName = _nameController.text;
+                _settings.age =
+                    int.tryParse(_ageController.text) ?? _settings.age;
+                _settings.height =
+                    double.tryParse(_heightController.text) ?? _settings.height;
+                _expandedIndex = null;
+              });
+            },
+          ),
         ],
       ),
     );
@@ -403,10 +454,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildFitnessGoalsSection() {
     final goals = [
-      {'title': 'Lose Weight',       'icon': Icons.trending_down, 'color': const Color(0xFFFC5C7D)},
-      {'title': 'Gain Muscle',       'icon': Icons.trending_up,   'color': const Color(0xFF34D399)},
-      {'title': 'Maintain Weight',   'icon': Icons.sync,          'color': const Color(0xFF60A5FA)},
-      {'title': 'Improve Endurance', 'icon': Icons.bolt,          'color': const Color(0xFFA78BFA)},
+      {
+        'title': 'Lose Weight',
+        'icon': Icons.trending_down,
+        'color': const Color(0xFFFC5C7D),
+      },
+      {
+        'title': 'Gain Muscle',
+        'icon': Icons.trending_up,
+        'color': const Color(0xFF34D399),
+      },
+      {
+        'title': 'Maintain Weight',
+        'icon': Icons.sync,
+        'color': const Color(0xFF60A5FA),
+      },
+      {
+        'title': 'Improve Endurance',
+        'icon': Icons.bolt,
+        'color': const Color(0xFFA78BFA),
+      },
     ];
 
     final selectedGoal = _settings.goal ?? 'Lose Weight';
@@ -430,21 +497,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
-                onTap: () => setState(() => _settings.goal = goal['title'] as String),
+                onTap: () =>
+                    setState(() => _settings.goal = goal['title'] as String),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? color.withOpacity(0.08)
                         : Colors.white.withOpacity(0.03),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isSelected ? color.withOpacity(0.5) : Colors.white.withOpacity(0.05),
+                      color: isSelected
+                          ? color.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.05),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
-                        ? [BoxShadow(color: color.withOpacity(0.15), blurRadius: 12, spreadRadius: 1)]
+                        ? [
+                            BoxShadow(
+                              color: color.withOpacity(0.15),
+                              blurRadius: 12,
+                              spreadRadius: 1,
+                            ),
+                          ]
                         : [],
                   ),
                   child: Row(
@@ -460,7 +539,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.white60,
                           fontSize: 15,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.w400,
                         ),
                       ),
                       const Spacer(),
@@ -486,12 +567,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildInputLabel('TARGET WEIGHT (KG)'),
           _buildTextField(_targetWeightController),
           const SizedBox(height: 24),
-          _buildDoneButton(onPressed: () {
-            setState(() {
-              _settings.targetWeight = double.tryParse(_targetWeightController.text) ?? _settings.targetWeight;
-              _expandedIndex = null;
-            });
-          }),
+          _buildDoneButton(
+            onPressed: () {
+              setState(() {
+                _settings.targetWeight =
+                    double.tryParse(_targetWeightController.text) ??
+                    _settings.targetWeight;
+                _expandedIndex = null;
+              });
+            },
+          ),
         ],
       ),
     );
@@ -499,8 +584,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildNotificationsSection() {
     // subtitle reflects overall state
-    final anyEnabled = _pushNotifications || _drinkWaterNotification ||
-        _mealLogNotification || _workoutNotification;
+    final anyEnabled =
+        _pushNotifications ||
+        _drinkWaterNotification ||
+        _mealLogNotification ||
+        _workoutNotification;
     return _buildCollapsibleCard(
       index: 2,
       icon: Icons.notifications_none,
@@ -616,8 +704,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: isMain ? 15 : 14,
-                    fontWeight:
-                        isMain ? FontWeight.bold : FontWeight.w500,
+                    fontWeight: isMain ? FontWeight.bold : FontWeight.w500,
                   ),
                 ),
                 Text(
@@ -633,12 +720,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.white,
+            activeThumbColor: Colors.white,
             activeTrackColor: iconColor,
             inactiveTrackColor: Colors.white.withOpacity(0.08),
             inactiveThumbColor: Colors.white38,
-            trackOutlineColor:
-                WidgetStateProperty.all(Colors.transparent),
+            trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
           ),
         ],
       ),
@@ -656,7 +742,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Divider(color: Colors.white10),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('Security settings will appear here', style: TextStyle(color: Colors.white38)),
+            child: Text(
+              'Security settings will appear here',
+              style: TextStyle(color: Colors.white38),
+            ),
           ),
         ],
       ),
@@ -692,9 +781,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         textInputAction: TextInputAction.done,
         onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
         onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-        ),
+        decoration: const InputDecoration(border: InputBorder.none),
       ),
     );
   }
@@ -708,13 +795,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF161616),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 0,
         ),
-        child: const Text('Done', style: TextStyle(fontWeight: FontWeight.bold)),
+        child: const Text(
+          'Done',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
+
   Widget _buildLogOutButton() {
     return Container(
       width: double.infinity,
@@ -741,7 +834,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(width: 8),
               Text(
                 'Log Out',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -751,10 +848,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatDivider() {
-    return Container(
-      width: 1,
-      height: 20,
-      color: Colors.white10,
-    );
+    return Container(width: 1, height: 20, color: Colors.white10);
   }
 }

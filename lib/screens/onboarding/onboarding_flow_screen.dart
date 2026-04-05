@@ -180,6 +180,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               onGenerate: _nextPage,
             ),
             CreatingPlanScreen(
+              data: _data,
               onFinish: _finish,
             ),
           ],

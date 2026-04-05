@@ -15,13 +15,13 @@ class OnboardingData {
     return {
       'age': age,
       'gender': gender,
-      'height': height,
-      'currentWeight': currentWeight,
+      'height': '${height?.toInt() ?? 0} cm',
+      'weight': '${currentWeight?.toInt() ?? 0} kg',
+      'targetWeight': '${targetWeight?.toInt() ?? 0} kg',
       'goal': goal,
       'activityLevel': activityLevel,
-      'workoutDays': workoutDays,
-      'dietPreference': dietPreference,
-      'targetWeight': targetWeight,
+      'workoutDaysPerWeek': workoutDays,
+      'dietaryPreference': dietPreference,
       'timezone': timezone,
       'weekStartDay': weekStartDay,
     };

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../models/ai_workout_plan.dart';
 import 'single_workout_screen.dart';
 
 class WorkoutScreen extends StatelessWidget {
@@ -9,7 +10,9 @@ class WorkoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final weekStartDay = AppSettings().weekStartDay;
+    final settings = AppSettings();
+    final plan = settings.currentPlan;
+    final weekStartDay = settings.weekStartDay;
     final now = DateTime.now();
     final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     int currentWeekday = now.weekday; // 1 = Mon, 7 = Sun
@@ -24,14 +27,15 @@ class WorkoutScreen extends StatelessWidget {
       backgroundColor: AppColors.darkBackground,
       body: CustomScrollView(
         slivers: [
-          _buildWorkoutHeader(context),
+          _buildWorkoutHeader(context, plan),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildInProgressSection(context),
+                  if (plan != null) _buildInProgressSection(context, plan.days.firstWhere((d) => !d.isRestDay, orElse: () => plan.days.first)),
+                  if (plan == null) _buildStaticInProgressSection(context),
                   const SizedBox(height: 32),
                   const Text(
                     'This Week',
@@ -42,17 +46,27 @@ class WorkoutScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...List.generate(7, (index) {
-                    final date = weekStart.add(Duration(days: index));
-                    final dayName = DateFormat('EEEE').format(date);
-                    final isRestDay = index > 0; // Simple dummy logic: first day is workout, others rest
-                    return _buildWorkoutCard(
-                      context,
-                      isRestDay ? 'Rest Day' : 'Push Up',
-                      isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
-                      dayName,
-                    );
-                  }),
+                  if (plan != null)
+                    ...plan.days.map((dayPlan) {
+                      return _buildWorkoutCard(
+                        context,
+                        dayPlan.title,
+                        dayPlan.isRestDay ? 'Recovery / Mobility' : '${dayPlan.exercises.length} Exercises',
+                        dayPlan.day,
+                      );
+                    }).toList()
+                  else
+                    ...List.generate(7, (index) {
+                      final date = weekStart.add(Duration(days: index));
+                      final dayName = DateFormat('EEEE').format(date);
+                      final isRestDay = index > 0;
+                      return _buildWorkoutCard(
+                        context,
+                        isRestDay ? 'Rest Day' : 'Push Up',
+                        isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
+                        dayName,
+                      );
+                    }),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -63,7 +77,8 @@ class WorkoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWorkoutHeader(BuildContext context) {
+  Widget _buildWorkoutHeader(BuildContext context, AiWeeklyWorkoutPlan? plan) {
+    int totalWorkouts = plan?.days.where((d) => !d.isRestDay).length ?? 0;
     return SliverAppBar(
       expandedHeight: 380,
       backgroundColor: Colors.transparent,
@@ -133,7 +148,7 @@ class WorkoutScreen extends StatelessWidget {
                           children: [
                             Expanded(child: _buildHeaderStat('0', 'Completed')),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
-                            Expanded(child: _buildHeaderStat('2', 'Total')),
+                            Expanded(child: _buildHeaderStat(totalWorkouts.toString(), 'Total')),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
                             Expanded(child: _buildHeaderStat('0%', 'Progress')),
                           ],
@@ -272,7 +287,7 @@ class WorkoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInProgressSection(BuildContext context) {
+  Widget _buildInProgressSection(BuildContext context, AiWorkoutDay dayPlan) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -311,13 +326,13 @@ class WorkoutScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Upper Body Strength',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    dayPlan.isRestDay ? 'Rest & Recovery' : dayPlan.title,
+                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Exercise 1 of 5',
+                    dayPlan.isRestDay ? 'Active recovery or yoga' : 'Exercise 1 of ${dayPlan.exercises.length}',
                     style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                   ),
                 ],
@@ -338,7 +353,7 @@ class WorkoutScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SingleWorkoutScreen(workoutName: 'Upper Body Strength')),
+                MaterialPageRoute(builder: (_) => SingleWorkoutScreen(workoutName: dayPlan.isRestDay ? 'Rest Day' : dayPlan.title)),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -353,6 +368,15 @@ class WorkoutScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildStaticInProgressSection(BuildContext context) {
+    return _buildInProgressSection(context, AiWorkoutDay(
+      day: 'Today',
+      title: 'Upper Body Strength',
+      isRestDay: false,
+      exercises: [],
+    ));
   }
 
   Widget _buildWorkoutCard(BuildContext context, String title, String subtitle, String day) {

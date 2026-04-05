@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysing_screen.dart';
+import '../controllers/ai_food_service.dart';
 
 class AiFoodScanScreen extends StatelessWidget {
   final String mealType;
-  const AiFoodScanScreen({super.key, required this.mealType});
+  final AiFoodService _aiService = AiFoodService();
+
+  AiFoodScanScreen({super.key, required this.mealType});
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +72,7 @@ class AiFoodScanScreen extends StatelessWidget {
             label: 'Take Photo',
             icon: Icons.camera_alt,
             isPrimary: true,
-            onPressed: () => _startAnalysis(context),
+            onPressed: () => _pickAndStart(context, ImageSource.camera),
           ),
           const SizedBox(height: 12),
           _buildButton(
@@ -76,11 +80,25 @@ class AiFoodScanScreen extends StatelessWidget {
             label: 'Upload from Gallery',
             icon: Icons.upload,
             isPrimary: false,
-            onPressed: () => _startAnalysis(context),
+            onPressed: () => _pickAndStart(context, ImageSource.gallery),
           ),
         ],
       ),
     );
+  }
+
+  void _pickAndStart(BuildContext context, ImageSource source) async {
+    final XFile? file = await _aiService.pickImage(source);
+    if (file != null && context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => AiFoodAnalysingScreen(
+            mealType: mealType,
+            imageFile: file,
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildButton(BuildContext context, {required String label, required IconData icon, required bool isPrimary, required VoidCallback onPressed}) {
@@ -173,12 +191,6 @@ class AiFoodScanScreen extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  void _startAnalysis(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AiFoodAnalysingScreen(mealType: mealType)),
     );
   }
 }
