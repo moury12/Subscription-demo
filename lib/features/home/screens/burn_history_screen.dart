@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../progress/controllers/burn_history_controller.dart';
 
 class BurnHistoryScreen extends StatefulWidget {
   const BurnHistoryScreen({super.key});
@@ -9,6 +11,23 @@ class BurnHistoryScreen extends StatefulWidget {
 
 class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
   bool _isWeekly = false;
+  final BurnHistoryController _controller = BurnHistoryController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_update);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_update);
+    super.dispose();
+  }
+
+  void _update() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +95,10 @@ class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
                   child: _buildStatCard(
                     icon: Icons.local_fire_department,
                     iconColor: const Color(0xFFFB923C),
-                    label: 'TOTAL BURNED',
-                    value: '922.5 kcal',
+                    label: _isWeekly ? 'WEEKLY BURN' : 'TOTAL BURNED',
+                    value: _isWeekly 
+                      ? '${_controller.history.fold(0.0, (sum, l) => sum + l.caloriesBurned).toStringAsFixed(1)} kcal'
+                      : '${_controller.totalBurnedToday.toStringAsFixed(1)} kcal',
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -85,8 +106,10 @@ class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
                   child: _buildStatCard(
                     icon: Icons.query_stats,
                     iconColor: const Color(0xFF60A5FA),
-                    label: 'ACTIVITIES',
-                    value: '3',
+                    label: _isWeekly ? 'TOTAL ACTIVITIES' : 'ACTIVITIES',
+                    value: _isWeekly 
+                      ? '${_controller.history.length}'
+                      : '${_controller.activityCountToday}',
                   ),
                 ),
               ],
@@ -109,9 +132,10 @@ class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildLogCard('walking for 20 minutes', '12:04 PM • 3/12/2026', '87.5'),
-            _buildLogCard('running for 1 hour', '11:53 AM • 3/12/2026', '700'),
-            _buildLogCard('Walking for 30 minutes', '11:51 AM • 3/12/2026', '135'),
+            ..._controller.history.map((log) {
+              final String formattedDate = DateFormat('h:mm a • d/M/yyyy').format(log.date);
+              return _buildLogCard(log.activity, formattedDate, log.caloriesBurned.toStringAsFixed(1));
+            }).toList(),
           ],
         ),
       ),

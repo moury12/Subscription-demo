@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../screens/burn_history_screen.dart';
+import '../../progress/controllers/ai_burn_service.dart';
+import '../../progress/controllers/burn_history_controller.dart';
 
 class BurnLogPopup extends StatefulWidget {
   const BurnLogPopup({super.key});
@@ -23,9 +25,11 @@ class _BurnLogPopupState extends State<BurnLogPopup>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final stt.SpeechToText _speech = stt.SpeechToText();
+  final AiBurnService _burnService = AiBurnService();
 
   bool _isListening = false;
   bool _speechAvailable = false;
+  bool _isProcessing = false;
   String _partialWords = '';
 
   // Animation controllers
@@ -152,6 +156,31 @@ class _BurnLogPopupState extends State<BurnLogPopup>
         t.cancel();
       }
     });
+  }
+
+  Future<void> _onLogActivity() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() => _isProcessing = true);
+
+    try {
+      final result = await _burnService.analyzeActivity(text);
+      if (result != null && mounted) {
+        BurnHistoryController().addAnalysedResult(result);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BurnHistoryScreen()),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to analyze activity. Please try again.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
   }
 
   @override
@@ -379,18 +408,11 @@ class _BurnLogPopupState extends State<BurnLogPopup>
                   ),
           ),
           const SizedBox(height: 32),
-          // Log Activity Button
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const BurnHistoryScreen()),
-                );
-              },
+              onPressed: _isProcessing ? null : _onLogActivity,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF333333),
                 foregroundColor: Colors.white,
@@ -399,17 +421,25 @@ class _BurnLogPopupState extends State<BurnLogPopup>
                 ),
                 elevation: 0,
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.send, size: 18),
-                  SizedBox(width: 8),
-                  Text(
-                    'Log Activity',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.send, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'Log Activity',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ],
