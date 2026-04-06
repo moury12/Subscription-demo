@@ -1,9 +1,37 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../controllers/burn_history_controller.dart';
+import '../../nutrition/controllers/nutrition_controller.dart';
 
-class ProgressScreen extends StatelessWidget {
+class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
+
+  @override
+  State<ProgressScreen> createState() => _ProgressScreenState();
+}
+
+class _ProgressScreenState extends State<ProgressScreen> {
+  final _nutritionController = NutritionController();
+  final _burnController = BurnHistoryController();
+
+  @override
+  void initState() {
+    super.initState();
+    _nutritionController.addListener(_rebuild);
+    _burnController.addListener(_rebuild);
+  }
+
+  @override
+  void dispose() {
+    _nutritionController.removeListener(_rebuild);
+    _burnController.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +52,7 @@ class ProgressScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildCalorieTrackingCard(),
                 const SizedBox(height: 16),
-                _buildAchievementsCard(),
+                // _buildAchievementsCard(),
                 const SizedBox(height: 100), // Bottom padding for nav
               ]),
             ),
@@ -125,11 +153,13 @@ class ProgressScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _buildSummaryRow('Workouts Completed', '0/7', icon: Icons.cancel_outlined, iconColor: Colors.white38),
+          _buildSummaryRow('Workouts Completed', '0/7',
+              icon: Icons.cancel_outlined, iconColor: Colors.white38),
           const SizedBox(height: 16),
-          _buildSummaryRow('Average Calories', '23 cal'),
+          _buildSummaryRow('Average Calories', '${_nutritionController.totalCalories.toInt()} cal'),
           const SizedBox(height: 16),
-          _buildSummaryRow('On Target Days', '7/7', icon: Icons.check_circle_rounded, iconColor: Colors.tealAccent.shade400),
+          _buildSummaryRow('On Target Days', '7/7',
+              icon: Icons.check_circle_rounded, iconColor: Colors.tealAccent.shade400),
         ],
       ),
     );
@@ -140,7 +170,8 @@ class ProgressScreen extends StatelessWidget {
       children: [
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
         const Spacer(),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(value,
+            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
         if (icon != null) ...[
           const SizedBox(width: 8),
           Icon(icon, color: iconColor, size: 16),
@@ -152,11 +183,11 @@ class ProgressScreen extends StatelessWidget {
   Widget _buildStatsRow() {
     return Row(
       children: [
-        _buildStatCard('0', 'Workouts'),
+        _buildStatCard(_nutritionController.totalCalories.toInt().toString(), 'Consumption'),
         const SizedBox(width: 12),
         _buildStatCard('0.0', 'kg Change'),
         const SizedBox(width: 12),
-        _buildStatCard('0', 'Badges'),
+        _buildStatCard(_burnController.totalBurnedToday.toInt().toString(), 'Total Burn'),
       ],
     );
   }
@@ -199,7 +230,8 @@ class ProgressScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Workout Consistency', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text('Workout Consistency',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
               const Text('0% complete', style: TextStyle(color: Colors.white24, fontSize: 12)),
             ],
           ),
@@ -238,7 +270,8 @@ class ProgressScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Calorie Tracking', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Calorie Tracking',
+              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           // Bar chart placeholder
           SizedBox(
@@ -314,7 +347,10 @@ class ProgressScreen extends StatelessWidget {
   Widget _buildLegend(Color color, String label) {
     return Row(
       children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
+        Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12)),
       ],
@@ -334,7 +370,8 @@ class ProgressScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Achievements', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text('Achievements',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
               const Text('0/6', style: TextStyle(color: Colors.white24, fontSize: 12)),
             ],
           ),
@@ -347,12 +384,12 @@ class ProgressScreen extends StatelessWidget {
             crossAxisSpacing: 12,
             childAspectRatio: 0.85,
             children: [
-              _buildAchievementItem('🤖', 'First\nWorkout'),
-              _buildAchievementItem('🔥', '7 Day Streak'),
-              _buildAchievementItem('🌅', 'Early Bird'),
-              _buildAchievementItem('🎯', 'Calorie\nMaster'),
-              _buildAchievementItem('⭐', 'Weight Goal'),
-              _buildAchievementItem('👑', 'Consistency\nKing'),
+              _buildAchievementItem('\u{1F916}', 'First\nWorkout'),
+              _buildAchievementItem('\u{1F525}', '7 Day Streak'),
+              _buildAchievementItem('\u{1F305}', 'Early Bird'),
+              _buildAchievementItem('\u{1F3AF}', 'Calorie\nMaster'),
+              _buildAchievementItem('\u{2B50}', 'Weight Goal'),
+              _buildAchievementItem('\u{1F451}', 'Consistency\nKing'),
             ],
           ),
         ],
