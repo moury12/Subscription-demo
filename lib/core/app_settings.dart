@@ -19,4 +19,7 @@ class AppSettings {
   String? timezone;
   String weekStartDay = 'Monday';
   int targetCalories = 2000;
+  int targetProtein = 150;
+  int targetCarbs = 200;
+  int targetFat = 60;
 }

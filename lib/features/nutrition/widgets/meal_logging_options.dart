@@ -9,56 +9,78 @@ class MealLoggingOptions {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF111111),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+      builder: (context) => _buildAddOptionsContent(context),
+    );
+  }
+
+  static void showAddOptionsForMealType(BuildContext context, String mealType) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildAddOptionsContent(context, mealType: mealType),
+    );
+  }
+
+  static Widget _buildAddOptionsContent(BuildContext context, {String? mealType}) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF111111),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(50),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(50),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Add Meal',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            _buildOptionItem(
-              context: context,
-              icon: Icons.edit_note,
-              title: 'Manual Entry',
-              subtitle: 'Log your meal by searching or manually',
-              onTap: () {
-                Navigator.pop(context);
+          const SizedBox(height: 24),
+          const Text(
+            'Add Meal',
+            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+          _buildOptionItem(
+            context: context,
+            icon: Icons.edit_note,
+            title: 'Manual Entry',
+            subtitle: 'Log your meal by searching or manually',
+            onTap: () {
+              Navigator.pop(context);
+              if (mealType != null) {
+                _openAddMeal(context, mealType);
+              } else {
                 showMealTimeSelection(context, isAiScan: false);
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildOptionItem(
-              context: context,
-              icon: Icons.camera_alt,
-              title: 'AI Scan',
-              subtitle: 'Scan your food for instant nutritional info',
-              onTap: () {
-                Navigator.pop(context);
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildOptionItem(
+            context: context,
+            icon: Icons.camera_alt,
+            title: 'AI Scan',
+            subtitle: 'Scan your food for instant nutritional info',
+            onTap: () {
+              Navigator.pop(context);
+              if (mealType != null) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => AiFoodScanScreen(mealType: mealType)),
+                );
+              } else {
                 showMealTimeSelection(context, isAiScan: true);
-              },
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
+              }
+            },
+          ),
+          const SizedBox(height: 24),
+        ],
       ),
     );
   }

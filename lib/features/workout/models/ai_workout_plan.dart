@@ -49,15 +49,40 @@ class AiWorkoutDay {
   }
 }
 
+class NutritionalTargets {
+  final int dailyCalories;
+  final int dailyProtein;
+  final int dailyCarbs;
+  final int dailyFat;
+
+  NutritionalTargets({
+    required this.dailyCalories,
+    required this.dailyProtein,
+    required this.dailyCarbs,
+    required this.dailyFat,
+  });
+
+  factory NutritionalTargets.fromJson(Map<String, dynamic> json) {
+    return NutritionalTargets(
+      dailyCalories: (json['dailyCalories'] as num?)?.toInt() ?? 2000,
+      dailyProtein: (json['dailyProtein'] as num?)?.toInt() ?? 150,
+      dailyCarbs: (json['dailyCarbs'] as num?)?.toInt() ?? 225,
+      dailyFat: (json['dailyFat'] as num?)?.toInt() ?? 65,
+    );
+  }
+}
+
 class AiWeeklyWorkoutPlan {
   final String planTitle;
   final int weekNumber;
   final List<AiWorkoutDay> days;
+  final NutritionalTargets? nutritionalTargets;
 
   AiWeeklyWorkoutPlan({
     required this.planTitle,
     required this.weekNumber,
     required this.days,
+    this.nutritionalTargets,
   });
 
   factory AiWeeklyWorkoutPlan.fromJson(Map<String, dynamic> json) {
@@ -67,6 +92,9 @@ class AiWeeklyWorkoutPlan {
       days: (json['days'] as List? ?? [])
           .map((d) => AiWorkoutDay.fromJson(d))
           .toList(),
+      nutritionalTargets: json['nutritionalTargets'] != null
+          ? NutritionalTargets.fromJson(json['nutritionalTargets'])
+          : null,
     );
   }
 }

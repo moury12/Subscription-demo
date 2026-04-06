@@ -62,6 +62,12 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
         );
       } else {
         AppSettings().currentPlan = plan;
+        if (plan.nutritionalTargets != null) {
+          AppSettings().targetCalories = plan.nutritionalTargets!.dailyCalories;
+          AppSettings().targetProtein = plan.nutritionalTargets!.dailyProtein;
+          AppSettings().targetCarbs = plan.nutritionalTargets!.dailyCarbs;
+          AppSettings().targetFat = plan.nutritionalTargets!.dailyFat;
+        }
       }
       widget.onFinish();
     }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../controllers/nutrition_controller.dart';
-import 'add_meal_screen.dart';
 import '../widgets/meal_logging_options.dart';
 
 class NutritionScreen extends StatefulWidget {
@@ -185,7 +184,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                   const Text(
                     'Today\'s Calories',
                     style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600),
                   ),
@@ -205,7 +204,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                   Text(
+                  Text(
                     '${remaining.clamp(0, target)} cal remaining',
                     style: const TextStyle(color: Colors.white38, fontSize: 14),
                   ),
@@ -239,9 +238,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildGlowingMacro('${_controller.totalProtein.toInt()}g', 'Protein', '/g'),
-              _buildGlowingMacro('${_controller.totalCarbs.toInt()}g', 'Carbs', '/g'),
-              _buildGlowingMacro('${_controller.totalFat.toInt()}g', 'Fat', '/g'),
+              _buildGlowingMacro('${_controller.totalProtein.toInt()}g', 'Protein', '/${AppSettings().targetProtein}g'),
+              _buildGlowingMacro('${_controller.totalCarbs.toInt()}g', 'Carbs', '/${AppSettings().targetCarbs}g'),
+              _buildGlowingMacro('${_controller.totalFat.toInt()}g', 'Fat', '/${AppSettings().targetFat}g'),
             ],
           ),
         ],
@@ -323,7 +322,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
         const SizedBox(height: 12),
         if (meals.isEmpty)
           GestureDetector(
-            onTap: () => _openAddMeal(title),
+            onTap: () => MealLoggingOptions.showAddOptionsForMealType(context, title),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -341,8 +340,36 @@ class _NutritionScreenState extends State<NutritionScreen> {
               ),
             ),
           )
-        else
+        else ...[
           ...meals.map((m) => _buildLoggedMealCard(m)),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () => MealLoggingOptions.showAddOptionsForMealType(context, title),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.05)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_circle_outline, color: color, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Add More',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -429,14 +456,5 @@ class _NutritionScreenState extends State<NutritionScreen> {
           ),
       ],
     );
-  }
-
-  void _openAddMeal(String type) async {
-    final result = await Navigator.of(context).push<Map<String, dynamic>>(
-      MaterialPageRoute(builder: (_) => AddMealScreen(initialMealType: type)),
-    );
-    if (result != null && result['food'] != null) {
-      _controller.addMeal(type, result['food'], result['multiplier'] ?? 1.0);
-    }
   }
 }
