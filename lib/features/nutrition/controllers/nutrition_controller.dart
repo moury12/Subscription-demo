@@ -19,6 +19,11 @@ class NutritionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeMeal(LoggedMeal meal) {
+    _loggedMeals.remove(meal);
+    notifyListeners();
+  }
+
   double get totalCalories => _loggedMeals.fold(0, (sum, item) => sum + (item.food.calories * item.multiplier));
   double get totalProtein => _loggedMeals.fold(0, (sum, item) => sum + (item.food.protein * item.multiplier));
   double get totalCarbs => _loggedMeals.fold(0, (sum, item) => sum + (item.food.carbs * item.multiplier));

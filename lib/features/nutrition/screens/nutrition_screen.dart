@@ -401,7 +401,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => _controller.removeMeal(loggedMeal),
             icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5252), size: 20),
           ),
         ],
