@@ -257,7 +257,7 @@ class _BurnHistoryScreenState extends State<BurnHistoryScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '+$kcal',
+                '-$kcal',
                 style: const TextStyle(
                   color: Color(0xFFFB923C),
                   fontSize: 18,
