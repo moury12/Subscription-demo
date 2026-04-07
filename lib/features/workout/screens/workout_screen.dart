@@ -380,6 +380,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Widget _buildWorkoutCard(BuildContext context, String title, String subtitle, String day, AiWorkoutDay? dayPlan) {
     final isCompleted = _workoutController.isWorkoutCompleted(title);
+    final isPausedActiveWorkout =
+        _workoutController.isPaused &&
+        _workoutController.activeWorkout != null &&
+        _workoutController.activeWorkout!.title == title;
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -436,7 +440,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isCompleted ? Colors.green : const Color(0xFF8B5CF6),
+                color: isCompleted
+                    ? Colors.green
+                    : isPausedActiveWorkout
+                        ? Colors.orange
+                        : const Color(0xFF8B5CF6),
                 shape: BoxShape.circle,
               ),
               child: Icon(
