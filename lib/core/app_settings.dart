@@ -6,7 +6,7 @@ class AppSettings {
   AppSettings._internal();
 
   AiWeeklyWorkoutPlan? currentPlan;
-  String? userName = 'Nur Hasan Masum';
+  String? userName = 'Tom Hanks';
   int? age;
   String? gender;
   double? height;
