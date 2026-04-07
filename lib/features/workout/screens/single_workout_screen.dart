@@ -46,7 +46,10 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Nicely done! Next: ${widget.exercises[_currentExerciseIndex].exerciseName}'),
+              content: Text(
+                'Nicely done! Next: ${widget.exercises[_currentExerciseIndex].exerciseName}',
+                style: const TextStyle(color: Colors.white),
+              ),
               duration: const Duration(seconds: 1),
               backgroundColor: Colors.green,
             ),
