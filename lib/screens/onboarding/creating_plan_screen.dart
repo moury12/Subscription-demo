@@ -130,10 +130,12 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
                           else
                             const Icon(Icons.circle_outlined, color: AppColors.textMuted, size: 20),
                           const SizedBox(width: 16),
-                          Text(
-                            _steps[index],
-                            style: AppTextStyles.body.copyWith(
-                              color: isCompleted ? Colors.white : AppColors.textSecondary,
+                          Expanded(
+                            child: Text(
+                              _steps[index],
+                              style: AppTextStyles.body.copyWith(
+                                color: isCompleted ? Colors.white : AppColors.textSecondary,
+                              ),
                             ),
                           ),
                         ],
