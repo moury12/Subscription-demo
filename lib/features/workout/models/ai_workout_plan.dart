@@ -1,25 +1,31 @@
 class AiWorkoutExercise {
-  final String name;
-  final int sets;
-  final String reps;
-  final String? duration;
-  final String? notes;
+  final int stepNumber;
+  final String exerciseName;
+  final String shortInstruction;
+  final List<String> detailedSteps;
+  final int repsCount;
+  final String ctaLabel;
+  final String completionRule;
 
   AiWorkoutExercise({
-    required this.name,
-    required this.sets,
-    required this.reps,
-    this.duration,
-    this.notes,
+    required this.stepNumber,
+    required this.exerciseName,
+    required this.shortInstruction,
+    required this.detailedSteps,
+    required this.repsCount,
+    required this.ctaLabel,
+    required this.completionRule,
   });
 
   factory AiWorkoutExercise.fromJson(Map<String, dynamic> json) {
     return AiWorkoutExercise(
-      name: json['name'] ?? '',
-      sets: json['sets'] ?? 0,
-      reps: json['reps'] ?? '',
-      duration: json['duration'],
-      notes: json['notes'],
+      stepNumber: json['step_number'] ?? 0,
+      exerciseName: json['exercise_name'] ?? '',
+      shortInstruction: json['short_instruction'] ?? '',
+      detailedSteps: List<String>.from(json['detailed_steps'] ?? []),
+      repsCount: json['reps_count'] ?? 0,
+      ctaLabel: json['cta_label'] ?? '',
+      completionRule: json['completion_rule'] ?? '',
     );
   }
 }

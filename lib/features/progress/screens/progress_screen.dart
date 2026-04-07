@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
 import '../../../core/theme/app_colors.dart';
+import '../../../core/app_settings.dart';
 import '../controllers/burn_history_controller.dart';
 import '../../nutrition/controllers/nutrition_controller.dart';
+import '../../workout/controllers/workout_controller.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -14,18 +15,22 @@ class ProgressScreen extends StatefulWidget {
 class _ProgressScreenState extends State<ProgressScreen> {
   final _nutritionController = NutritionController();
   final _burnController = BurnHistoryController();
+  final _workoutController = WorkoutController();
+  final _settings = AppSettings();
 
   @override
   void initState() {
     super.initState();
     _nutritionController.addListener(_rebuild);
     _burnController.addListener(_rebuild);
+    _workoutController.addListener(_rebuild);
   }
 
   @override
   void dispose() {
     _nutritionController.removeListener(_rebuild);
     _burnController.removeListener(_rebuild);
+    _workoutController.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -51,8 +56,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 _buildWorkoutConsistencyCard(),
                 const SizedBox(height: 16),
                 _buildCalorieTrackingCard(),
-                const SizedBox(height: 16),
-                // _buildAchievementsCard(),
                 const SizedBox(height: 100), // Bottom padding for nav
               ]),
             ),
@@ -71,7 +74,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
-            // Header Glow
             Positioned(
               bottom: 0,
               left: 40,
@@ -107,19 +109,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       const SizedBox(height: 10),
                       const Text(
                         'Progress',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Track your fitness journey',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                       ),
                     ],
                   ),
@@ -133,6 +128,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildSummaryCard() {
+    int totalWorkoutDays = _settings.currentPlan?.days.where((d) => !d.isRestDay).length ?? 0;
+    int completedCount = _workoutController.completedCount;
+    double avgCalories = _nutritionController.totalCalories;
+    bool onTarget = (_nutritionController.totalCalories - _settings.targetCalories).abs() < 200;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -153,13 +153,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildSummaryRow('Workouts Completed', '0/7',
-              icon: Icons.cancel_outlined, iconColor: Colors.white38),
+          _buildSummaryRow(
+            'Workouts Completed', 
+            '$completedCount/$totalWorkoutDays',
+            icon: completedCount > 0 ? Icons.check_circle_rounded : Icons.cancel_outlined, 
+            iconColor: completedCount > 0 ? Colors.tealAccent.shade400 : Colors.white38
+          ),
           const SizedBox(height: 16),
-          _buildSummaryRow('Average Calories', '${_nutritionController.totalCalories.toInt()} cal'),
+          _buildSummaryRow('Average Calories', '${avgCalories.toInt()} cal'),
           const SizedBox(height: 16),
-          _buildSummaryRow('On Target Days', '7/7',
-              icon: Icons.check_circle_rounded, iconColor: Colors.tealAccent.shade400),
+          _buildSummaryRow(
+            'On Target Days', 
+            onTarget ? '1/7' : '0/7', // Placeholder for daily target tracking
+            icon: Icons.check_circle_rounded, 
+            iconColor: onTarget ? Colors.tealAccent.shade400 : Colors.white12
+          ),
         ],
       ),
     );
@@ -170,8 +178,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       children: [
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
         const Spacer(),
-        Text(value,
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
         if (icon != null) ...[
           const SizedBox(width: 8),
           Icon(icon, color: iconColor, size: 16),
@@ -181,11 +188,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildStatsRow() {
+    // Difference between target and current or just a placeholder for now
+    double weightChange = 0.0; 
+    
     return Row(
       children: [
         _buildStatCard(_nutritionController.totalCalories.toInt().toString(), 'Consumption'),
         const SizedBox(width: 12),
-        _buildStatCard('0.0', 'kg Change'),
+        _buildStatCard(weightChange.toStringAsFixed(1), 'kg Change'),
         const SizedBox(width: 12),
         _buildStatCard(_burnController.totalBurnedToday.toInt().toString(), 'Total Burn'),
       ],
@@ -202,15 +212,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ),
         child: Column(
           children: [
-            Text(
-              value,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+            Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white38, fontSize: 12),
-            ),
+            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12)),
           ],
         ),
       ),
@@ -218,6 +222,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildWorkoutConsistencyCard() {
+    int totalWorkoutDays = _settings.currentPlan?.days.where((d) => !d.isRestDay).length ?? 7;
+    int completedCount = _workoutController.completedCount;
+    double completionRate = (completedCount / totalWorkoutDays) * 100;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -230,24 +238,36 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Workout Consistency',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              const Text('0% complete', style: TextStyle(color: Colors.white24, fontSize: 12)),
+              const Text('Workout Consistency', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('${completionRate.toInt()}% complete', style: const TextStyle(color: Colors.white24, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 40),
-          // Chart placeholder
           Container(
             height: 120,
             width: double.infinity,
             alignment: Alignment.bottomCenter,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: ['Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon'].map((day) {
+              children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) {
+                // Check if workout was completed for this day's title if plans exist
+                bool isDone = false;
+                if (_settings.currentPlan != null) {
+                  final dayPlan = _settings.currentPlan!.days.firstWhere((d) => d.day.contains(day), orElse: () => _settings.currentPlan!.days.first);
+                  isDone = _workoutController.isWorkoutCompleted(dayPlan.title);
+                }
+
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Container(height: 1, width: 30, color: Colors.white12),
+                    Container(
+                      height: isDone ? 80 : 2, 
+                      width: 30, 
+                      decoration: BoxDecoration(
+                        color: isDone ? AppColors.progressOrange : Colors.white12,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Text(day, style: const TextStyle(color: Colors.white24, fontSize: 10)),
                   ],
@@ -261,6 +281,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildCalorieTrackingCard() {
+    double calories = _nutritionController.totalCalories;
+    double target = _settings.targetCalories.toDouble();
+    double ratio = (calories / target).clamp(0.01, 1.0);
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -270,10 +294,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Calorie Tracking',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Calorie Tracking', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
-          // Bar chart placeholder
           SizedBox(
             height: 160,
             child: Row(
@@ -291,7 +313,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       _buildCalorieBar('Fri', 0.1),
                       _buildCalorieBar('Sat', 0.1),
                       _buildCalorieBar('Sun', 0.1),
-                      _buildCalorieBar('Mon', 0.8), // Example bar
+                      _buildCalorieBar('Mon', ratio), 
                     ],
                   ),
                 ),
@@ -313,11 +335,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildYAxisLabels() {
+    int target = _settings.targetCalories;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: ['180', '135', '90', '45', '0'].map((label) {
-        return Text(label, style: const TextStyle(color: Colors.white24, fontSize: 10));
-      }).toList(),
+      children: [
+        Text('${(target * 1.5).toInt()}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        Text('${target}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        Text('${(target * 0.5).toInt()}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        const Text('0', style: TextStyle(color: Colors.white24, fontSize: 10)),
+      ],
     );
   }
 
@@ -354,67 +380,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12)),
       ],
-    );
-  }
-
-  Widget _buildAchievementsCard() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Achievements',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              const Text('0/6', style: TextStyle(color: Colors.white24, fontSize: 12)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.85,
-            children: [
-              _buildAchievementItem('\u{1F916}', 'First\nWorkout'),
-              _buildAchievementItem('\u{1F525}', '7 Day Streak'),
-              _buildAchievementItem('\u{1F305}', 'Early Bird'),
-              _buildAchievementItem('\u{1F3AF}', 'Calorie\nMaster'),
-              _buildAchievementItem('\u{2B50}', 'Weight Goal'),
-              _buildAchievementItem('\u{1F451}', 'Consistency\nKing'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementItem(String emoji, String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1D20),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 24)),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
     );
   }
 }

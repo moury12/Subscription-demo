@@ -3,10 +3,34 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../models/ai_workout_plan.dart';
+import '../controllers/workout_controller.dart';
 import 'single_workout_screen.dart';
 
-class WorkoutScreen extends StatelessWidget {
+class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
+
+  @override
+  State<WorkoutScreen> createState() => _WorkoutScreenState();
+}
+
+class _WorkoutScreenState extends State<WorkoutScreen> {
+  final _workoutController = WorkoutController();
+
+  @override
+  void initState() {
+    super.initState();
+    _workoutController.addListener(_update);
+  }
+
+  @override
+  void dispose() {
+    _workoutController.removeListener(_update);
+    super.dispose();
+  }
+
+  void _update() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +58,9 @@ class WorkoutScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (plan != null) _buildInProgressSection(context, plan.days.firstWhere((d) => !d.isRestDay, orElse: () => plan.days.first)),
-                  if (plan == null) _buildStaticInProgressSection(context),
+                  if (_workoutController.activeWorkout != null && _workoutController.isPaused)
+                    _buildInProgressSection(context, _workoutController.activeWorkout!),
+                  
                   const SizedBox(height: 32),
                   const Text(
                     'This Week',
@@ -53,6 +78,7 @@ class WorkoutScreen extends StatelessWidget {
                         dayPlan.title,
                         dayPlan.isRestDay ? 'Recovery / Mobility' : '${dayPlan.exercises.length} Exercises',
                         dayPlan.day,
+                        dayPlan,
                       );
                     }).toList()
                   else
@@ -65,6 +91,7 @@ class WorkoutScreen extends StatelessWidget {
                         isRestDay ? 'Rest Day' : 'Push Up',
                         isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
                         dayName,
+                        null,
                       );
                     }),
                   const SizedBox(height: 100),
@@ -79,6 +106,9 @@ class WorkoutScreen extends StatelessWidget {
 
   Widget _buildWorkoutHeader(BuildContext context, AiWeeklyWorkoutPlan? plan) {
     int totalWorkouts = plan?.days.where((d) => !d.isRestDay).length ?? 0;
+    int completedCount = _workoutController.completedCount;
+    int progress = totalWorkouts > 0 ? (completedCount * 100 ~/ totalWorkouts) : 0;
+
     return SliverAppBar(
       expandedHeight: 380,
       backgroundColor: Colors.transparent,
@@ -87,7 +117,6 @@ class WorkoutScreen extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
-            // Header Glow
             Positioned(
               bottom: 0,
               left: 40,
@@ -137,6 +166,7 @@ class WorkoutScreen extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
+                      const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
@@ -146,21 +176,18 @@ class WorkoutScreen extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Expanded(child: _buildHeaderStat('0', 'Completed')),
+                            Expanded(child: _buildHeaderStat(completedCount.toString(), 'Completed')),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
                             Expanded(child: _buildHeaderStat(totalWorkouts.toString(), 'Total')),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
-                            Expanded(child: _buildHeaderStat('0%', 'Progress')),
+                            Expanded(child: _buildHeaderStat('$progress%', 'Progress')),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
                       const Text(
                         'This Week',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
                       const SizedBox(height: 12),
                       _buildDatePicker(),
@@ -181,18 +208,11 @@ class WorkoutScreen extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
-            fontSize: 14,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
         ),
       ],
     );
@@ -201,15 +221,11 @@ class WorkoutScreen extends StatelessWidget {
   Widget _buildDatePicker() {
     final weekStartDay = AppSettings().weekStartDay;
     final now = DateTime.now();
-
     final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-    int currentWeekday = now.weekday; // 1 = Mon, 7 = Sun
+    int currentWeekday = now.weekday;
     int targetWeekdayIndex = daysOfWeek.indexOf(weekStartDay) + 1;
-
     int daysToBack = (currentWeekday - targetWeekdayIndex) % 7;
     if (daysToBack < 0) daysToBack += 7;
-
     DateTime weekStart = now.subtract(Duration(days: daysToBack));
 
     List<Widget> dateItems = [];
@@ -222,10 +238,7 @@ class WorkoutScreen extends StatelessWidget {
         dateItems.add(
           Column(
             children: [
-              Text(
-                dayName,
-                style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
-              ),
+              Text(dayName, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
               const SizedBox(height: 8),
               Container(
                 width: 44,
@@ -233,13 +246,7 @@ class WorkoutScreen extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white54,
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.white54, blurRadius: 10, spreadRadius: 1)],
                 ),
                 child: const Icon(Icons.calendar_today_outlined, color: AppColors.workoutPurple, size: 20),
               ),
@@ -260,10 +267,7 @@ class WorkoutScreen extends StatelessWidget {
   Widget _buildDateItem(String day, String weekday, bool isSelected) {
     return Column(
       children: [
-        Text(
-          weekday,
-          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
-        ),
+        Text(weekday, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
         const SizedBox(height: 8),
         Container(
           width: 44,
@@ -288,6 +292,7 @@ class WorkoutScreen extends StatelessWidget {
   }
 
   Widget _buildInProgressSection(BuildContext context, AiWorkoutDay dayPlan) {
+    final currentIndex = _workoutController.currentExerciseIndex;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -311,7 +316,6 @@ class WorkoutScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-      
               const SizedBox(width: 8),
               Text(
                 'Workout in Progress',
@@ -332,17 +336,14 @@ class WorkoutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    dayPlan.isRestDay ? 'Active recovery or yoga' : 'Exercise 1 of ${dayPlan.exercises.length}',
+                    dayPlan.isRestDay ? 'Active recovery or yoga' : 'Exercise ${currentIndex + 1} of ${dayPlan.exercises.length}',
                     style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                   ),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Colors.white24,
-                  shape: BoxShape.circle,
-                ),
+                decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
                 child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30),
               ),
             ],
@@ -351,10 +352,17 @@ class WorkoutScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SingleWorkoutScreen(workoutName: dayPlan.isRestDay ? 'Rest Day' : dayPlan.title)),
-              ),
+              onPressed: () {
+                _workoutController.resumeWorkout();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SingleWorkoutScreen(
+                    workoutName: dayPlan.title,
+                    exercises: dayPlan.exercises,
+                    startIndex: currentIndex,
+                  )),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.orange,
@@ -370,23 +378,19 @@ class WorkoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStaticInProgressSection(BuildContext context) {
-    return _buildInProgressSection(context, AiWorkoutDay(
-      day: 'Today',
-      title: 'Upper Body Strength',
-      isRestDay: false,
-      exercises: [],
-    ));
-  }
-
-  Widget _buildWorkoutCard(BuildContext context, String title, String subtitle, String day) {
+  Widget _buildWorkoutCard(BuildContext context, String title, String subtitle, String day, AiWorkoutDay? dayPlan) {
+    final isCompleted = _workoutController.isWorkoutCompleted(title);
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF161616),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(
+          color: isCompleted ? Colors.green.withOpacity(0.3) : Colors.white.withOpacity(0.05),
+          width: isCompleted ? 2 : 1,
+        ),
       ),
       child: Row(
         children: [
@@ -394,41 +398,52 @@ class WorkoutScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  day,
-                  style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
-                ),
+                Text(day, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                 const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    if (isCompleted) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Icon(Icons.access_time, color: Colors.white.withOpacity(0.5), size: 14),
                     const SizedBox(width: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
-                    ),
+                    Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
                   ],
                 ),
               ],
             ),
           ),
           InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => SingleWorkoutScreen(workoutName: title)),
-            ),
+            onTap: () {
+              if (dayPlan != null && !dayPlan.isRestDay) {
+                _workoutController.startWorkout(dayPlan);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SingleWorkoutScreen(
+                    workoutName: title,
+                    exercises: dayPlan.exercises,
+                  )),
+                );
+              }
+            },
             child: Container(
               padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                color: Color(0xFF8B5CF6),
+              decoration: BoxDecoration(
+                color: isCompleted ? Colors.green : const Color(0xFF8B5CF6),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+              child: Icon(
+                isCompleted ? Icons.replay_rounded : Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
           ),
         ],
