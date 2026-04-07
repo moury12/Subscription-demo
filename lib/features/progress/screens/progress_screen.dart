@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../main/controllers/navigation_controller.dart';
 import '../controllers/burn_history_controller.dart';
 import '../../nutrition/controllers/nutrition_controller.dart';
 import '../../workout/controllers/workout_controller.dart';
@@ -13,9 +14,12 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {
+  static const int _progressTabIndex = 3;
+
   final _nutritionController = NutritionController();
   final _burnController = BurnHistoryController();
   final _workoutController = WorkoutController();
+  final _navController = NavigationController();
   final _settings = AppSettings();
 
   @override
@@ -24,6 +28,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _nutritionController.addListener(_rebuild);
     _burnController.addListener(_rebuild);
     _workoutController.addListener(_rebuild);
+    // IndexedStack + const child widgets can skip rebuilding this screen when
+    // AppSettings change on another tab; refresh when the Progress tab is shown.
+    _navController.addListener(_onNavigationChanged);
   }
 
   @override
@@ -31,11 +38,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _nutritionController.removeListener(_rebuild);
     _burnController.removeListener(_rebuild);
     _workoutController.removeListener(_rebuild);
+    _navController.removeListener(_onNavigationChanged);
     super.dispose();
   }
 
   void _rebuild() {
     if (mounted) setState(() {});
+  }
+
+  void _onNavigationChanged() {
+    if (!mounted) return;
+    if (_navController.currentIndex == _progressTabIndex) {
+      setState(() {});
+    }
   }
 
   @override
@@ -188,9 +203,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildStatsRow() {
-    // Difference between target and current or just a placeholder for now
-    double weightChange = 0.0; 
-    
+    final double? current = _settings.currentWeight;
+    final double? entry = _settings.entryWeight;
+    final double weightChange = (current != null && entry != null)
+        ? (current - entry)
+        : 0.0;
+
     return Row(
       children: [
         _buildStatCard(_nutritionController.totalCalories.toInt().toString(), 'Consumption'),

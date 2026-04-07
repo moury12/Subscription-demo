@@ -11,6 +11,8 @@ class AppSettings {
   String? gender;
   double? height;
   double? currentWeight;
+  /// Starting weight when the user began tracking (baseline for progress).
+  double? entryWeight;
   String? goal;
   String? activityLevel;
   int workoutDays = 3;

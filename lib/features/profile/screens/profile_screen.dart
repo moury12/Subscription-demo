@@ -27,11 +27,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final TextEditingController _heightController;
   late final TextEditingController _targetWeightController;
   late final TextEditingController _currentWeightController;
+  late final TextEditingController _entryWeightController;
 
   @override
   void initState() {
     super.initState();
     _settings = AppSettings();
+    if (_settings.entryWeight == null && _settings.currentWeight != null) {
+      _settings.entryWeight = _settings.currentWeight;
+    }
     _nameController = TextEditingController(text: _settings.userName ?? '');
     _ageController = TextEditingController(
       text: _settings.age?.toString() ?? '',
@@ -45,6 +49,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _currentWeightController = TextEditingController(
       text: _settings.currentWeight?.toString() ?? '',
     );
+    _entryWeightController = TextEditingController(
+      text: _settings.entryWeight?.toString() ?? '',
+    );
   }
 
   @override
@@ -54,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _heightController.dispose();
     _targetWeightController.dispose();
     _currentWeightController.dispose();
+    _entryWeightController.dispose();
     super.dispose();
   }
 
@@ -198,6 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 48,
@@ -212,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,16 +230,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'CURRENT WEIGHT',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       '${_settings.currentWeight ?? 0} kg',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ENTRY WEIGHT',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_settings.entryWeight ?? _settings.currentWeight ?? 0} kg',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.95),
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -240,15 +275,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               TextButton(
                 onPressed: () {
                   if (_isEditingWeight) {
-                    // Update settings when saving
                     setState(() {
-                      _settings.currentWeight =
-                          double.tryParse(_currentWeightController.text) ??
-                          _settings.currentWeight;
+                      _currentWeightController.text =
+                          _settings.currentWeight?.toString() ?? '';
+                      _entryWeightController.text =
+                          _settings.entryWeight?.toString() ?? '';
                       _isEditingWeight = false;
                     });
                   } else {
-                    setState(() => _isEditingWeight = true);
+                    setState(() {
+                      _currentWeightController.text =
+                          _settings.currentWeight?.toString() ?? '';
+                      _entryWeightController.text =
+                          _settings.entryWeight?.toString() ?? '';
+                      _isEditingWeight = true;
+                    });
                   }
                 },
                 child: Text(
@@ -263,6 +304,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           if (_isEditingWeight) ...[
             const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'CURRENT WEIGHT',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.35),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
             Container(
               height: 56,
               decoration: BoxDecoration(
@@ -279,7 +333,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(border: InputBorder.none),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'ENTRY WEIGHT',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.35),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              alignment: Alignment.center,
+              child: TextField(
+                controller: _entryWeightController,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(border: InputBorder.none),
               ),
             ),
@@ -290,9 +378,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _settings.currentWeight =
-                        double.tryParse(_currentWeightController.text) ??
-                        _settings.currentWeight;
+                    final parsedCurrent = double.tryParse(
+                      _currentWeightController.text,
+                    );
+                    final parsedEntry = double.tryParse(
+                      _entryWeightController.text,
+                    );
+                    if (parsedCurrent != null) {
+                      _settings.currentWeight = parsedCurrent;
+                    }
+                    if (parsedEntry != null) {
+                      _settings.entryWeight = parsedEntry;
+                    } else if (_settings.entryWeight == null &&
+                        parsedCurrent != null) {
+                      _settings.entryWeight = parsedCurrent;
+                    }
                     _isEditingWeight = false;
                   });
                 },

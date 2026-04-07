@@ -47,6 +47,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     settings.gender = _data.gender;
     settings.height = _data.height;
     settings.currentWeight = _data.currentWeight;
+    settings.entryWeight = _data.currentWeight;
     settings.goal = _data.goal;
     settings.activityLevel = _data.activityLevel;
     settings.workoutDays = _data.workoutDays;
