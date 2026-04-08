@@ -14,6 +14,7 @@ import 'week_starts_screen.dart';
 import 'target_weight_screen.dart';
 import 'review_profile_screen.dart';
 import 'creating_plan_screen.dart';
+import '../../features/profile/services/profile_service.dart';
 
 class OnboardingFlowScreen extends StatefulWidget {
   const OnboardingFlowScreen({super.key});
@@ -25,6 +26,12 @@ class OnboardingFlowScreen extends StatefulWidget {
 class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
   final PageController _pageController = PageController();
   final OnboardingData _data = OnboardingData();
+
+  @override
+  void initState() {
+    super.initState();
+    _data.name = AppSettings().userName;
+  }
 
   void _nextPage() {
     _pageController.nextPage(
@@ -40,8 +47,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     );
   }
 
-  void _finish() {
-    // Save preferences
+  void _finish() async {
+    // Save preferences locally
     final settings = AppSettings();
     settings.age = _data.age;
     settings.gender = _data.gender;
@@ -55,10 +62,15 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     settings.targetWeight = _data.targetWeight;
     settings.timezone = _data.timezone;
     settings.weekStartDay = _data.weekStartDay;
+
+    // Sync to backend
+    await ProfileService().updateProfile(_data.toJson());
     
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const MainShellScreen()),
-    );
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainShellScreen()),
+      );
+    }
   }
 
   @override
@@ -76,10 +88,6 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
           controller: _pageController,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            WelcomeScreen(
-              onStart: _nextPage,
-              onSkip: _finish,
-            ),
             AgeGenderScreen(
               age: _data.age ?? 0,
               gender: _data.gender ?? 'Male',

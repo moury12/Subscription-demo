@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/ai_workout_plan.dart';
+import '../../../core/services/log_service.dart';
 
 class WorkoutController extends ChangeNotifier {
   static final WorkoutController _instance = WorkoutController._internal();
@@ -59,6 +60,19 @@ class WorkoutController extends ChangeNotifier {
       final todayKey = _dayKey(DateTime.now());
       _completedWorkoutsByDay[todayKey] =
           (_completedWorkoutsByDay[todayKey] ?? 0) + 1;
+      
+      // Sync to backend
+      LogService().saveWorkoutLog({
+        'date': DateTime.now().toIso8601String(),
+        'exercises': _activeWorkout!.exercises.map((e) => {
+          'name': e.exerciseName,
+          'sets': 0, // Mocking sets/reps if not in model
+          'reps': e.repsCount,
+          'completed': true
+        }).toList(),
+        'durationMinutes': 0,
+        'notes': 'Completed via AI Workout Plan'
+      });
     }
     _activeWorkout = null;
     _currentExerciseIndex = 0;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/food.dart';
+import '../../../core/services/log_service.dart';
 
 class NutritionController extends ChangeNotifier {
   static final NutritionController _instance = NutritionController._internal();
@@ -16,6 +17,18 @@ class NutritionController extends ChangeNotifier {
       food: food,
       multiplier: multiplier,
     ));
+    
+    // Sync to backend
+    LogService().saveMealLog({
+      'mealType': type,
+      'dishName': food.name,
+      'totalCalories': food.calories * multiplier,
+      'totalProtein': food.protein * multiplier,
+      'totalCarbs': food.carbs * multiplier,
+      'totalFat': food.fat * multiplier,
+      'ingredients': [] // Individual food objects don't have ingredients in this simplified model
+    });
+
     notifyListeners();
   }
 

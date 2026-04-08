@@ -6,7 +6,13 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/branding/gradient_logo.dart';
 import '../../../widgets/navigation/pagination_dots.dart';
-import '../../auth/screens/sign_in_screen.dart';
+import '../../auth/screens/auth_choice_screen.dart';
+import '../../../screens/onboarding/onboarding_flow_screen.dart';
+import '../../auth/services/auth_service.dart';
+import '../../profile/services/profile_service.dart';
+import '../../main/screens/main_shell_screen.dart';
+import '../../../core/app_settings.dart';
+import '../../../screens/onboarding/welcome_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,25 +22,75 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const SignInScreen()),
-        );
-      }
-    });
+    _checkLoginStatus();
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<void> _checkLoginStatus() async {
+    // Show splash for at least 1.5s
+    final startTime = DateTime.now();
+    
+    final isLoggedIn = await AuthService().isLoggedIn();
+    
+    if (isLoggedIn) {
+      debugPrint('[SPLASH] User is logged in, fetching profile...');
+      final profile = await ProfileService().getProfile();
+      
+      // Calculate remaining delay
+      final elapsed = DateTime.now().difference(startTime).inMilliseconds;
+      if (elapsed < 1500) {
+        await Future.delayed(Duration(milliseconds: 1500 - elapsed));
+      }
+
+      if (mounted) {
+        if (profile != null && profile['hasCompletedOnboarding'] == true) {
+          debugPrint('[SPLASH] Profile complete. Going to Dashboard.');
+          AppSettings().syncFromProfile(profile);
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainShellScreen()),
+          );
+        } else if (profile != null) {
+          debugPrint('[SPLASH] Profile incomplete. Going to Onboarding Survey.');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()),
+          );
+        } else {
+          // If profile fetch fails (like a 401 or network error), treat as Guest
+          debugPrint('[SPLASH] Profile fetch failed. Redirecting to Landing.');
+          await AuthService().logout(); // Clear stale token
+          _goToLanding();
+        }
+      }
+    } else {
+      debugPrint('[SPLASH] User is a Guest. Redirecting to Landing.');
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) {
+        _goToLanding();
+      }
+    }
   }
+
+  void _goToLanding() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => WelcomeScreen(
+          onStart: () {
+            debugPrint('[LANDING] Get Started clicked. Going to Auth Choice.');
+            Navigator.of(ctx).pushReplacement(
+                MaterialPageRoute(builder: (_) => const AuthChoiceScreen()));
+          },
+          onSkip: () {
+            debugPrint('[LANDING] Skip clicked. Going to Auth Choice.');
+            Navigator.of(ctx).pushReplacement(
+                MaterialPageRoute(builder: (_) => const AuthChoiceScreen()));
+          },
+        ),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -297,7 +297,9 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
                   fat: analysisResult.totalFat,
                 );
                 NutritionController().addMeal(mealType, food, 1.0);
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                // Go back to scanning screen or nutrition dashboard
+                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,

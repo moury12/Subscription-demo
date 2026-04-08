@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/ai_burn_model.dart';
+import '../../../core/services/log_service.dart';
 
 class BurnLog {
   final String activity;
@@ -28,18 +29,6 @@ class BurnHistoryController extends ChangeNotifier {
       date: DateTime(2026, 3, 12, 12, 4), 
       caloriesBurned: 87.5,
     ),
-    BurnLog(
-      activity: 'running for 1 hour', 
-      duration: '1 hour', 
-      date: DateTime(2026, 3, 12, 11, 53), 
-      caloriesBurned: 700.0,
-    ),
-    BurnLog(
-      activity: 'Walking for 30 minutes', 
-      duration: '30 min', 
-      date: DateTime(2026, 3, 12, 11, 51), 
-      caloriesBurned: 135.0,
-    ),
   ];
 
   List<BurnLog> get history => List.unmodifiable(_history);
@@ -61,6 +50,18 @@ class BurnHistoryController extends ChangeNotifier {
         caloriesBurned: act.caloriesBurned,
       ));
     }
+    
+    // Sync to backend
+    LogService().saveBurnLog({
+      'activityDescription': 'AI Burn Analysis',
+      'totalCaloriesBurned': result.totalCaloriesBurned,
+      'activities': result.activities.map((a) => {
+        'activity': a.activity,
+        'duration': a.duration,
+        'caloriesBurned': a.caloriesBurned
+      }).toList()
+    });
+
     notifyListeners();
   }
 }

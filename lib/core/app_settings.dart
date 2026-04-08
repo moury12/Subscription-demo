@@ -6,7 +6,7 @@ class AppSettings {
   AppSettings._internal();
 
   AiWeeklyWorkoutPlan? currentPlan;
-  String? userName = 'Tom Hanks';
+  String? userName;
   int? age;
   String? gender;
   double? height;
@@ -24,4 +24,20 @@ class AppSettings {
   int targetProtein = 150;
   int targetCarbs = 200;
   int targetFat = 60;
+
+  void syncFromProfile(Map<String, dynamic> json) {
+    userName = json['name'];
+    age = json['age'];
+    gender = json['gender'];
+    height = (json['height'] as num?)?.toDouble();
+    currentWeight = (json['currentWeight'] as num?)?.toDouble();
+    entryWeight = (json['entryWeight'] as num?)?.toDouble();
+    goal = json['goal'];
+    activityLevel = json['activityLevel'];
+    workoutDays = json['workoutSchedule']?['daysPerWeek'] ?? 3;
+    dietPreference = json['dietaryPreference'];
+    targetWeight = (json['targetWeight'] as num?)?.toDouble();
+    timezone = json['timezone'];
+    weekStartDay = json['weekStart'] ?? 'Monday';
+  }
 }
