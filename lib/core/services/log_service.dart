@@ -46,6 +46,15 @@ class LogService {
     }
   }
 
+  Future<bool> saveWeightLog(Map<String, dynamic> weightData) async {
+    try {
+      final response = await _api.post('/logs/weight', weightData);
+      return response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // --- Fetch Methods ---
 
   Future<List<Map<String, dynamic>>> getMealLogs() async {
@@ -90,6 +99,19 @@ class LogService {
   Future<List<Map<String, dynamic>>> getWorkoutPlans() async {
     try {
       final response = await _api.get('/logs/plans');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getWeightLogs() async {
+    try {
+      final response = await _api.get('/logs/weight');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.cast<Map<String, dynamic>>();

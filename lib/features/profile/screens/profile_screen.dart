@@ -3,6 +3,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../../auth/services/auth_service.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
+import '../../progress/controllers/weight_history_controller.dart';
+import '../services/profile_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -378,24 +380,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    final parsedCurrent = double.tryParse(
-                      _currentWeightController.text,
-                    );
-                    final parsedEntry = double.tryParse(
-                      _entryWeightController.text,
-                    );
-                    if (parsedCurrent != null) {
-                      _settings.currentWeight = parsedCurrent;
-                    }
-                    if (parsedEntry != null) {
-                      _settings.entryWeight = parsedEntry;
-                    } else if (_settings.entryWeight == null &&
-                        parsedCurrent != null) {
-                      _settings.entryWeight = parsedCurrent;
-                    }
-                    _isEditingWeight = false;
-                  });
+                  final parsedCurrent = double.tryParse(
+                    _currentWeightController.text,
+                  );
+                  final parsedEntry = double.tryParse(
+                    _entryWeightController.text,
+                  );
+
+                  if (parsedCurrent != null &&
+                      parsedCurrent != _settings.currentWeight) {
+                    WeightHistoryController().logWeight(parsedCurrent);
+                  }
+
+                  if (parsedEntry != null &&
+                      parsedEntry != _settings.entryWeight) {
+                    WeightHistoryController().updateEntryWeight(parsedEntry);
+                  } else if (_settings.entryWeight == null &&
+                      parsedCurrent != null) {
+                    WeightHistoryController().updateEntryWeight(parsedCurrent);
+                  }
+
+                  setState(() => _isEditingWeight = false);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -546,6 +551,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     double.tryParse(_heightController.text) ?? _settings.height;
                 _expandedIndex = null;
               });
+              ProfileService().updateProfile({
+                'name': _settings.userName,
+                'age': _settings.age,
+                'height': _settings.height,
+              });
             },
           ),
         ],
@@ -675,6 +685,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     double.tryParse(_targetWeightController.text) ??
                     _settings.targetWeight;
                 _expandedIndex = null;
+              });
+              ProfileService().updateProfile({
+                'goal': _settings.goal,
+                'targetWeight': _settings.targetWeight,
               });
             },
           ),

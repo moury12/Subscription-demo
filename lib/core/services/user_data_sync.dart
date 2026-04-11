@@ -4,6 +4,7 @@ import '../services/log_service.dart';
 import '../../features/workout/models/ai_workout_plan.dart';
 import '../../features/nutrition/controllers/nutrition_controller.dart';
 import '../../features/progress/controllers/burn_history_controller.dart';
+import '../../features/progress/controllers/weight_history_controller.dart';
 import '../../features/workout/controllers/workout_controller.dart';
 
 /// Loads all persisted user data from the backend after login or app restart.
@@ -14,6 +15,7 @@ class UserDataSync {
       NutritionController().loadFromDatabase(),
       BurnHistoryController().loadFromDatabase(),
       WorkoutController().loadFromDatabase(),
+      WeightHistoryController().loadFromDatabase(),
     ]);
     debugPrint('[SYNC] All user data loaded from database');
   }
@@ -49,5 +51,6 @@ class UserDataSync {
     NutritionController().clearAll();
     BurnHistoryController().clearAll();
     WorkoutController().clearAll();
+    WeightHistoryController().clearAll();
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../../main/controllers/navigation_controller.dart';
 import '../controllers/burn_history_controller.dart';
+import '../controllers/weight_history_controller.dart';
 import '../../nutrition/controllers/nutrition_controller.dart';
 import '../../workout/controllers/workout_controller.dart';
 
@@ -19,6 +21,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   final _nutritionController = NutritionController();
   final _burnController = BurnHistoryController();
   final _workoutController = WorkoutController();
+  final _weightController = WeightHistoryController();
   final _navController = NavigationController();
   final _settings = AppSettings();
 
@@ -28,8 +31,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _nutritionController.addListener(_rebuild);
     _burnController.addListener(_rebuild);
     _workoutController.addListener(_rebuild);
-    // IndexedStack + const child widgets can skip rebuilding this screen when
-    // AppSettings change on another tab; refresh when the Progress tab is shown.
+    _weightController.addListener(_rebuild);
     _navController.addListener(_onNavigationChanged);
   }
 
@@ -38,6 +40,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _nutritionController.removeListener(_rebuild);
     _burnController.removeListener(_rebuild);
     _workoutController.removeListener(_rebuild);
+    _weightController.removeListener(_rebuild);
     _navController.removeListener(_onNavigationChanged);
     super.dispose();
   }
@@ -70,8 +73,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 const SizedBox(height: 24),
                 _buildWorkoutConsistencyCard(),
                 const SizedBox(height: 16),
+                _buildWeightProgressCard(),
+                const SizedBox(height: 16),
                 _buildCalorieTrackingCard(),
-                const SizedBox(height: 100), // Bottom padding for nav
+                const SizedBox(height: 100),
               ]),
             ),
           ),
@@ -208,13 +213,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final double? entry = _settings.entryWeight;
     final double weightChange = (current != null && entry != null)
         ? (current - entry)
-        : 0.0;
+        : _weightController.totalChange;
 
     return Row(
       children: [
         _buildStatCard(_nutritionController.totalCalories.toInt().toString(), 'Consumption'),
         const SizedBox(width: 12),
-        _buildStatCard(weightChange.toStringAsFixed(1), 'kg Change'),
+        _buildStatCard('${weightChange >= 0 ? '+' : ''}${weightChange.toStringAsFixed(1)}', 'kg Change'),
         const SizedBox(width: 12),
         _buildStatCard(_burnController.totalBurnedToday.toInt().toString(), 'Total Burn'),
       ],
@@ -389,6 +394,184 @@ class _ProgressScreenState extends State<ProgressScreen> {
         const SizedBox(height: 8),
         Text(day, style: const TextStyle(color: Colors.white24, fontSize: 10)),
       ],
+    );
+  }
+
+  Widget _buildWeightProgressCard() {
+    final entries = _weightController.history;
+    final current = _settings.currentWeight;
+    final entry = _settings.entryWeight;
+    final target = _settings.targetWeight;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111111),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Weight Progress',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (current != null)
+                Text(
+                  '${current.toStringAsFixed(1)} kg',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _buildWeightStat(
+                'Entry',
+                entry != null ? '${entry.toStringAsFixed(1)} kg' : '—',
+                Colors.blue.shade400,
+              ),
+              const SizedBox(width: 16),
+              _buildWeightStat(
+                'Current',
+                current != null ? '${current.toStringAsFixed(1)} kg' : '—',
+                AppColors.progressOrange,
+              ),
+              const SizedBox(width: 16),
+              _buildWeightStat(
+                'Target',
+                target != null ? '${target.toStringAsFixed(1)} kg' : '—',
+                Colors.tealAccent.shade400,
+              ),
+            ],
+          ),
+          if (entries.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            const Divider(color: Colors.white10),
+            const SizedBox(height: 12),
+            const Text(
+              'Recent Changes',
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...entries.take(5).map((e) {
+              final changeStr = e.change != null
+                  ? '${e.change! >= 0 ? '+' : ''}${e.change!.toStringAsFixed(1)} kg'
+                  : 'Initial';
+              final isLoss = (e.change ?? 0) < 0;
+              final isGain = (e.change ?? 0) > 0;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isLoss
+                            ? Colors.tealAccent.shade400
+                            : isGain
+                                ? Colors.redAccent
+                                : Colors.white38,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      '${e.weight.toStringAsFixed(1)} kg',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      changeStr,
+                      style: TextStyle(
+                        color: isLoss
+                            ? Colors.tealAccent.shade400
+                            : isGain
+                                ? Colors.redAccent
+                                : Colors.white38,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      DateFormat('MMM d, yyyy').format(e.date),
+                      style: const TextStyle(
+                        color: Colors.white24,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Center(
+                child: Text(
+                  'Update your weight in Profile to track changes',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeightStat(String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.15)),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: color.withOpacity(0.7),
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
