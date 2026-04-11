@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/services/user_data_sync.dart';
 import '../../../widgets/buttons/primary_glow_button.dart';
 import '../../../widgets/inputs/app_text_input.dart';
 import '../../../screens/onboarding/onboarding_flow_screen.dart';
@@ -47,6 +48,8 @@ class _SignInScreenState extends State<SignInScreen> {
           setState(() => _isLoading = false);
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
             AppSettings().syncFromProfile(profile);
+            await UserDataSync.loadAll();
+            if (!mounted) return;
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const MainShellScreen()));
           } else {

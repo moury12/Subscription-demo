@@ -10,7 +10,7 @@ class WorkoutController extends ChangeNotifier {
   AiWorkoutDay? _activeWorkout;
   int _currentExerciseIndex = 0;
   bool _isPaused = false;
-  final Set<String> _completedWorkoutTitles = {}; // Track completed workouts by title
+  final Set<String> _completedWorkoutTitles = {};
   final Map<String, int> _completedWorkoutsByDay = {};
 
   AiWorkoutDay? get activeWorkout => _activeWorkout;
@@ -56,24 +56,58 @@ class WorkoutController extends ChangeNotifier {
 
   void finishWorkout() {
     if (_activeWorkout != null) {
-      _completedWorkoutTitles.add(_activeWorkout!.title);
+      final title = _activeWorkout!.title;
+      _completedWorkoutTitles.add(title);
       final todayKey = _dayKey(DateTime.now());
       _completedWorkoutsByDay[todayKey] =
           (_completedWorkoutsByDay[todayKey] ?? 0) + 1;
       
-      // Sync to backend
       LogService().saveWorkoutLog({
         'date': DateTime.now().toIso8601String(),
+        'workoutTitle': title,
         'exercises': _activeWorkout!.exercises.map((e) => {
-          'name': e.exerciseName,
-          'sets': 0, // Mocking sets/reps if not in model
-          'reps': e.repsCount,
+          'name': e.name,
+          'sets': e.sets,
+          'reps': e.reps,
           'completed': true
         }).toList(),
         'durationMinutes': 0,
-        'notes': 'Completed via AI Workout Plan'
+        'notes': title,
       });
     }
+    _activeWorkout = null;
+    _currentExerciseIndex = 0;
+    _isPaused = false;
+    notifyListeners();
+  }
+
+  /// Load completed workout logs from the backend database to restore state
+  Future<void> loadFromDatabase() async {
+    final logs = await LogService().getWorkoutLogs();
+    _completedWorkoutTitles.clear();
+    _completedWorkoutsByDay.clear();
+
+    for (final log in logs) {
+      final dateStr = log['date'] as String?;
+      if (dateStr != null) {
+        final logDate = DateTime.tryParse(dateStr);
+        if (logDate != null) {
+          final dayKey = _dayKey(logDate);
+          _completedWorkoutsByDay[dayKey] =
+              (_completedWorkoutsByDay[dayKey] ?? 0) + 1;
+        }
+      }
+      final title = log['workoutTitle'] as String? ?? log['notes'] as String? ?? '';
+      if (title.isNotEmpty) {
+        _completedWorkoutTitles.add(title);
+      }
+    }
+    notifyListeners();
+  }
+
+  void clearAll() {
+    _completedWorkoutTitles.clear();
+    _completedWorkoutsByDay.clear();
     _activeWorkout = null;
     _currentExerciseIndex = 0;
     _isPaused = false;

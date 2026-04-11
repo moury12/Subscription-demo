@@ -1,33 +1,27 @@
 class AiWorkoutExercise {
-  final int stepNumber;
-  final String exerciseName;
-  final String shortInstruction;
-  final List<String> detailedSteps;
-  final int repsCount;
-  final String ctaLabel;
-  final String completionRule;
+  final String name;
+  final int sets;
+  final String reps;
 
   AiWorkoutExercise({
-    required this.stepNumber,
-    required this.exerciseName,
-    required this.shortInstruction,
-    required this.detailedSteps,
-    required this.repsCount,
-    required this.ctaLabel,
-    required this.completionRule,
+    required this.name,
+    required this.sets,
+    required this.reps,
   });
 
   factory AiWorkoutExercise.fromJson(Map<String, dynamic> json) {
     return AiWorkoutExercise(
-      stepNumber: json['step_number'] ?? 0,
-      exerciseName: json['exercise_name'] ?? '',
-      shortInstruction: json['short_instruction'] ?? '',
-      detailedSteps: List<String>.from(json['detailed_steps'] ?? []),
-      repsCount: json['reps_count'] ?? 0,
-      ctaLabel: json['cta_label'] ?? '',
-      completionRule: json['completion_rule'] ?? '',
+      name: json['name'] ?? '',
+      sets: (json['sets'] as num?)?.toInt() ?? 0,
+      reps: json['reps'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'sets': sets,
+    'reps': reps,
+  };
 }
 
 class AiWorkoutDay {
@@ -53,6 +47,13 @@ class AiWorkoutDay {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'day': day,
+    'title': title,
+    'isRestDay': isRestDay,
+    'exercises': exercises.map((e) => e.toJson()).toList(),
+  };
 }
 
 class NutritionalTargets {
@@ -76,17 +77,28 @@ class NutritionalTargets {
       dailyFat: (json['dailyFat'] as num?)?.toInt() ?? 65,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'dailyCalories': dailyCalories,
+    'dailyProtein': dailyProtein,
+    'dailyCarbs': dailyCarbs,
+    'dailyFat': dailyFat,
+  };
 }
 
 class AiWeeklyWorkoutPlan {
   final String planTitle;
   final int weekNumber;
+  final DateTime? startDate;
+  final DateTime? endDate;
   final List<AiWorkoutDay> days;
   final NutritionalTargets? nutritionalTargets;
 
   AiWeeklyWorkoutPlan({
     required this.planTitle,
     required this.weekNumber,
+    this.startDate,
+    this.endDate,
     required this.days,
     this.nutritionalTargets,
   });
@@ -95,6 +107,8 @@ class AiWeeklyWorkoutPlan {
     return AiWeeklyWorkoutPlan(
       planTitle: json['planTitle'] ?? '',
       weekNumber: json['weekNumber'] ?? 1,
+      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
+      endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
       days: (json['days'] as List? ?? [])
           .map((d) => AiWorkoutDay.fromJson(d))
           .toList(),
@@ -102,5 +116,24 @@ class AiWeeklyWorkoutPlan {
           ? NutritionalTargets.fromJson(json['nutritionalTargets'])
           : null,
     );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'planTitle': planTitle,
+    'weekNumber': weekNumber,
+    if (startDate != null) 'startDate': startDate!.toIso8601String(),
+    if (endDate != null) 'endDate': endDate!.toIso8601String(),
+    'days': days.map((d) => d.toJson()).toList(),
+    if (nutritionalTargets != null) 'nutritionalTargets': nutritionalTargets!.toJson(),
+  };
+
+  bool coversDate(DateTime date) {
+    if (startDate == null) return false;
+    final start = DateTime(startDate!.year, startDate!.month, startDate!.day);
+    final end = endDate != null
+        ? DateTime(endDate!.year, endDate!.month, endDate!.day)
+        : start.add(const Duration(days: 6));
+    final check = DateTime(date.year, date.month, date.day);
+    return !check.isBefore(start) && !check.isAfter(end);
   }
 }

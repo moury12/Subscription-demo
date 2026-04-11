@@ -143,7 +143,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildSummaryCard() {
-    int totalWorkoutDays = _settings.currentPlan?.days.where((d) => !d.isRestDay).length ?? 0;
+    final currentPlan = _settings.currentWeekPlan;
+    int totalWorkoutDays = (currentPlan != null ? currentPlan.days.where((d) => !d.isRestDay).length : 0);
     int completedCount = _workoutController.completedCount;
     double avgCalories = _nutritionController.totalCalories;
     bool onTarget = (_nutritionController.totalCalories - _settings.targetCalories).abs() < 200;
@@ -240,9 +241,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Widget _buildWorkoutConsistencyCard() {
-    int totalWorkoutDays = _settings.currentPlan?.days.where((d) => !d.isRestDay).length ?? 7;
+    final currentPlan = _settings.currentWeekPlan;
+    int totalWorkoutDays = (currentPlan != null ? currentPlan.days.where((d) => !d.isRestDay).length : 7);
     int completedCount = _workoutController.completedCount;
-    double completionRate = (completedCount / totalWorkoutDays) * 100;
+    double completionRate = totalWorkoutDays > 0 ? (completedCount / totalWorkoutDays) * 100 : 0;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -270,9 +272,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
               children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) {
                 // Check if workout was completed for this day's title if plans exist
                 bool isDone = false;
-                if (_settings.currentPlan != null) {
-                  final dayPlan = _settings.currentPlan!.days.firstWhere((d) => d.day.contains(day), orElse: () => _settings.currentPlan!.days.first);
-                  isDone = _workoutController.isWorkoutCompleted(dayPlan.title);
+                if (currentPlan != null) {
+                  try {
+                    final dayPlan = currentPlan.days.firstWhere((d) => d.day.contains(day));
+                    isDone = _workoutController.isWorkoutCompleted(dayPlan.title);
+                  } catch (_) {}
                 }
 
                 return Column(

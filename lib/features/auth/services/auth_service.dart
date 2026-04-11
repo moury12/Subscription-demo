@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/app_settings.dart';
+import '../../../core/services/user_data_sync.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -49,6 +51,7 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+    UserDataSync.clearAll();
   }
 
   Future<bool> isLoggedIn() async {
@@ -59,5 +62,18 @@ class AuthService {
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
+    await _fetchAndSyncProfile();
+  }
+
+  Future<void> _fetchAndSyncProfile() async {
+    try {
+      final response = await _api.get('/user/profile');
+      if (response.statusCode == 200) {
+        final profileData = jsonDecode(response.body);
+        AppSettings().syncFromProfile(profileData);
+      }
+    } catch (e) {
+      // Profile fetch failed silently
+    }
   }
 }

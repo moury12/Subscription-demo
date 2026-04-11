@@ -6,6 +6,7 @@ import '../../widgets/onboarding/onboarding_background.dart';
 import '../../core/app_settings.dart';
 import '../../features/onboarding/models/onboarding_data.dart';
 import '../../features/workout/controllers/ai_workout_service.dart';
+import '../../features/profile/services/profile_service.dart';
 
 class CreatingPlanScreen extends StatefulWidget {
   final OnboardingData data;
@@ -61,12 +62,22 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
           const SnackBar(content: Text('Failed to generate plan. Using default template.')),
         );
       } else {
-        AppSettings().currentPlan = plan;
+        AppSettings().addWorkoutPlan(plan);
         if (plan.nutritionalTargets != null) {
           AppSettings().targetCalories = plan.nutritionalTargets!.dailyCalories;
           AppSettings().targetProtein = plan.nutritionalTargets!.dailyProtein;
           AppSettings().targetCarbs = plan.nutritionalTargets!.dailyCarbs;
           AppSettings().targetFat = plan.nutritionalTargets!.dailyFat;
+
+          // Persist nutritional targets to user profile
+          ProfileService().updateProfile({
+            'nutritionalTargets': {
+              'dailyCalories': plan.nutritionalTargets!.dailyCalories,
+              'dailyProtein': plan.nutritionalTargets!.dailyProtein,
+              'dailyCarbs': plan.nutritionalTargets!.dailyCarbs,
+              'dailyFat': plan.nutritionalTargets!.dailyFat,
+            }
+          });
         }
       }
       widget.onFinish();

@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/food.dart';
 
 class AiFoodService {
-  // Use localhost for Web/Desktop, 10.0.2.2 for Android emulator
   static String get _baseUrl {
     if (kIsWeb) return 'http://localhost:3000/api/ai';
     return 'http://10.0.2.2:3000/api/ai';
@@ -42,10 +42,14 @@ class AiFoodService {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/food-scan'));
       
-      // Use bytes for web compatibility
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      
       final bytes = await imageFile.readAsBytes();
       
-      // Determine content type based on extension
       String extension = imageFile.name.split('.').last.toLowerCase();
       String subtype = (extension == 'png') ? 'png' : 'jpeg';
       

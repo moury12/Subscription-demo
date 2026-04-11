@@ -35,7 +35,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
       _currentRepClickCount++;
       
       final currentExercise = widget.exercises[_currentExerciseIndex];
-      if (_currentRepClickCount >= currentExercise.repsCount) {
+      if (_currentRepClickCount >= currentExercise.sets) {
         // Exercise completed
         if (_currentExerciseIndex < widget.exercises.length - 1) {
           _currentExerciseIndex++;
@@ -47,7 +47,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Nicely done! Next: ${widget.exercises[_currentExerciseIndex].exerciseName}',
+                'Nicely done! Next: ${widget.exercises[_currentExerciseIndex].name}',
                 style: const TextStyle(color: Colors.white),
               ),
               duration: const Duration(seconds: 1),
@@ -118,8 +118,6 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
             _buildProgressSection(),
             const Spacer(),
             _buildExerciseDetail(currentExercise),
-            const Spacer(),
-            _buildInstructionsList(currentExercise),
             const Spacer(),
             _buildCompleteButton(currentExercise),
             const SizedBox(height: 20),
@@ -195,7 +193,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
-            exercise.exerciseName,
+            exercise.name,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
@@ -208,7 +206,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
-            exercise.shortInstruction,
+            exercise.reps,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
@@ -219,7 +217,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         ),
         const SizedBox(height: 24),
         Text(
-          'Goal: ${exercise.repsCount} clicks',
+          'Goal: ${exercise.reps}',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -234,32 +232,6 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildInstructionsList(AiWorkoutExercise exercise) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: exercise.detailedSteps.map((step) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('\u{2022} ', style: TextStyle(color: Colors.white, fontSize: 18)),
-                Expanded(
-                  child: Text(
-                    step,
-                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
     );
   }
 
@@ -285,7 +257,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
               const Icon(Icons.fitness_center, size: 20),
               const SizedBox(width: 12),
               Text(
-                exercise.ctaLabel.toUpperCase(),
+                'COMPLETE SET',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],

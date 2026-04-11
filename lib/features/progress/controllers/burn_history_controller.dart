@@ -21,24 +21,16 @@ class BurnHistoryController extends ChangeNotifier {
   factory BurnHistoryController() => _instance;
   BurnHistoryController._internal();
 
-  final List<BurnLog> _history = [
-    // Mock initial data
-    BurnLog(
-      activity: 'walking for 20 minutes', 
-      duration: '20 min', 
-      date: DateTime(2026, 3, 12, 12, 4), 
-      caloriesBurned: 87.5,
-    ),
-  ];
+  final List<BurnLog> _history = [];
 
   List<BurnLog> get history => List.unmodifiable(_history);
 
   double get totalBurnedToday => _history
-      .where((l) => l.date.day == DateTime.now().day)
+      .where((l) => _isSameDay(l.date, DateTime.now()))
       .fold(0.0, (sum, l) => sum + l.caloriesBurned);
 
   int get activityCountToday => _history
-      .where((l) => l.date.day == DateTime.now().day)
+      .where((l) => _isSameDay(l.date, DateTime.now()))
       .length;
 
   void addAnalysedResult(AiBurnAnalysisResult result) {
@@ -51,7 +43,6 @@ class BurnHistoryController extends ChangeNotifier {
       ));
     }
     
-    // Sync to backend
     LogService().saveBurnLog({
       'activityDescription': 'AI Burn Analysis',
       'totalCaloriesBurned': result.totalCaloriesBurned,
@@ -63,5 +54,36 @@ class BurnHistoryController extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  /// Load burn logs from the backend database
+  Future<void> loadFromDatabase() async {
+    final logs = await LogService().getBurnLogs();
+    _history.clear();
+
+    for (final log in logs) {
+      final activities = log['activities'] as List<dynamic>? ?? [];
+      final dateStr = log['date'] as String?;
+      final logDate = dateStr != null ? DateTime.tryParse(dateStr) : DateTime.now();
+
+      for (final act in activities) {
+        _history.add(BurnLog(
+          activity: act['activity'] ?? '',
+          duration: act['duration'] ?? '',
+          date: logDate ?? DateTime.now(),
+          caloriesBurned: (act['caloriesBurned'] as num?)?.toDouble() ?? 0,
+        ));
+      }
+    }
+    notifyListeners();
+  }
+
+  void clearAll() {
+    _history.clear();
+    notifyListeners();
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

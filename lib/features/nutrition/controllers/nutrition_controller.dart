@@ -18,7 +18,6 @@ class NutritionController extends ChangeNotifier {
       multiplier: multiplier,
     ));
     
-    // Sync to backend
     LogService().saveMealLog({
       'mealType': type,
       'dishName': food.name,
@@ -26,7 +25,7 @@ class NutritionController extends ChangeNotifier {
       'totalProtein': food.protein * multiplier,
       'totalCarbs': food.carbs * multiplier,
       'totalFat': food.fat * multiplier,
-      'ingredients': [] // Individual food objects don't have ingredients in this simplified model
+      'ingredients': []
     });
 
     notifyListeners();
@@ -34,6 +33,43 @@ class NutritionController extends ChangeNotifier {
 
   void removeMeal(LoggedMeal meal) {
     _loggedMeals.remove(meal);
+    notifyListeners();
+  }
+
+  /// Load today's meal logs from the backend database
+  Future<void> loadFromDatabase() async {
+    final logs = await LogService().getMealLogs();
+    _loggedMeals.clear();
+
+    final today = DateTime.now();
+    for (final log in logs) {
+      final dateStr = log['date'] as String?;
+      if (dateStr != null) {
+        final logDate = DateTime.tryParse(dateStr);
+        if (logDate != null &&
+            logDate.year == today.year &&
+            logDate.month == today.month &&
+            logDate.day == today.day) {
+          _loggedMeals.add(LoggedMeal(
+            type: log['mealType'] ?? 'Snack',
+            food: Food(
+              name: log['dishName'] ?? '',
+              servingSize: '1 serving',
+              calories: (log['totalCalories'] as num?)?.toDouble() ?? 0,
+              protein: (log['totalProtein'] as num?)?.toDouble() ?? 0,
+              carbs: (log['totalCarbs'] as num?)?.toDouble() ?? 0,
+              fat: (log['totalFat'] as num?)?.toDouble() ?? 0,
+            ),
+            multiplier: 1.0,
+          ));
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  void clearAll() {
+    _loggedMeals.clear();
     notifyListeners();
   }
 

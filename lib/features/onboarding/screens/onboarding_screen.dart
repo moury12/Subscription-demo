@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/services/user_data_sync.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/branding/gradient_logo.dart';
@@ -48,6 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         if (profile != null && profile['hasCompletedOnboarding'] == true) {
           debugPrint('[SPLASH] Profile complete. Going to Dashboard.');
           AppSettings().syncFromProfile(profile);
+          await UserDataSync.loadAll(); // Load all persisted user data
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const MainShellScreen()),
           );

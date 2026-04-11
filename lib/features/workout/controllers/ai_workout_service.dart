@@ -12,6 +12,7 @@ class AiWorkoutService {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
+        debugPrint('Raw AI Workout Plan JSON: $json');
         return AiWeeklyWorkoutPlan.fromJson(json);
       } else {
         debugPrint('Server error: ${response.statusCode}');

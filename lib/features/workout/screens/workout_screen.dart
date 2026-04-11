@@ -15,11 +15,27 @@ class WorkoutScreen extends StatefulWidget {
 
 class _WorkoutScreenState extends State<WorkoutScreen> {
   final _workoutController = WorkoutController();
+  AiWeeklyWorkoutPlan? _selectedPlan;
 
   @override
   void initState() {
     super.initState();
     _workoutController.addListener(_update);
+    _selectCurrentWeekPlan();
+  }
+
+  void _selectCurrentWeekPlan() {
+    final plans = AppSettings().workoutPlans;
+    if (plans.isEmpty) return;
+
+    final now = DateTime.now();
+    for (final plan in plans) {
+      if (plan.coversDate(now)) {
+        _selectedPlan = plan;
+        return;
+      }
+    }
+    _selectedPlan = plans.first;
   }
 
   @override
@@ -35,7 +51,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = AppSettings();
-    final plan = settings.currentPlan;
+    if (_selectedPlan == null && settings.workoutPlans.isNotEmpty) {
+      _selectCurrentWeekPlan();
+    }
+    final AiWeeklyWorkoutPlan? plan = _selectedPlan;
     final weekStartDay = settings.weekStartDay;
     final now = DateTime.now();
     final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -51,7 +70,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       backgroundColor: AppColors.darkBackground,
       body: CustomScrollView(
         slivers: [
-          _buildWorkoutHeader(context, plan),
+          _buildWorkoutHeader(context),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -71,8 +90,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (plan != null)
-                    ...plan.days.map((dayPlan) {
+                  if (_selectedPlan != null)
+                    ..._selectedPlan!.days.map((dayPlan) {
                       return _buildWorkoutCard(
                         context,
                         dayPlan.title,
@@ -104,13 +123,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 
-  Widget _buildWorkoutHeader(BuildContext context, AiWeeklyWorkoutPlan? plan) {
+  Widget _buildWorkoutHeader(BuildContext context) {
+    final allPlans = AppSettings().workoutPlans;
+    final plan = _selectedPlan;
+
     int totalWorkouts = plan?.days.where((d) => !d.isRestDay).length ?? 0;
     int completedCount = _workoutController.completedCount;
     int progress = totalWorkouts > 0 ? (completedCount * 100 ~/ totalWorkouts) : 0;
 
     return SliverAppBar(
-      expandedHeight: 380,
+      expandedHeight: 420, // Increased height to accommodate dropdown
       backgroundColor: Colors.transparent,
       pinned: false,
       automaticallyImplyLeading: false,
@@ -150,17 +172,40 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
-                        'Workouts',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                      // Dropdown for selecting workout plans
+                      if (allPlans.length > 1) // Only show dropdown if there's more than one plan
+                        DropdownButton<AiWeeklyWorkoutPlan>(
+                          value: _selectedPlan,
+                          dropdownColor: AppColors.darkBackground,
+                          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                          onChanged: (AiWeeklyWorkoutPlan? newValue) {
+                            setState(() {
+                              _selectedPlan = newValue;
+                            });
+                          },
+                          items: allPlans.map<DropdownMenuItem<AiWeeklyWorkoutPlan>>((AiWeeklyWorkoutPlan value) {
+                            return DropdownMenuItem<AiWeeklyWorkoutPlan>(
+                              value: value,
+                              child: Text(
+                                '${value.planTitle} (${value.startDate != null ? DateFormat('MMM d, yyyy').format(value.startDate!) : 'N/A'})',
+                                style: const TextStyle(color: Colors.white, fontSize: 16),
+                              ),
+                            );
+                          }).toList(),
+                        ) else if (plan != null) // If only one plan, just display its title
+                        Text(
+                          plan.planTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 4),
                       Text(
-                        'Your personalized training plan',
+                        plan != null
+                            ? 'Week ${plan.weekNumber}${plan.startDate != null ? ' • ${DateFormat('MMM d').format(plan.startDate!)} – ${DateFormat('MMM d').format(plan.endDate ?? plan.startDate!.add(const Duration(days: 6)))}' : ''}'
+                            : 'Your personalized training plan',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 14,
