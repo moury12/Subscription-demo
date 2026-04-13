@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../app_settings.dart';
 import '../services/log_service.dart';
+import '../services/reminder_scheduler.dart';
 import '../../features/workout/models/ai_workout_plan.dart';
 import '../../features/nutrition/controllers/nutrition_controller.dart';
 import '../../features/progress/controllers/burn_history_controller.dart';
@@ -18,6 +19,9 @@ class UserDataSync {
       WeightHistoryController().loadFromDatabase(),
     ]);
     debugPrint('[SYNC] All user data loaded from database');
+
+    // Schedule notifications based on today's existing logs
+    ReminderScheduler().scheduleTodayNotifications();
   }
 
   static Future<void> _loadWorkoutPlans() async {

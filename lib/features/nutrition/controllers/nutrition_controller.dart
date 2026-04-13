@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/food.dart';
 import '../../../core/services/log_service.dart';
+import '../../../core/services/reminder_scheduler.dart';
 
 class NutritionController extends ChangeNotifier {
   static final NutritionController _instance = NutritionController._internal();
@@ -28,6 +29,7 @@ class NutritionController extends ChangeNotifier {
       'ingredients': []
     });
 
+    ReminderScheduler().onMealLogged(type);
     notifyListeners();
   }
 

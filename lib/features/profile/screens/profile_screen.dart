@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../../core/services/notification_service.dart';
+import '../../../core/services/reminder_scheduler.dart';
 import '../../auth/services/auth_service.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import '../../progress/controllers/weight_history_controller.dart';
@@ -39,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_settings.entryWeight == null && _settings.currentWeight != null) {
       _settings.entryWeight = _settings.currentWeight;
     }
+    _loadNotificationPrefs();
     _nameController = TextEditingController(text: _settings.userName ?? '');
     _ageController = TextEditingController(
       text: _settings.age?.toString() ?? '',
@@ -55,6 +58,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _entryWeightController = TextEditingController(
       text: _settings.entryWeight?.toString() ?? '',
     );
+  }
+
+  Future<void> _loadNotificationPrefs() async {
+    final notif = NotificationService();
+    final master = await notif.isMasterEnabled;
+    final water = await notif.isWaterEnabled;
+    final meal = await notif.isMealEnabled;
+    final workout = await notif.isWorkoutEnabled;
+    if (mounted) {
+      setState(() {
+        _pushNotifications = master;
+        _drinkWaterNotification = water;
+        _mealLogNotification = meal;
+        _workoutNotification = workout;
+      });
+    }
+  }
+
+  void _onToggleChanged() {
+    final notif = NotificationService();
+    notif.setMasterEnabled(_pushNotifications);
+    notif.setWaterEnabled(_drinkWaterNotification);
+    notif.setMealEnabled(_mealLogNotification);
+    notif.setWorkoutEnabled(_workoutNotification);
+    ReminderScheduler().forceReschedule();
   }
 
   @override
@@ -719,15 +747,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: Icons.notifications_active_outlined,
             iconColor: const Color(0xFF60A5FA),
             value: _pushNotifications,
-            onChanged: (v) => setState(() {
-              _pushNotifications = v;
-              // If master is turned off, turn all sub-options off too
-              if (!v) {
-                _drinkWaterNotification = false;
-                _mealLogNotification = false;
-                _workoutNotification = false;
-              }
-            }),
+            onChanged: (v) {
+              setState(() {
+                _pushNotifications = v;
+                if (!v) {
+                  _drinkWaterNotification = false;
+                  _mealLogNotification = false;
+                  _workoutNotification = false;
+                }
+              });
+              _onToggleChanged();
+            },
             isMain: true,
           ),
           AnimatedCrossFade(
@@ -744,7 +774,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.water_drop_outlined,
                   iconColor: const Color(0xFF34D399),
                   value: _drinkWaterNotification,
-                  onChanged: (v) => setState(() => _drinkWaterNotification = v),
+                  onChanged: (v) {
+                    setState(() => _drinkWaterNotification = v);
+                    _onToggleChanged();
+                  },
                 ),
                 _buildNotificationToggle(
                   title: 'Meal Log',
@@ -752,7 +785,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.restaurant_outlined,
                   iconColor: const Color(0xFFFBBF24),
                   value: _mealLogNotification,
-                  onChanged: (v) => setState(() => _mealLogNotification = v),
+                  onChanged: (v) {
+                    setState(() => _mealLogNotification = v);
+                    _onToggleChanged();
+                  },
                 ),
                 _buildNotificationToggle(
                   title: 'Workout',
@@ -760,7 +796,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.fitness_center_outlined,
                   iconColor: const Color(0xFFFB923C),
                   value: _workoutNotification,
-                  onChanged: (v) => setState(() => _workoutNotification = v),
+                  onChanged: (v) {
+                    setState(() => _workoutNotification = v);
+                    _onToggleChanged();
+                  },
                 ),
                 const SizedBox(height: 8),
               ],

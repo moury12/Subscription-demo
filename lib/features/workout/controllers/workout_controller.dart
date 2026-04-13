@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/ai_workout_plan.dart';
 import '../../../core/services/log_service.dart';
+import '../../../core/services/reminder_scheduler.dart';
 
 class WorkoutController extends ChangeNotifier {
   static final WorkoutController _instance = WorkoutController._internal();
@@ -78,6 +79,7 @@ class WorkoutController extends ChangeNotifier {
     _activeWorkout = null;
     _currentExerciseIndex = 0;
     _isPaused = false;
+    ReminderScheduler().onWorkoutLogged();
     notifyListeners();
   }
 
