@@ -9,8 +9,7 @@ import '../models/food.dart';
 
 class AiFoodService {
   static String get _baseUrl {
-    if (kIsWeb) return 'http://localhost:3000/api/ai';
-    return 'http://10.0.2.2:3000/api/ai';
+    return 'http://localhost:3000/api/ai';
   }
 
   final ImagePicker _picker = ImagePicker();

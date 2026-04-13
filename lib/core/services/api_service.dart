@@ -9,9 +9,8 @@ class ApiService {
   ApiService._internal();
 
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:3000/api';
-    // 10.0.2.2 is the special IP for Android emulator to access host machine localhost
-    return 'http://10.0.2.2:3000/api';
+    // adb reverse tcp:3000 tcp:3000 must be run for emulator
+    return 'http://localhost:3000/api';
   }
 
   Future<String?> _getToken() async {
