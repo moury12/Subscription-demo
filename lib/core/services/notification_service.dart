@@ -145,6 +145,8 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
     );
 
     debugPrint('[NOTIF] Scheduled #$id "$title" at $scheduledTime');
