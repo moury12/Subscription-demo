@@ -94,21 +94,27 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (_selectedPlan != null)
-                    ..._selectedPlan!.days.map((dayPlan) {
+                    ..._selectedPlan!.days.asMap().entries.map((entry) {
+                      final dayPlan = entry.value;
                       final localizedExercises = l10n.getString('workout.exercises');
                       final localizedRecovery = l10n.getString('workout.recovery');
+                      
+                      // Translate Day Name
+                      final dayName = l10n.getString('days.${dayPlan.day.toLowerCase()}');
+                      
                       return _buildWorkoutCard(
                         context,
                         dayPlan.title,
                         dayPlan.isRestDay ? localizedRecovery : '${l10n.formatInteger(dayPlan.exercises.length)} $localizedExercises',
-                        dayPlan.day,
+                        dayName,
                         dayPlan,
                       );
                     }).toList()
                   else
                     ...List.generate(7, (index) {
                       final date = weekStart.add(Duration(days: index));
-                      final dayName = DateFormat('EEEE').format(date);
+                      final dayNameRaw = DateFormat('EEEE').format(date);
+                      final dayName = l10n.getString('days.${dayNameRaw.toLowerCase()}');
                       final isRestDay = index > 0;
                       return _buildWorkoutCard(
                         context,
