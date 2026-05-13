@@ -77,7 +77,7 @@ class LogActivityOptions extends StatelessWidget {
             subtitle: l10n.getString('home.log_a_meal_desc'),
             onTap: () {
               Navigator.pop(context);
-              MealLoggingOptions.showAddOptions(context);
+              MealLoggingOptions.showMealTimeSelection(context, isAiScan: true);
             },
           ),
           const SizedBox(height: 12),

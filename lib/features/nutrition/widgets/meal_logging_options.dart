@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers/language_provider.dart';
 import '../controllers/nutrition_controller.dart';
 import '../screens/add_meal_screen.dart';
 import '../screens/ai_food_scan_screen.dart';
@@ -131,11 +133,12 @@ class MealLoggingOptions {
   }
 
   static void showMealTimeSelection(BuildContext context, {required bool isAiScan}) {
+    final l10n = context.read<LanguageProvider>();
     final mealTimes = [
-      {'title': 'Breakfast', 'icon': Icons.coffee_rounded},
-      {'title': 'Lunch', 'icon': Icons.wb_sunny_rounded},
-      {'title': 'Dinner', 'icon': Icons.mode_night_rounded},
-      {'title': 'Snack', 'icon': Icons.cookie_rounded},
+      {'title': l10n.getString('nutrition.breakfast'), 'icon': Icons.coffee_rounded, 'key': 'Breakfast'},
+      {'title': l10n.getString('nutrition.lunch'), 'icon': Icons.wb_sunny_rounded, 'key': 'Lunch'},
+      {'title': l10n.getString('nutrition.dinner'), 'icon': Icons.mode_night_rounded, 'key': 'Dinner'},
+      {'title': l10n.getString('nutrition.snacks'), 'icon': Icons.cookie_rounded, 'key': 'Snack'},
     ];
 
     showModalBottomSheet(
@@ -162,9 +165,9 @@ class MealLoggingOptions {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Select Meal Time',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              l10n.getString('nutrition.add_meal_prompt'),
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             ...mealTimes.map((meal) => Padding(
@@ -174,10 +177,10 @@ class MealLoggingOptions {
                   Navigator.pop(context);
                   if (isAiScan) {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => AiFoodScanScreen(mealType: meal['title'] as String)),
+                      MaterialPageRoute(builder: (_) => AiFoodScanScreen(mealType: meal['key'] as String)),
                     );
                   } else {
-                    _openAddMeal(context, meal['title'] as String);
+                    _openAddMeal(context, meal['key'] as String);
                   }
                 },
                 borderRadius: BorderRadius.circular(16),
