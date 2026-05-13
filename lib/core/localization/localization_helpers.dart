@@ -15,10 +15,12 @@
 /// For more details, see the translation examples below.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
 extension LocalizationExtension on BuildContext {
-  LanguageProvider get l10n => read<LanguageProvider>();
+  LanguageProvider get l10n => watch<LanguageProvider>();
+  LanguageProvider get l10nRead => read<LanguageProvider>();
 }
 
 /// Common translation keys used throughout the app

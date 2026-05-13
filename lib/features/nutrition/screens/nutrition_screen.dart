@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../../core/providers/language_provider.dart';
 import '../controllers/nutrition_controller.dart';
 import '../widgets/meal_logging_options.dart';
 
@@ -30,27 +32,28 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
-              _buildNutritionHeader(),
+              _buildNutritionHeader(l10n),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
                   child: Column(
                     children: [
-                      _buildCalorieCard(),
+                      _buildCalorieCard(l10n),
                       const SizedBox(height: 32),
-                      _buildMealSection('Breakfast', Icons.coffee_rounded, const Color(0xFF00C853)),
+                      _buildMealSection(l10n, 'Breakfast', Icons.coffee_rounded, const Color(0xFF00C853)),
                       const SizedBox(height: 24),
-                      _buildMealSection('Lunch', Icons.wb_sunny_rounded, const Color(0xFF34D399)),
+                      _buildMealSection(l10n, 'Lunch', Icons.wb_sunny_rounded, const Color(0xFF34D399)),
                       const SizedBox(height: 24),
-                      _buildMealSection('Dinner', Icons.mode_night_rounded, const Color(0xFF00E676)),
+                      _buildMealSection(l10n, 'Dinner', Icons.mode_night_rounded, const Color(0xFF00E676)),
                       const SizedBox(height: 24),
-                      _buildMealSection('Snack', Icons.cookie_rounded, const Color(0xFF00C853)),
+                      _buildMealSection(l10n, 'Snacks', Icons.cookie_rounded, const Color(0xFF00C853)),
                     ],
                   ),
                 ),
@@ -73,7 +76,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-  Widget _buildNutritionHeader() {
+  Widget _buildNutritionHeader(LanguageProvider l10n) {
     return SliverAppBar(
       expandedHeight: 140,
       backgroundColor: Colors.transparent,
@@ -120,9 +123,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 10),
-                          const Text(
-                            'Nutrition',
-                            style: TextStyle(
+                          Text(
+                            l10n.getString('nutrition.nutrition'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -130,7 +133,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Track your daily meals and macros',
+                            l10n.getString('nutrition.food_analysis'),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
@@ -162,7 +165,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-  Widget _buildCalorieCard() {
+  Widget _buildCalorieCard(LanguageProvider l10n) {
     final total = _controller.totalCalories.toInt();
     final target = AppSettings().targetCalories;
     final progress = (total / target).clamp(0.0, 1.0);
@@ -184,9 +187,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   const Text(
-                    'Today\'s Calories',
-                    style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600),
+                   Text(
+                    l10n.getString('nutrition.total_calories'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -194,7 +197,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
-                        '$total',
+                        l10n.formatCalories(total),
                         style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -205,7 +208,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${remaining.clamp(0, target)} cal remaining',
+                    '${l10n.formatCalories(remaining.clamp(0, target))} ${l10n.getString('nutrition.remaining')}',
                     style: const TextStyle(color: Colors.white38, fontSize: 14),
                   ),
                 ],
@@ -225,7 +228,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     ),
                   ),
                   Text(
-                    '$percent%',
+                    l10n.formatPercentage(percent),
                     style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -238,9 +241,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildGlowingMacro('${_controller.totalProtein.toInt()}g', 'Protein', '/${AppSettings().targetProtein}g'),
-              _buildGlowingMacro('${_controller.totalCarbs.toInt()}g', 'Carbs', '/${AppSettings().targetCarbs}g'),
-              _buildGlowingMacro('${_controller.totalFat.toInt()}g', 'Fat', '/${AppSettings().targetFat}g'),
+              _buildGlowingMacro(l10n.formatMacro(_controller.totalProtein), l10n.getString('nutrition.protein'), '/${l10n.formatMacro(AppSettings().targetProtein)}'),
+              _buildGlowingMacro(l10n.formatMacro(_controller.totalCarbs), l10n.getString('nutrition.carbs'), '/${l10n.formatMacro(AppSettings().targetCarbs)}'),
+              _buildGlowingMacro(l10n.formatMacro(_controller.totalFat), l10n.getString('nutrition.fat'), '/${l10n.formatMacro(AppSettings().targetFat)}'),
             ],
           ),
         ],
@@ -284,7 +287,15 @@ class _NutritionScreenState extends State<NutritionScreen> {
     );
   }
 
-  Widget _buildMealSection(String title, IconData icon, Color color) {
+  Widget _buildMealSection(LanguageProvider l10n, String title, IconData icon, Color color) {
+    // Map internal English title to localization keys
+    final localizedTitle = {
+      'Breakfast': l10n.getString('nutrition.breakfast'),
+      'Lunch': l10n.getString('nutrition.lunch'),
+      'Dinner': l10n.getString('nutrition.dinner'),
+      'Snacks': l10n.getString('nutrition.snacks'),
+    }[title] ?? title;
+
     final meals = _controller.loggedMeals.where((m) => m.type == title).toList();
     final sectionCals = meals.fold(0.0, (sum, m) => sum + m.food.calories).toInt();
 
@@ -308,13 +319,13 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  title,
+                  localizedTitle,
                   style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             Text(
-               sectionCals > 0 ? '$sectionCals cal' : '',
+              sectionCals > 0 ? '${l10n.formatCalories(sectionCals)} ${l10n.getString('nutrition.cal_unit')}' : '',
               style: const TextStyle(color: Colors.white38, fontSize: 14),
             ),
           ],
@@ -333,9 +344,9 @@ class _NutritionScreenState extends State<NutritionScreen> {
               ),
               child: Column(
                 children: [
-                  const Text('No meals logged yet', style: TextStyle(color: Colors.white38, fontSize: 14)),
+                  Text(l10n.getString('nutrition.no_meals_yet'), style: const TextStyle(color: Colors.white38, fontSize: 14)),
                   const SizedBox(height: 4),
-                  Text('+ Add $title', style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+                  Text('${l10n.getString('nutrition.add_meal')} $localizedTitle', style: TextStyle(color: color, fontWeight: FontWeight.w600)),
                 ],
               ),
             ),
@@ -358,7 +369,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                   Icon(Icons.add_circle_outline, color: color, size: 16),
                   const SizedBox(width: 8),
                   Text(
-                    'Add More',
+                    l10n.getString('nutrition.add_more'),
                     style: TextStyle(
                       color: color,
                       fontSize: 13,

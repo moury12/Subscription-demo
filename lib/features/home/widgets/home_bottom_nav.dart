@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -15,12 +17,13 @@ class HomeBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const items = <({IconData icon, String label})>[
-      (icon: Icons.dashboard_outlined, label: 'Dashboard'),
-      (icon: Icons.fitness_center, label: 'Workout'),
-      (icon: Icons.restaurant_menu_outlined, label: 'Nutrition'),
-      (icon: Icons.show_chart, label: 'Progress'),
-      (icon: Icons.person_outline, label: 'Profile'),
+    final l10n = context.watch<LanguageProvider>();
+    final items = <({IconData icon, String label})>[
+      (icon: Icons.dashboard_outlined, label: l10n.getString('dashboard.dashboard')),
+      (icon: Icons.fitness_center, label: l10n.getString('dashboard.workout')),
+      (icon: Icons.restaurant_menu_outlined, label: l10n.getString('nutrition.nutrition')),
+      (icon: Icons.show_chart, label: l10n.getString('progress.progress')),
+      (icon: Icons.person_outline, label: l10n.getString('dashboard.profile')),
     ];
 
     return Container(

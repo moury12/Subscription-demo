@@ -18,6 +18,12 @@ class ApiService {
     return prefs.getString('auth_token');
   }
 
+  /// Get current language code from shared preferences
+  Future<String> _getLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('app_language') ?? 'en';
+  }
+
   Future<Map<String, String>> _getHeaders({bool requiresAuth = true}) async {
     final headers = {
       'Content-Type': 'application/json',
@@ -37,7 +43,17 @@ class ApiService {
   Future<http.Response> post(String endpoint, dynamic data, {bool requiresAuth = true}) async {
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = await _getHeaders(requiresAuth: requiresAuth);
-    final body = jsonEncode(data);
+    
+    // Add language to request body if it's a Map
+    dynamic requestBody = data;
+    if (data is Map) {
+      requestBody = Map.from(data);
+      if (requestBody['language'] == null) {
+        requestBody['language'] = await _getLanguage();
+      }
+    }
+    
+    final body = jsonEncode(requestBody);
 
     debugPrint('[API POST] $url');
     final response = await http.post(url, headers: headers, body: body);
@@ -58,7 +74,17 @@ class ApiService {
   Future<http.Response> put(String endpoint, dynamic data, {bool requiresAuth = true}) async {
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = await _getHeaders(requiresAuth: requiresAuth);
-    final body = jsonEncode(data);
+    
+    // Add language to request body if it's a Map
+    dynamic requestBody = data;
+    if (data is Map) {
+      requestBody = Map.from(data);
+      if (requestBody['language'] == null) {
+        requestBody['language'] = await _getLanguage();
+      }
+    }
+    
+    final body = jsonEncode(requestBody);
 
     debugPrint('[API PUT] $url');
     final response = await http.put(url, headers: headers, body: body);

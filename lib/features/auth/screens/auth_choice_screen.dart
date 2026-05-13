@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/language_provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -13,6 +15,7 @@ class AuthChoiceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.watch<LanguageProvider>();
     return AuthScaffold(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -21,20 +24,20 @@ class AuthChoiceScreen extends StatelessWidget {
             const Spacer(),
             const GradientLogo(size: 100),
             const SizedBox(height: 32),
-            const Text(
-              'Join FitnessPro',
+            Text(
+              l.getString('join_gocal_today'),
               style: AppTextStyles.authTitle,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              'Achieve your fitness goals with AI coaching',
+              l.getString('fitness_goals_subtitle'),
               style: AppTextStyles.authSubtitle.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const Spacer(),
             PrimaryGlowButton(
-              label: 'SIGN IN',
+              label: l.getString('sign_in_upper'),
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SignInScreen()));
@@ -53,7 +56,7 @@ class AuthChoiceScreen extends StatelessWidget {
                   side: BorderSide(color: AppColors.textPrimary.withOpacity(0.2)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: const Text('CREATE ACCOUNT', style: AppTextStyles.buttonLabel),
+                child: Text(l.getString('create_account_upper'), style: AppTextStyles.buttonLabel),
               ),
             ),
             const SizedBox(height: 48),

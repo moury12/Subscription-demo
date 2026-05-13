@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/app_settings.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/cards/app_surface_card.dart';
 import '../../main/controllers/navigation_controller.dart';
@@ -12,8 +14,9 @@ class TodaysWorkoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     final plans = AppSettings().workoutPlans;
-    String title = 'Rest day or no workout scheduled';
+    String title = l10n.getString('home.rest_day_no_workout');
 
     if (plans.isNotEmpty) {
       final todayName = DateFormat('EEEE').format(DateTime.now());
@@ -21,8 +24,8 @@ class TodaysWorkoutCard extends StatelessWidget {
       for (final day in plan.days) {
         if (day.day.contains(todayName)) {
           title = day.isRestDay
-              ? 'Rest & Recovery day'
-              : '${day.title} - ${day.exercises.length} exercises';
+              ? l10n.getString('home.rest_recovery_day')
+              : '${day.title} - ${day.exercises.length} ${l10n.getString('workout.exercises')}';
           break;
         }
       }
@@ -35,11 +38,11 @@ class TodaysWorkoutCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Today\'s Workout', style: AppTextStyles.h3),
+            Text(l10n.getString('workout.todays_workout'), style: AppTextStyles.h3),
             const SizedBox(height: 16),
             HomeListItem(
               title: title,
-              actionLabel: 'View Workouts →',
+              actionLabel: l10n.getString('home.view_workouts'),
               onTap: () => NavigationController().setIndex(1),
             ),
           ],

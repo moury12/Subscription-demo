@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/language_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_spacing.dart';
@@ -77,40 +79,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.watch<LanguageProvider>();
     return AuthScaffold(
       child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 40),
-            const AuthHeader(
-              title: 'Create Account',
-              subtitle: 'Start your fitness journey today',
+            AuthHeader(
+              title: l.getString('create_account'),
+              subtitle: l.getString('start_journey_subtitle'),
             ),
             const SizedBox(height: AppSpacing.authHeaderGap),
             AppTextInput(
               controller: _nameController,
-              hint: 'Full Name',
+              hint: l.getString('full_name'),
               prefixIcon: const Icon(Icons.person_outline,
                   color: AppColors.textSecondary, size: AppSpacing.iconSize),
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _emailController,
-              hint: 'Email',
+              hint: l.getString('email'),
               svgIcon: 'assets/icons/email_icon.svg',
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _passwordController,
-              hint: 'Password',
+              hint: l.getString('password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _confirmPasswordController,
-              hint: 'Confirm Password',
+              hint: l.getString('confirm_password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
@@ -118,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
               : PrimaryGlowButton(
-                  label: 'Sign Up',
+                  label: l.getString('sign_up'),
                   onPressed: _handleSignUp,
                 ),
             const SizedBox(height: AppSpacing.md),
@@ -130,9 +133,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 text: TextSpan(
                   style: AppTextStyles.label.copyWith(color: AppColors.textMuted),
                   children: [
-                    const TextSpan(text: 'By signing up, you agree to our '),
+                    TextSpan(text: l.getString('by_signing_up_agree') + ' '),
                     TextSpan(
-                      text: 'Terms',
+                      text: l.getString('terms'),
                       style: AppTextStyles.label.copyWith(
                         color: AppColors.brandPrimary,
                         fontWeight: FontWeight.w600,
@@ -140,9 +143,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => launchUrl(Uri.parse('https://github.com')),
                     ),
-                    const TextSpan(text: ' and '),
+                    TextSpan(text: ' ' + l.getString('and') + ' '),
                     TextSpan(
-                      text: 'Privacy Policy',
+                      text: l.getString('privacy_policy'),
                       style: AppTextStyles.label.copyWith(
                         color: AppColors.brandPrimary,
                         fontWeight: FontWeight.w600,
@@ -156,8 +159,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             const SizedBox(height: AppSpacing.lg),
             AuthCtaRow(
-              label: 'Already have an account? ',
-              action: 'Sign In',
+              label: l.getString('already_have_account') + ' ',
+              action: l.getString('sign_in'),
               onTap: () => Navigator.of(context).pop(),
             ),
             const SizedBox(height: 40),

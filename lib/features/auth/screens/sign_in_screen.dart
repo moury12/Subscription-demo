@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/language_provider.dart';
+import '../../../core/services/localization_service.dart';
 
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -49,7 +52,12 @@ class _SignInScreenState extends State<SignInScreen> {
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
             AppSettings().syncFromProfile(profile);
             await UserDataSync.loadAll();
+            
             if (!mounted) return;
+            // Sync language to provider so it updates the whole app UI
+            final langCode = LocalizationService().currentLanguageCode;
+            context.read<LanguageProvider>().syncLanguage(langCode);
+
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const MainShellScreen()));
           } else {
@@ -72,25 +80,26 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.watch<LanguageProvider>();
     return AuthScaffold(
       child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             const SizedBox(height: 40),
-            const AuthHeader(
-              title: 'Welcome Back',
-              subtitle: 'Sign in to continue your fitness journey',
+            AuthHeader(
+              title: l.getString('welcome_back'),
+              subtitle: l.getString('sign_in_subtitle'),
             ),
             const SizedBox(height: AppSpacing.authHeaderGap),
             AppTextInput(
               controller: _emailController,
-              hint: 'Email',
+              hint: l.getString('email'),
               svgIcon: 'assets/icons/email_icon.svg',
             ),
             const SizedBox(height: AppSpacing.authFormGap),
             AppTextInput(
               controller: _passwordController,
-              hint: 'Password',
+              hint: l.getString('password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
@@ -101,20 +110,20 @@ class _SignInScreenState extends State<SignInScreen> {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
                 },
-                child: const Text('Forgot Password?', style: AppTextStyles.authHelp),
+                child: Text(l.getString('forgot_password_q'), style: AppTextStyles.authHelp),
               ),
             ),
             const SizedBox(height: AppSpacing.authForgotToButton),
             _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
               : PrimaryGlowButton(
-                  label: 'Sign In',
+                  label: l.getString('sign_in'),
                   onPressed: _handleSignIn,
                 ),
             const SizedBox(height: AppSpacing.lg),
             AuthCtaRow(
-              label: 'Don\'t have an account? ',
-              action: 'Sign Up',
+              label: l.getString('no_account_label') + ' ',
+              action: l.getString('sign_up'),
               onTap: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SignUpScreen()));

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../../core/providers/language_provider.dart';
 import '../models/ai_workout_plan.dart';
 import '../controllers/workout_controller.dart';
 import 'single_workout_screen.dart';
@@ -50,6 +52,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     final settings = AppSettings();
     if (_selectedPlan == null && settings.workoutPlans.isNotEmpty) {
       _selectCurrentWeekPlan();
@@ -70,7 +73,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       backgroundColor: AppColors.darkBackground,
       body: CustomScrollView(
         slivers: [
-          _buildWorkoutHeader(context),
+          _buildWorkoutHeader(context, l10n),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -78,12 +81,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_workoutController.activeWorkout != null && _workoutController.isPaused)
-                    _buildInProgressSection(context, _workoutController.activeWorkout!),
+                    _buildInProgressSection(context, l10n, _workoutController.activeWorkout!),
                   
                   const SizedBox(height: 32),
-                  const Text(
-                    'This Week',
-                    style: TextStyle(
+                  Text(
+                    l10n.getString('workout.this_week'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -92,10 +95,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   const SizedBox(height: 16),
                   if (_selectedPlan != null)
                     ..._selectedPlan!.days.map((dayPlan) {
+                      final localizedExercises = l10n.getString('workout.exercises');
+                      final localizedRecovery = l10n.getString('workout.recovery');
                       return _buildWorkoutCard(
                         context,
                         dayPlan.title,
-                        dayPlan.isRestDay ? 'Recovery / Mobility' : '${dayPlan.exercises.length} Exercises',
+                        dayPlan.isRestDay ? localizedRecovery : '${l10n.formatInteger(dayPlan.exercises.length)} $localizedExercises',
                         dayPlan.day,
                         dayPlan,
                       );
@@ -107,7 +112,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       final isRestDay = index > 0;
                       return _buildWorkoutCard(
                         context,
-                        isRestDay ? 'Rest Day' : 'Push Up',
+                        isRestDay ? l10n.getString('workout.rest_day') : 'Push Up',
                         isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
                         dayName,
                         null,
@@ -123,7 +128,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 
-  Widget _buildWorkoutHeader(BuildContext context) {
+  Widget _buildWorkoutHeader(BuildContext context, LanguageProvider l10n) {
     final allPlans = AppSettings().workoutPlans;
     final plan = _selectedPlan;
 
@@ -204,8 +209,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       const SizedBox(height: 4),
                       Text(
                         plan != null
-                            ? 'Week ${plan.weekNumber}${plan.startDate != null ? ' • ${DateFormat('MMM d').format(plan.startDate!)} – ${DateFormat('MMM d').format(plan.endDate ?? plan.startDate!.add(const Duration(days: 6)))}' : ''}'
-                            : 'Your personalized training plan',
+                            ? '${l10n.getString('workout.week')} ${l10n.formatInteger(plan.weekNumber)}${plan.startDate != null ? ' • ${l10n.translateDigits(DateFormat('MMM d').format(plan.startDate!))} – ${l10n.translateDigits(DateFormat('MMM d').format(plan.endDate ?? plan.startDate!.add(const Duration(days: 6))))}' : ''}'
+                            : l10n.getString('workout.weekly_plan_desc'),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 14,
@@ -221,21 +226,21 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         ),
                         child: Row(
                           children: [
-                            Expanded(child: _buildHeaderStat(completedCount.toString(), 'Completed')),
+                            Expanded(child: _buildHeaderStat(l10n.formatInteger(completedCount), l10n.getString('workout.completed'))),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
-                            Expanded(child: _buildHeaderStat(totalWorkouts.toString(), 'Total')),
+                            Expanded(child: _buildHeaderStat(l10n.formatInteger(totalWorkouts), l10n.getString('workout.total'))),
                             Container(width: 1, height: 40, color: Colors.white.withOpacity(0.2)),
-                            Expanded(child: _buildHeaderStat('$progress%', 'Progress')),
+                            Expanded(child: _buildHeaderStat(l10n.formatPercentage(progress), l10n.getString('workout.progress'))),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'This Week',
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      Text(
+                        l10n.getString('workout.this_week'),
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
                       ),
                       const SizedBox(height: 12),
-                      _buildDatePicker(),
+                      _buildDatePicker(l10n),
                       const SizedBox(height: 10),
                     ],
                   ),
@@ -263,8 +268,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 
-  Widget _buildDatePicker() {
-    final weekStartDay = AppSettings().weekStartDay;
+  Widget _buildDatePicker(LanguageProvider l10n) {
+    final settings = AppSettings();
+    final weekStartDay = settings.weekStartDay;
     final now = DateTime.now();
     final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     int currentWeekday = now.weekday;
@@ -277,13 +283,15 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     for (int i = 0; i < 7; i++) {
       DateTime date = weekStart.add(Duration(days: i));
       bool isToday = date.day == now.day && date.month == now.month && date.year == now.year;
-      String dayName = DateFormat('E').format(date);
+      // Get localized day initial (e.g., M, T, W or Hindi equivalents)
+      String fullDayName = DateFormat('EEEE').format(date);
+      String dayInitial = l10n.getString('days.${fullDayName.toLowerCase()}').substring(0, 1);
 
       if (isToday) {
         dateItems.add(
           Column(
             children: [
-              Text(dayName, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+              Text(dayInitial, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
               const SizedBox(height: 8),
               Container(
                 width: 44,
@@ -299,7 +307,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           ),
         );
       } else {
-        dateItems.add(_buildDateItem(date.day.toString(), dayName, false));
+        dateItems.add(_buildDateItem(context, l10n.formatInteger(date.day), dayInitial, false));
       }
     }
 
@@ -309,7 +317,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 
-  Widget _buildDateItem(String day, String weekday, bool isSelected) {
+  Widget _buildDateItem(BuildContext context, String day, String weekday, bool isSelected) {
     return Column(
       children: [
         Text(weekday, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
@@ -336,7 +344,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     );
   }
 
-  Widget _buildInProgressSection(BuildContext context, AiWorkoutDay dayPlan) {
+  Widget _buildInProgressSection(BuildContext context, LanguageProvider l10n, AiWorkoutDay dayPlan) {
     final currentIndex = _workoutController.currentExerciseIndex;
     return Container(
       width: double.infinity,
@@ -363,7 +371,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             children: [
               const SizedBox(width: 8),
               Text(
-                'Workout in Progress',
+                l10n.getString('workout.in_progress'),
                 style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14),
               ),
             ],
@@ -376,12 +384,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    dayPlan.isRestDay ? 'Rest & Recovery' : dayPlan.title,
+                    dayPlan.isRestDay ? l10n.getString('workout.rest_recovery') : dayPlan.title,
                     style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    dayPlan.isRestDay ? 'Active recovery or yoga' : 'Exercise ${currentIndex + 1} of ${dayPlan.exercises.length}',
+                    dayPlan.isRestDay 
+                      ? l10n.getString('workout.active_recovery') 
+                      : '${l10n.getString('workout.exercise')} ${l10n.formatInteger(currentIndex + 1)} ${l10n.getString('workout.of')} ${l10n.formatInteger(dayPlan.exercises.length)}',
                     style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                   ),
                 ],
@@ -415,7 +425,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Resume Workout', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(l10n.getString('workout.resume_workout'), style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
         ],

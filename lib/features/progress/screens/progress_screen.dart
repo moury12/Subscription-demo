@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../main/controllers/navigation_controller.dart';
 import '../controllers/burn_history_controller.dart';
 import '../controllers/weight_history_controller.dart';
@@ -58,24 +60,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: CustomScrollView(
         slivers: [
-          _buildProgressHeader(context),
+          _buildProgressHeader(context, l10n),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _buildSummaryCard(),
+                _buildSummaryCard(l10n),
                 const SizedBox(height: 16),
-                _buildStatsRow(),
+                _buildStatsRow(l10n),
                 const SizedBox(height: 24),
-                _buildWorkoutConsistencyCard(),
+                _buildWorkoutConsistencyCard(l10n),
                 const SizedBox(height: 16),
-                _buildWeightProgressCard(),
+                _buildWeightProgressCard(l10n),
                 const SizedBox(height: 16),
-                _buildCalorieTrackingCard(),
+                _buildCalorieTrackingCard(l10n),
                 const SizedBox(height: 100),
               ]),
             ),
@@ -85,7 +88,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildProgressHeader(BuildContext context) {
+  Widget _buildProgressHeader(BuildContext context, LanguageProvider l10n) {
     return SliverAppBar(
       expandedHeight: 140,
       backgroundColor: Colors.transparent,
@@ -127,13 +130,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
-                        'Progress',
-                        style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                      Text(
+                        l10n.getString('progress.progress'),
+                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Track your fitness journey',
+                        l10n.getString('progress.journey_desc'),
                         style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                       ),
                     ],
@@ -147,7 +150,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(LanguageProvider l10n) {
     final currentPlan = _settings.currentWeekPlan;
     int totalWorkoutDays = (currentPlan != null ? currentPlan.days.where((d) => !d.isRestDay).length : 0);
     int completedCount = _workoutController.completedCount;
@@ -166,26 +169,26 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'This Week\'s Summary',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                l10n.getString('progress.weekly_summary'),
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Icon(Icons.calendar_today_rounded, color: Colors.blue.shade400, size: 20),
             ],
           ),
           const SizedBox(height: 20),
           _buildSummaryRow(
-            'Workouts Completed', 
-            '$completedCount/$totalWorkoutDays',
+            l10n.getString('progress.workouts_completed'), 
+            '${l10n.formatInteger(completedCount)}/${l10n.formatInteger(totalWorkoutDays)}',
             icon: completedCount > 0 ? Icons.check_circle_rounded : Icons.cancel_outlined, 
             iconColor: completedCount > 0 ? Colors.tealAccent.shade400 : Colors.white38
           ),
           const SizedBox(height: 16),
-          _buildSummaryRow('Average Calories', '${avgCalories.toInt()} cal'),
+          _buildSummaryRow(l10n.getString('progress.average_calories'), '${l10n.formatCalories(avgCalories.toInt())} ${l10n.getString('nutrition.cal_unit')}'),
           const SizedBox(height: 16),
           _buildSummaryRow(
-            'On Target Days', 
-            onTarget ? '1/7' : '0/7', // Placeholder for daily target tracking
+            l10n.getString('progress.on_target_days'), 
+            onTarget ? '${l10n.formatInteger(1)}/${l10n.formatInteger(7)}' : '${l10n.formatInteger(0)}/${l10n.formatInteger(7)}', 
             icon: Icons.check_circle_rounded, 
             iconColor: onTarget ? Colors.tealAccent.shade400 : Colors.white12
           ),
@@ -208,7 +211,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildStatsRow() {
+  Widget _buildStatsRow(LanguageProvider l10n) {
     final double? current = _settings.currentWeight;
     final double? entry = _settings.entryWeight;
     final double weightChange = (current != null && entry != null)
@@ -217,16 +220,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
     return Row(
       children: [
-        _buildStatCard(_nutritionController.totalCalories.toInt().toString(), 'Consumption'),
+        _buildStatCard(context, l10n.formatCalories(_nutritionController.totalCalories.toInt()), l10n.getString('progress.consumption')),
         const SizedBox(width: 12),
-        _buildStatCard('${weightChange >= 0 ? '+' : ''}${weightChange.toStringAsFixed(1)}', 'kg Change'),
+        _buildStatCard(context, '${weightChange >= 0 ? '+' : ''}${l10n.formatWeight(weightChange)}', l10n.getString('progress.weight_change')),
         const SizedBox(width: 12),
-        _buildStatCard(_burnController.totalBurnedToday.toInt().toString(), 'Total Burn'),
+        _buildStatCard(context, l10n.formatCalories(_burnController.totalBurnedToday.toInt()), l10n.getString('progress.total_burn')),
       ],
     );
   }
 
-  Widget _buildStatCard(String value, String label) {
+  Widget _buildStatCard(BuildContext context, String value, String label) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -238,18 +241,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
           children: [
             Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 12), textAlign: TextAlign.center),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWorkoutConsistencyCard() {
+  Widget _buildWorkoutConsistencyCard(LanguageProvider l10n) {
     final currentPlan = _settings.currentWeekPlan;
     int totalWorkoutDays = (currentPlan != null ? currentPlan.days.where((d) => !d.isRestDay).length : 7);
     int completedCount = _workoutController.completedCount;
     double completionRate = totalWorkoutDays > 0 ? (completedCount / totalWorkoutDays) * 100 : 0;
+
+    final days = [
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    ];
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -263,8 +270,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Workout Consistency', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              Text('${completionRate.toInt()}% complete', style: const TextStyle(color: Colors.white24, fontSize: 12)),
+              Text(l10n.getString('progress.workout_consistency'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('${l10n.formatPercentage(completionRate.toInt())} ${l10n.getString('progress.complete')}', style: const TextStyle(color: Colors.white24, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 40),
@@ -274,12 +281,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
             alignment: Alignment.bottomCenter,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) {
+              children: days.map((dayName) {
+                final dayKey = dayName.toLowerCase();
+                final dayInitial = l10n.getString('days.$dayKey').substring(0, 1);
+                
                 // Check if workout was completed for this day's title if plans exist
                 bool isDone = false;
                 if (currentPlan != null) {
                   try {
-                    final dayPlan = currentPlan.days.firstWhere((d) => d.day.contains(day));
+                    final dayPlan = currentPlan.days.firstWhere((d) => d.day.toLowerCase().contains(dayKey.substring(0,3)));
                     isDone = _workoutController.isWorkoutCompleted(dayPlan.title);
                   } catch (_) {}
                 }
@@ -296,7 +306,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(day, style: const TextStyle(color: Colors.white24, fontSize: 10)),
+                    Text(dayInitial, style: const TextStyle(color: Colors.white24, fontSize: 10)),
                   ],
                 );
               }).toList(),
@@ -307,10 +317,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildCalorieTrackingCard() {
+  Widget _buildCalorieTrackingCard(LanguageProvider l10n) {
     double calories = _nutritionController.totalCalories;
     double target = _settings.targetCalories.toDouble();
     double ratio = (calories / target).clamp(0.01, 1.0);
+
+    final days = [
+      'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday'
+    ];
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -321,27 +335,25 @@ class _ProgressScreenState extends State<ProgressScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Calorie Tracking', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(l10n.getString('progress.calorie_tracking'), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           SizedBox(
             height: 160,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildYAxisLabels(),
+                _buildYAxisLabels(l10n),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildCalorieBar('Tue', 0.1),
-                      _buildCalorieBar('Wed', 0.1),
-                      _buildCalorieBar('Thu', 0.1),
-                      _buildCalorieBar('Fri', 0.1),
-                      _buildCalorieBar('Sat', 0.1),
-                      _buildCalorieBar('Sun', 0.1),
-                      _buildCalorieBar('Mon', ratio), 
-                    ],
+                    children: days.map((dayName) {
+                      final dayKey = dayName.toLowerCase();
+                      final dayInitial = l10n.getString('days.$dayKey').substring(0, 1);
+                      // Placeholder logic: Current day (Mon mock) uses real ratio, others use 0.1
+                      final isCurrentMockDay = dayName == 'Monday';
+                      return _buildCalorieBar(dayInitial, isCurrentMockDay ? ratio : 0.1);
+                    }).toList(),
                   ),
                 ),
               ],
@@ -351,9 +363,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegend(AppColors.accentGreen, 'Consumed'),
+              _buildLegend(AppColors.accentGreen, l10n.getString('progress.consumed')),
               const SizedBox(width: 24),
-              _buildLegend(Colors.white, 'Target'),
+              _buildLegend(Colors.white, l10n.getString('progress.target')),
             ],
           ),
         ],
@@ -361,15 +373,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildYAxisLabels() {
+  Widget _buildYAxisLabels(LanguageProvider l10n) {
     int target = _settings.targetCalories;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('${(target * 1.5).toInt()}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
-        Text('${target}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
-        Text('${(target * 0.5).toInt()}', style: const TextStyle(color: Colors.white24, fontSize: 10)),
-        const Text('0', style: TextStyle(color: Colors.white24, fontSize: 10)),
+        Text(l10n.formatInteger((target * 1.5).toInt()), style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        Text(l10n.formatInteger(target), style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        Text(l10n.formatInteger((target * 0.5).toInt()), style: const TextStyle(color: Colors.white24, fontSize: 10)),
+        Text(l10n.formatInteger(0), style: const TextStyle(color: Colors.white24, fontSize: 10)),
       ],
     );
   }
@@ -397,7 +409,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildWeightProgressCard() {
+  Widget _buildWeightProgressCard(LanguageProvider l10n) {
     final entries = _weightController.history;
     final current = _settings.currentWeight;
     final entry = _settings.entryWeight;
@@ -415,9 +427,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Weight Progress',
-                style: TextStyle(
+              Text(
+                l10n.getString('progress.weight_progress'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -425,7 +437,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
               if (current != null)
                 Text(
-                  '${current.toStringAsFixed(1)} kg',
+                  l10n.formatWeight(current),
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -438,20 +450,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             children: [
               _buildWeightStat(
-                'Entry',
-                entry != null ? '${entry.toStringAsFixed(1)} kg' : '—',
+                l10n.getString('onboarding.start'),
+                entry != null ? l10n.formatWeight(entry) : '—',
                 Colors.blue.shade400,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
-                'Current',
-                current != null ? '${current.toStringAsFixed(1)} kg' : '—',
+                l10n.getString('onboarding.current'),
+                current != null ? l10n.formatWeight(current) : ' —',
                 AppColors.progressOrange,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
-                'Target',
-                target != null ? '${target.toStringAsFixed(1)} kg' : '—',
+                l10n.getString('onboarding.goal'),
+                target != null ? l10n.formatWeight(target) : '—',
                 Colors.tealAccent.shade400,
               ),
             ],
@@ -460,9 +472,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
             const SizedBox(height: 20),
             const Divider(color: Colors.white10),
             const SizedBox(height: 12),
-            const Text(
-              'Recent Changes',
-              style: TextStyle(
+            Text(
+              l10n.getString('progress.recent_changes'),
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -471,8 +483,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
             const SizedBox(height: 12),
             ...entries.take(5).map((e) {
               final changeStr = e.change != null
-                  ? '${e.change! >= 0 ? '+' : ''}${e.change!.toStringAsFixed(1)} kg'
-                  : 'Initial';
+                  ? '${e.change! >= 0 ? '+' : ''}${l10n.formatWeight(e.change!)}'
+                  : l10n.getString('progress.initial');
               final isLoss = (e.change ?? 0) < 0;
               final isGain = (e.change ?? 0) > 0;
               return Padding(
@@ -493,7 +505,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '${e.weight.toStringAsFixed(1)} kg',
+                      l10n.formatWeight(e.weight),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -526,14 +538,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
             }),
           ] else
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
                 child: Text(
-                  'Update your weight in Profile to track changes',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
-                    fontSize: 13,
-                  ),
+                  l10n.getString('progress.no_history'),
+                  style: const TextStyle(color: Colors.white24, fontSize: 13),
                 ),
               ),
             ),

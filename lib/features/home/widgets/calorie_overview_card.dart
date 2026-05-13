@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../widgets/buttons/primary_glow_button.dart';
@@ -23,6 +25,7 @@ class CalorieOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     final remaining = target - consumed;
     final progressPct = (progress * 100).round();
 
@@ -30,21 +33,20 @@ class CalorieOverviewCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(17.1, 17.1, 17.1, 1.1),
       child: Column(
         children: [
-          SizedBox(
-            height: 111.83,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Daily Logs', style: AppTextStyles.h3),
+                      Text(l10n.getString('home.daily_logs'), style: AppTextStyles.h3),
                       const SizedBox(height: AppSpacing.xxs),
-                      Text('$consumed/', style: AppTextStyles.valueLarge),
+                      Text('${l10n.formatCalories(consumed)}/', style: AppTextStyles.valueLarge),
                       const SizedBox(height: AppSpacing.xxs),
-                      Text('${remaining.clamp(0, target)} cal remaining', style: AppTextStyles.label),
+                      Text('${l10n.formatCalories(remaining.clamp(0, target))} ${l10n.getString('home.cal_remaining')}', style: AppTextStyles.label),
                       const SizedBox(height: AppSpacing.xxs),
-                      Text('Start logging meals', style: AppTextStyles.caption),
+                      Text(l10n.getString('home.start_logging_meals'), style: AppTextStyles.caption),
                     ],
                   ),
                 ),
@@ -74,18 +76,17 @@ class CalorieOverviewCard extends StatelessWidget {
                               AppColors.accentGreen),
                         ),
                       ),
-                      Text('$progressPct%', style: AppTextStyles.valueMedium),
+                      Text(l10n.formatPercentage(progressPct), style: AppTextStyles.valueMedium),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
           const SizedBox(height: AppSpacing.md),
-          _buildMacroSummary(),
+          _buildMacroSummary(context, l10n),
           const SizedBox(height: AppSpacing.md),
           PrimaryGlowButton(
-            label: '+ Log Activity',
+            label: l10n.getString('home.log_activity'),
             height: 56,
             onPressed: () => LogActivityOptions.show(context),
           ),
@@ -95,24 +96,24 @@ class CalorieOverviewCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMacroSummary() {
+  Widget _buildMacroSummary(BuildContext context, LanguageProvider l10n) {
     final nutrition = NutritionController();
     final settings = AppSettings();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _macroItem('Protein', nutrition.totalProtein.round(),
+        _macroItem(l10n, l10n.getString('nutrition.protein'), nutrition.totalProtein.round(),
             settings.targetProtein, Colors.green),
-        _macroItem('Carbs', nutrition.totalCarbs.round(),
+        _macroItem(l10n, l10n.getString('nutrition.carbs'), nutrition.totalCarbs.round(),
             settings.targetCarbs, Colors.orange),
-        _macroItem('Fat', nutrition.totalFat.round(),
+        _macroItem(l10n, l10n.getString('nutrition.fat'), nutrition.totalFat.round(),
             settings.targetFat, Colors.blue),
       ],
     );
   }
 
-  Widget _macroItem(String label, int current, int target, Color color) {
+  Widget _macroItem(LanguageProvider l10n, String label, int current, int target, Color color) {
     return Column(
       children: [
         Text(
@@ -122,7 +123,7 @@ class CalorieOverviewCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '$current/$target g',
+          '${l10n.formatMacro(current)}/${l10n.formatMacro(target)}',
           style: const TextStyle(
               color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
         ),

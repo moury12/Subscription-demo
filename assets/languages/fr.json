@@ -14,8 +14,17 @@
     "success": "Succès",
     "warning": "Avertissement",
     "yes": "Oui",
-    "no": "Non",
+    "no": "No",
     "confirm": "Confirmer"
+  },
+  "days": {
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche"
   },
   "profile": {
     "personal_information": "Informations personnelles",
@@ -41,6 +50,8 @@
     "language": "Langue",
     "select_language": "Sélectionner la langue",
     "privacy_security": "Confidentialité et sécurité",
+    "ssl_protected": "Protégé par chiffrement SSL",
+    "security_placeholder": "Les paramètres de sécurité apparaîtront ici",
     "profile_updated": "Profil mis à jour avec succès",
     "save_new_weight": "Enregistrer le nouveau poids",
     "logout": "Déconnexion",
@@ -57,7 +68,7 @@
   "workout": {
     "todays_workout": "Entraînement d'aujourd'hui",
     "workout_plan": "Plan d'entraînement",
-    "exercises": "Exercices",
+    "exercises": "exercices",
     "sets": "Séries",
     "reps": "Répétitions",
     "duration": "Durée",
@@ -66,7 +77,13 @@
     "complete_workout": "Terminer l'entraînement",
     "skip_workout": "Sauter l'entraînement",
     "workout_history": "Historique d'entraînement",
-    "cal_burned": "cal brûlées"
+    "cal_burned": "cal brûlées",
+    "completed": "Complété",
+    "total": "Total",
+    "progress": "Progrès",
+    "this_week": "Cette semaine",
+    "recovery": "Récupération / Mobilité",
+    "week": "Semaine"
   },
   "nutrition": {
     "nutrition": "Nutrition",
@@ -79,16 +96,20 @@
     "calories": "Calories",
     "protein": "Protéines",
     "carbs": "Glucides",
-    "fat": "Matières grasses",
+    "fat": "Graisses",
     "protein_g": "g de protéines",
     "carbs_g": "g de glucides",
-    "fat_g": "g de matières grasses",
+    "fat_g": "g de graisses",
     "daily_summary": "Résumé quotidien",
     "total_calories": "Total des calories",
     "remaining": "Restant",
     "exceeded": "Dépassé",
     "scan_food": "Scanner les aliments",
-    "food_analysis": "Analyse des aliments"
+    "food_analysis": "Analyse des aliments",
+    "cal_unit": "cal",
+    "add_more": "Ajouter plus",
+    "no_meals_yet": "Aucun repas enregistré",
+    "add_meal_prompt": "Ajouter un repas"
   },
   "progress": {
     "progress": "Progrès",
@@ -96,7 +117,23 @@
     "burn_history": "Historique des calories brûlées",
     "this_month": "Ce mois-ci",
     "total_burn": "Total brûlé",
-    "total_workouts": "Total des entraînements"
+    "total_workouts": "Total des entraînements",
+    "journey_desc": "Suivez votre parcours fitness",
+    "weekly_summary": "Résumé de cette semaine",
+    "workouts_completed": "Entraînements complétés",
+    "average_calories": "Calories moyennes",
+    "on_target_days": "Jours sur la cible",
+    "consumption": "Consommation",
+    "weight_change": "Variation de poids",
+    "workout_consistency": "Consistance de l'entraînement",
+    "complete": "complet",
+    "initial": "Initial",
+    "recent_changes": "Changements récents",
+    "no_history": "Aucun historique de poids pour le moment",
+    "weight_stat_update": "Mettez à jour votre poids dans Profil pour suivre les changements",
+    "calorie_tracking": "Suivi des calories",
+    "target": "Cible",
+    "consumed": "Consommé"
   },
   "onboarding": {
     "welcome": "Bienvenue",
@@ -128,7 +165,10 @@
     "timezone": "Fuseau horaire",
     "review_profile": "Examiner le profil",
     "creating_your_plan": "Création de votre plan",
-    "your_personalized_plan": "Votre plan personnalisé"
+    "your_personalized_plan": "Votre plan personnalisé",
+    "start": "Début",
+    "current": "Actuel",
+    "goal": "Objectif"
   },
   "auth": {
     "sign_in": "Se connecter",
@@ -149,9 +189,23 @@
     "dashboard": "Tableau de bord",
     "home": "Accueil",
     "profile": "Profil",
+    "workout": "Entraînement",
     "today": "Aujourd'hui",
     "this_week": "Cette semaine",
     "this_month": "Ce mois-ci"
+  },
+  "home": {
+    "good_morning": "Bonjour,",
+    "day_streak": "Jours d'affilée",
+    "keep_it_up": "Continuez comme ça! 🔥",
+    "workouts": "Entraînements",
+    "daily_logs": "Journaux quotidiens",
+    "cal_remaining": "cal restantes",
+    "start_logging_meals": "Commencez à enregistrer les repas",
+    "log_activity": "+ Enregistrer l'activité",
+    "view_workouts": "Voir les entraînements →",
+    "rest_day_no_workout": "Jour de repos ou pas d'entraînement prévu",
+    "rest_recovery_day": "Jour de repos et récupération"
   },
   "ai": {
     "generating": "Génération en cours...",

@@ -1,6 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+
+import '../../../core/providers/language_provider.dart';
+import 'package:provider/provider.dart';
+import '../../../core/services/localization_service.dart';
 
 import '../../../core/services/user_data_sync.dart';
 import '../../../core/constants/app_spacing.dart';
@@ -50,6 +53,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           debugPrint('[SPLASH] Profile complete. Going to Dashboard.');
           AppSettings().syncFromProfile(profile);
           await UserDataSync.loadAll(); // Load all persisted user data
+          
+          if (!mounted) return;
+          // Sync language to provider so it updates the whole app UI
+          final langCode = LocalizationService().currentLanguageCode;
+          context.read<LanguageProvider>().syncLanguage(langCode);
+
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const MainShellScreen()),
           );
@@ -156,7 +165,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                   // Title
                   const Text(
-                    'FitnessPro',
+                    'GoCal AI',
                     style: AppTextStyles.splashTitle,
                     textAlign: TextAlign.center,
                   ),

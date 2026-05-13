@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/reminder_scheduler.dart';
@@ -16,23 +18,31 @@ class GocalAiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'GoCal AI',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      builder: (context, child) {
-        return GestureDetector(
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          // Use HitTestBehavior.opaque so that the gesture detector catches taps
-          // even when the rest of the UI doesn't explicitly catch them.
-          // Wait, 'translucent' is better so it doesn't block hits beneath.
-          behavior: HitTestBehavior.translucent,
-          child: child!,
-        );
-      },
-      home: const OnboardingScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => LanguageProvider()..initialize(),
+        ),
+      ],
+      child: Consumer<LanguageProvider>(
+        builder: (context, languageProvider, _) {
+          return MaterialApp(
+            title: 'GoCal AI',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.dark,
+            builder: (context, child) {
+              return GestureDetector(
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                behavior: HitTestBehavior.translucent,
+                child: child!,
+              );
+            },
+            home: const OnboardingScreen(),
+          );
+        },
+      ),
     );
   }
 }

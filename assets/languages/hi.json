@@ -17,6 +17,15 @@
     "no": "नहीं",
     "confirm": "पुष्टि करें"
   },
+  "days": {
+    "monday": "सोमवार",
+    "tuesday": "मंगलवार",
+    "wednesday": "बुधवार",
+    "thursday": "गुरुवार",
+    "friday": "शुक्रवार",
+    "saturday": "शनिवार",
+    "sunday": "रविवार"
+  },
   "profile": {
     "personal_information": "व्यक्तिगत जानकारी",
     "full_name": "पूरा नाम",
@@ -41,6 +50,8 @@
     "language": "भाषा",
     "select_language": "भाषा चुनें",
     "privacy_security": "गोपनीयता और सुरक्षा",
+    "ssl_protected": "SSL एन्क्रिप्शन के साथ सुरक्षित",
+    "security_placeholder": "सुरक्षा सेटिंग्स यहां दिखेंगी",
     "profile_updated": "प्रोफ़ाइल सफलतापूर्वक अपडेट किया गया",
     "save_new_weight": "नया वजन सहेजें",
     "logout": "लॉग आउट करें",
@@ -66,7 +77,13 @@
     "complete_workout": "कसरत पूरी करें",
     "skip_workout": "कसरत छोड़ें",
     "workout_history": "कसरत इतिहास",
-    "cal_burned": "कैलोरी जली"
+    "cal_burned": "कैलोरी जली",
+    "completed": "पूरा किया",
+    "total": "कुल",
+    "progress": "प्रगति",
+    "this_week": "इस सप्ताह",
+    "recovery": "रिकवरी / गतिशीलता",
+    "week": "सप्ताह"
   },
   "nutrition": {
     "nutrition": "पोषण",
@@ -88,7 +105,11 @@
     "remaining": "शेष",
     "exceeded": "अतिक्रम किया गया",
     "scan_food": "भोजन स्कैन करें",
-    "food_analysis": "भोजन विश्लेषण"
+    "food_analysis": "भोजन विश्लेषण",
+    "cal_unit": "कैलोरी",
+    "add_more": "और जोड़ें",
+    "no_meals_yet": "अभी तक कोई भोजन लॉग नहीं किया गया",
+    "add_meal_prompt": "भोजन जोड़ें"
   },
   "progress": {
     "progress": "प्रगति",
@@ -96,7 +117,23 @@
     "burn_history": "जलने का इतिहास",
     "this_month": "इस महीने",
     "total_burn": "कुल जला",
-    "total_workouts": "कुल कसरत"
+    "total_workouts": "कुल कसरत",
+    "journey_desc": "अपनी फिटनेस यात्रा को ट्रैक करें",
+    "weekly_summary": "इस सप्ताह का सारांश",
+    "workouts_completed": "कसरत पूरी हुई",
+    "average_calories": "औसत कैलोरी",
+    "on_target_days": "लक्ष्य दिनों पर",
+    "consumption": "खपत",
+    "weight_change": "वजन परिवर्तन",
+    "workout_consistency": "कसरत निरंतरता",
+    "complete": "पूर्ण",
+    "initial": "प्रारंभिक",
+    "recent_changes": "हाल के बदलाव",
+    "no_history": "अभी तक कोई वजन इतिहास नहीं",
+    "weight_stat_update": "बदलावों को ट्रैक करने के लिए प्रोफाइल में अपना वजन अपडेट करें",
+    "calorie_tracking": "कैलोरी ट्रैकिंग",
+    "target": "लक्ष्य",
+    "consumed": "खपत की गई"
   },
   "onboarding": {
     "welcome": "स्वागत है",
@@ -128,30 +165,57 @@
     "timezone": "समय क्षेत्र",
     "review_profile": "प्रोफ़ाइल की समीक्षा करें",
     "creating_your_plan": "अपनी योजना बना रहे हैं",
-    "your_personalized_plan": "आपकी व्यक्तिगत योजना"
+    "your_personalized_plan": "आपकी व्यक्तिगत योजना",
+    "start": "प्रारंभ",
+    "current": "वर्तमान",
+    "goal": "लक्ष्य"
   },
   "auth": {
     "sign_in": "साइन इन करें",
+    "sign_in_upper": "साइन इन करें",
+    "sign_in_subtitle": "अपनी फिटनेस यात्रा जारी रखने के लिए साइन इन करें",
     "sign_up": "साइन अप करें",
+    "sign_up_upper": "साइन अप करें",
+    "welcome_back": "वापस स्वागत है",
+    "join_gocal_today": "आज ही GoCal AI से जुड़ें",
+    "fitness_goals_subtitle": "AI कोचिंग के साथ अपने फिटनेस लक्ष्यों को प्राप्त करें",
+    "start_journey_subtitle": "आज ही अपनी फिटनेस यात्रा शुरू करें",
+    "create_account": "खाता बनाएँ",
+    "create_account_upper": "खाता बनाएँ",
+    "full_name": "पूरा नाम",
     "email": "ईमेल",
     "password": "पासवर्ड",
     "confirm_password": "पासवर्ड की पुष्टि करें",
-    "forgot_password": "पासवर्ड भूल गए?",
-    "remember_me": "मुझे याद रखें",
-    "login_with_google": "Google के साथ लॉगिन करें",
-    "dont_have_account": "खाता नहीं है?",
+    "forgot_password_q": "पासवर्ड भूल गए?",
+    "no_account_label": "खाता नहीं है?",
     "already_have_account": "पहले से ही खाता है?",
-    "reset_password": "पासवर्ड रीसेट करें",
-    "send_reset_link": "रीसेट लिंक भेजें",
+    "by_signing_up_agree": "साइन अप करके, आप हमारे से सहमत हैं",
+    "terms": "शर्तें",
+    "and": "और",
+    "privacy_policy": "गोपनीयता नीति",
     "back_to_login": "लॉगिन पर वापस जाएं"
   },
   "dashboard": {
     "dashboard": "डैशबोर्ड",
     "home": "होम",
     "profile": "प्रोफ़ाइल",
+    "workout": "कसरत",
     "today": "आज",
     "this_week": "इस हफ्ते",
     "this_month": "इस महीने"
+  },
+  "home": {
+    "good_morning": "सुप्रभात,",
+    "day_streak": "दिनों की लकीर",
+    "keep_it_up": "ऐसे ही चलते रहें! 🔥",
+    "workouts": "कसरत",
+    "daily_logs": "दैनिक लॉग",
+    "cal_remaining": "कैलोरी शेष",
+    "start_logging_meals": "भोजन लॉग करना शुरू करें",
+    "log_activity": "+ गतिविधि लॉग करें",
+    "view_workouts": "कसरत देखें →",
+    "rest_day_no_workout": "आराम का दिन या कोई कसरत नहीं",
+    "rest_recovery_day": "आराम और पुनर्प्राप्ति का दिन"
   },
   "ai": {
     "generating": "उत्पन्न हो रहा है...",

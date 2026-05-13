@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../utils/responsive.dart';
@@ -48,9 +50,10 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     final scale = widget.scale;
-    final dateStr = DateFormat('EEEE, MMMM d,').format(_currentTime);
-    final timeStr = DateFormat('hh:mm a').format(_currentTime);
+    final dateStr = l10n.translateDigits(DateFormat('EEEE, MMMM d,').format(_currentTime));
+    final timeStr = l10n.translateDigits(DateFormat('hh:mm a').format(_currentTime));
 
     return Container(
       height: scale.s(260.16),
@@ -86,7 +89,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Good morning,',
+                          l10n.getString('home.good_morning'),
                           style: AppTextStyles.body.copyWith(
                             color: AppColors.textPrimary90,
                             fontSize: scale.s(16),
@@ -164,8 +167,14 @@ class _HomeHeaderState extends State<HomeHeader> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${widget.streakDays} Day Streak', style: AppTextStyles.h3.copyWith(fontSize: scale.s(18))),
-                        Text('Keep it up! 🔥', style: AppTextStyles.body.copyWith(fontSize: scale.s(14))),
+                        Text(
+                          '${widget.streakDays} ${l10n.getString('home.day_streak')}',
+                          style: AppTextStyles.h3.copyWith(fontSize: scale.s(18)),
+                        ),
+                        Text(
+                          l10n.getString('home.keep_it_up'),
+                          style: AppTextStyles.body.copyWith(fontSize: scale.s(14)),
+                        ),
                       ],
                     ),
                   ],

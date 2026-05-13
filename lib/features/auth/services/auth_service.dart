@@ -71,6 +71,14 @@ class AuthService {
       if (response.statusCode == 200) {
         final profileData = jsonDecode(response.body);
         AppSettings().syncFromProfile(profileData);
+
+        // Load language preference and initialize LanguageProvider
+        if (profileData['language'] != null) {
+          // Note: This will be called from main after LanguageProvider is ready
+          // Store it for later initialization
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('app_language', profileData['language']);
+        }
       }
     } catch (e) {
       // Profile fetch failed silently

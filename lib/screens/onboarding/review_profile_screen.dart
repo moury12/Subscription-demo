@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/providers/language_provider.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
 import '../../widgets/onboarding/onboarding_background.dart';
 import '../../features/onboarding/models/onboarding_data.dart';
@@ -19,6 +21,7 @@ class ReviewProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -64,12 +67,12 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     _buildSummaryCard(
                       'Personal Info',
-                      '${data.age} years old • ${data.gender}',
+                      '${l10n.formatInteger(data.age ?? 0)} years old • ${data.gender}',
                     ),
                     const SizedBox(height: 16),
                     _buildSummaryCard(
                       'Physical Stats',
-                      '${data.height} cm • ${data.currentWeight} kg',
+                      '${l10n.formatInteger((data.height ?? 0).toInt())} cm • ${l10n.formatWeight(data.currentWeight ?? 0)} kg',
                     ),
                     const SizedBox(height: 16),
                     _buildSummaryCard('Fitness Goal', '${data.goal}'),
@@ -85,7 +88,7 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildSummaryCard(
                       'Workout Schedule',
-                      '${data.workoutDays} days per week',
+                      '${l10n.formatInteger(data.workoutDays)} days per week',
                     ),
                     const SizedBox(height: 16),
                     _buildSummaryCard(
@@ -95,7 +98,7 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildSummaryCard(
                       'Target Weight',
-                      '${data.targetWeight} kg',
+                      '${l10n.formatWeight(data.targetWeight ?? 0)} kg',
                     ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(

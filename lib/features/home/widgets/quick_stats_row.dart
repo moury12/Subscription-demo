@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_spacing.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../widgets/cards/mini_stat_card.dart';
 
@@ -16,12 +18,13 @@ class QuickStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Row(
       children: [
         Expanded(
           child: MiniStatCard(
-            value: workouts.toString(),
-            label: 'Workouts',
+            value: l10n.formatInteger(workouts),
+            label: l10n.getString('home.workouts'),
             icon: Icons.fitness_center,
             iconColor: AppColors.accentPurple,
           ),
@@ -29,8 +32,8 @@ class QuickStatsRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: MiniStatCard(
-            value: streak.toString(),
-            label: 'Day Streak',
+            value: l10n.formatInteger(streak),
+            label: l10n.getString('home.day_streak'),
             icon: Icons.local_fire_department,
             iconColor: AppColors.accentGreen,
           ),

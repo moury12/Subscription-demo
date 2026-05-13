@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/reminder_scheduler.dart';
 import '../../auth/services/auth_service.dart';
@@ -19,14 +21,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int? _expandedIndex;
   bool _isEditingWeight = false;
   late final AppSettings _settings;
+  late LanguageProvider _l10n;
 
   // Language selection
   String _selectedLanguage = 'English';
   final List<Map<String, String>> _languages = [
-    {'name': 'English', 'flag': '🇺🇸'},
-    {'name': 'Hindi', 'flag': '🇮🇳'},
-    {'name': 'French', 'flag': '🇫🇷'},
-    {'name': 'Spanish', 'flag': '🇪🇸'},
+    {'code': 'en', 'name': 'English', 'flag': '🇺🇸'},
+    {'code': 'hi', 'name': 'Hindi', 'flag': '🇮🇳'},
+    {'code': 'fr', 'name': 'French', 'flag': '🇫🇷'},
+    {'code': 'es', 'name': 'Spanish', 'flag': '🇪🇸'},
   ];
 
   // Notification toggles
@@ -70,6 +73,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  String _getLanguageCode(String languageName) {
+    final lang = _languages.firstWhere(
+      (l) => l['name'] == languageName,
+      orElse: () => _languages[0],
+    );
+    return lang['code'] ?? 'en';
+  }
+
   Future<void> _loadNotificationPrefs() async {
     final notif = NotificationService();
     final master = await notif.isMasterEnabled;
@@ -106,8 +117,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
+  String _translateGoal(String goal) {
+    const map = {
+      'Lose Weight': 'goals.lose_weight',
+      'Gain Muscle': 'goals.gain_muscle',
+      'Maintain Weight': 'goals.maintain_weight',
+      'Improve Endurance': 'goals.improve_endurance',
+    };
+    return _l10n.getString(map[goal] ?? 'goals.lose_weight');
+  }
+
   @override
   Widget build(BuildContext context) {
+    _l10n = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -202,11 +224,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildQuickStat('${_settings.currentWeight ?? 0}', 'kg'),
+                _buildQuickStat(context, _l10n.formatWeight(_settings.currentWeight ?? 0), 'kg'),
                 _buildStatDivider(),
-                _buildQuickStat('${_settings.height ?? 0}', 'cm'),
+                _buildQuickStat(context, _l10n.formatInteger((_settings.height ?? 0).toInt()), 'cm'),
                 _buildStatDivider(),
-                _buildQuickStat('${_settings.age ?? 0}', 'years'),
+                _buildQuickStat(context, _l10n.formatInteger(_settings.age ?? 0), 'years'),
               ],
             ),
           ),
@@ -215,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildQuickStat(String value, String unit) {
+  Widget _buildQuickStat(BuildContext context, String value, String unit) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -270,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'CURRENT WEIGHT',
+                      _l10n.getString('profile.current_weight').toUpperCase(),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 11,
@@ -280,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_settings.currentWeight ?? 0} kg',
+                      '${_l10n.formatWeight(_settings.currentWeight ?? 0)} kg',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -295,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ENTRY WEIGHT',
+                      _l10n.getString('profile.entry_weight').toUpperCase(),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.4),
                         fontSize: 11,
@@ -305,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_settings.entryWeight ?? _settings.currentWeight ?? 0} kg',
+                      '${_l10n.formatWeight(_settings.entryWeight ?? _settings.currentWeight ?? 0)} kg',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.95),
                         fontSize: 22,
@@ -336,7 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }
                 },
                 child: Text(
-                  _isEditingWeight ? 'Cancel' : 'Update',
+                  _isEditingWeight ? _l10n.getString('common.cancel') : _l10n.getString('common.update'),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.6),
                     fontWeight: FontWeight.bold,
@@ -350,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'CURRENT WEIGHT',
+                _l10n.getString('profile.current_weight').toUpperCase(),
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.35),
                   fontSize: 10,
@@ -384,7 +406,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'ENTRY WEIGHT',
+                _l10n.getString('profile.entry_weight').toUpperCase(),
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.35),
                   fontSize: 10,
@@ -449,9 +471,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text(
-                  'Save New Weight',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  _l10n.getString('profile.save_new_weight'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -547,14 +569,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildCollapsibleCard(
       index: 0,
       icon: Icons.person_outline,
-      title: 'Personal Information',
+      title: _l10n.getString('profile.personal_information'),
       subtitle: _nameController.text.toUpperCase(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 16),
-          _buildInputLabel('FULL NAME'),
+          _buildInputLabel(_l10n.getString('profile.full_name').toUpperCase()),
           _buildTextField(_nameController),
           const SizedBox(height: 16),
           Row(
@@ -563,7 +585,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputLabel('AGE'),
+                    _buildInputLabel(_l10n.getString('profile.age').toUpperCase()),
                     _buildTextField(_ageController),
                   ],
                 ),
@@ -573,7 +595,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputLabel('HEIGHT (CM)'),
+                    _buildInputLabel(_l10n.getString('profile.height_cm').toUpperCase()),
                     _buildTextField(_heightController),
                   ],
                 ),
@@ -632,14 +654,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildCollapsibleCard(
       index: 1,
       icon: Icons.settings_outlined,
-      title: 'Fitness Goals',
-      subtitle: selectedGoal.toUpperCase(),
+      title: _l10n.getString('profile.fitness_goals'),
+      subtitle: _translateGoal(selectedGoal).toUpperCase(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 16),
-          _buildInputLabel('PRIMARY GOAL'),
+          _buildInputLabel(_l10n.getString('profile.primary_goal').toUpperCase()),
           const SizedBox(height: 8),
           // Goal selector cards
           ...goals.map((goal) {
@@ -686,7 +708,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        goal['title'] as String,
+                        _translateGoal(goal['title'] as String),
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.white60,
                           fontSize: 15,
@@ -715,7 +737,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }),
           const SizedBox(height: 8),
-          _buildInputLabel('TARGET WEIGHT (KG)'),
+          _buildInputLabel(_l10n.getString('profile.target_weight_kg').toUpperCase()),
           _buildTextField(_targetWeightController),
           const SizedBox(height: 24),
           _buildDoneButton(
@@ -747,15 +769,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildCollapsibleCard(
       index: 2,
       icon: Icons.notifications_none,
-      title: 'Notifications',
-      subtitle: anyEnabled ? 'ENABLED' : 'DISABLED',
+      title: _l10n.getString('profile.notifications'),
+      subtitle: anyEnabled ? _l10n.getString('profile.enabled').toUpperCase() : _l10n.getString('profile.disabled').toUpperCase(),
       child: Column(
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 8),
           _buildNotificationToggle(
-            title: 'Push Notifications',
-            subtitle: 'Reminders for workouts and meals',
+            title: _l10n.getString('profile.push_notifications'),
+            subtitle: _l10n.getString('profile.reminders_for_workouts'),
             icon: Icons.notifications_active_outlined,
             iconColor: const Color(0xFF60A5FA),
             value: _pushNotifications,
@@ -781,8 +803,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const SizedBox(height: 4),
                 _buildNotificationToggle(
-                  title: 'Drink Water',
-                  subtitle: 'Hydration reminders throughout the day',
+                  title: _l10n.getString('profile.drink_water'),
+                  subtitle: _l10n.getString('profile.hydration_reminders'),
                   icon: Icons.water_drop_outlined,
                   iconColor: const Color(0xFF34D399),
                   value: _drinkWaterNotification,
@@ -792,8 +814,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 _buildNotificationToggle(
-                  title: 'Meal Log',
-                  subtitle: 'Remind me to log my meals',
+                  title: _l10n.getString('profile.meal_log'),
+                  subtitle: _l10n.getString('profile.remind_log_meals'),
                   icon: Icons.restaurant_outlined,
                   iconColor: const Color(0xFFFBBF24),
                   value: _mealLogNotification,
@@ -803,8 +825,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 _buildNotificationToggle(
-                  title: 'Workout',
-                  subtitle: 'Daily workout schedule reminders',
+                  title: _l10n.getString('profile.workout'),
+                  subtitle: _l10n.getString('profile.daily_workout_reminders'),
                   icon: Icons.fitness_center_outlined,
                   iconColor: const Color(0xFFFB923C),
                   value: _workoutNotification,
@@ -827,25 +849,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildCollapsibleCard(
       index: 4,
       icon: Icons.language_outlined,
-      title: 'Language',
-      subtitle: _selectedLanguage.toUpperCase(),
+      title: _l10n.getString('profile.language'),
+      subtitle: _languages.firstWhere(
+        (l) => l['code'] == _selectedLanguage || l['name'] == _selectedLanguage,
+        orElse: () => _languages[0],
+      )['name']?.toUpperCase() ?? 'ENGLISH',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(color: Colors.white10),
           const SizedBox(height: 16),
-          _buildInputLabel('SELECT LANGUAGE'),
+          _buildInputLabel(_l10n.getString('profile.select_language').toUpperCase()),
           const SizedBox(height: 8),
           ..._languages.map((lang) {
-            final isSelected = _selectedLanguage == lang['name'];
+            final isSelected = _selectedLanguage == lang['name'] || _selectedLanguage == lang['code'];
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     _selectedLanguage = lang['name']!;
                     _settings.language = _selectedLanguage;
                   });
+                  await context.read<LanguageProvider>().setLanguage(lang['code']!);
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
@@ -900,11 +926,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }),
           const SizedBox(height: 16),
           _buildDoneButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 _settings.language = _selectedLanguage;
                 _expandedIndex = null;
               });
+
+              // This now saves to both local and backend
+              await context.read<LanguageProvider>().setLanguage(
+                _getLanguageCode(_selectedLanguage),
+              );
+
+              // Also call profile service for consistency
               ProfileService().updateProfile({
                 'language': _selectedLanguage,
               });
@@ -993,16 +1026,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return _buildCollapsibleCard(
       index: 3,
       icon: Icons.security,
-      title: 'Privacy & Security',
-      subtitle: 'PROTECTED WITH SSL ENCRYPTION',
-      child: const Column(
+      title: _l10n.getString('profile.privacy_security'),
+      subtitle: _l10n.getString('profile.ssl_protected').toUpperCase(),
+      child: Column(
         children: [
-          Divider(color: Colors.white10),
+          const Divider(color: Colors.white10),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
-              'Security settings will appear here',
-              style: TextStyle(color: Colors.white38),
+              _l10n.getString('profile.security_placeholder'),
+              style: const TextStyle(color: Colors.white38),
             ),
           ),
         ],
@@ -1058,9 +1091,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           elevation: 0,
         ),
-        child: const Text(
-          'Done',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        child: Text(
+          _l10n.getString('common.done'),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -1088,14 +1121,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             }
           },
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.logout, color: Colors.redAccent, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.logout, color: Colors.redAccent, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Log Out',
-                style: TextStyle(
+                _l10n.getString('profile.logout'),
+                style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

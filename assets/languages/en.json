@@ -17,6 +17,15 @@
     "no": "No",
     "confirm": "Confirm"
   },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
   "profile": {
     "personal_information": "Personal Information",
     "full_name": "Full Name",
@@ -41,9 +50,11 @@
     "language": "Language",
     "select_language": "Select Language",
     "privacy_security": "Privacy & Security",
+    "ssl_protected": "Protected with SSL Encryption",
+    "security_placeholder": "Security settings will appear here",
     "profile_updated": "Profile updated successfully",
     "save_new_weight": "Save New Weight",
-    "logout": "Logout",
+    "logout": "Log Out",
     "weight_kg": "kg",
     "years": "years",
     "cm": "cm"
@@ -57,7 +68,7 @@
   "workout": {
     "todays_workout": "Today's Workout",
     "workout_plan": "Workout Plan",
-    "exercises": "Exercises",
+    "exercises": "exercises",
     "sets": "Sets",
     "reps": "Reps",
     "duration": "Duration",
@@ -66,7 +77,13 @@
     "complete_workout": "Complete Workout",
     "skip_workout": "Skip Workout",
     "workout_history": "Workout History",
-    "cal_burned": "cal burned"
+    "cal_burned": "cal burned",
+    "completed": "Completed",
+    "total": "Total",
+    "progress": "Progress",
+    "this_week": "This Week",
+    "recovery": "Recovery / Mobility",
+    "week": "Week"
   },
   "nutrition": {
     "nutrition": "Nutrition",
@@ -88,7 +105,11 @@
     "remaining": "Remaining",
     "exceeded": "Exceeded",
     "scan_food": "Scan Food",
-    "food_analysis": "Food Analysis"
+    "food_analysis": "Food Analysis",
+    "cal_unit": "cal",
+    "add_more": "Add More",
+    "no_meals_yet": "No meals logged yet",
+    "add_meal_prompt": "Add Meal"
   },
   "progress": {
     "progress": "Progress",
@@ -96,7 +117,23 @@
     "burn_history": "Burn History",
     "this_month": "This Month",
     "total_burn": "Total Burn",
-    "total_workouts": "Total Workouts"
+    "total_workouts": "Total Workouts",
+    "journey_desc": "Track your fitness journey",
+    "weekly_summary": "This Week's Summary",
+    "workouts_completed": "Workouts Completed",
+    "average_calories": "Average Calories",
+    "on_target_days": "On Target Days",
+    "consumption": "Consumption",
+    "weight_change": "Weight Change",
+    "workout_consistency": "Workout Consistency",
+    "complete": "complete",
+    "initial": "Initial",
+    "recent_changes": "Recent Changes",
+    "no_history": "No weight history yet",
+    "weight_stat_update": "Update your weight in Profile to track changes",
+    "calorie_tracking": "Calorie Tracking",
+    "target": "Target",
+    "consumed": "Consumed"
   },
   "onboarding": {
     "welcome": "Welcome",
@@ -128,30 +165,57 @@
     "timezone": "Timezone",
     "review_profile": "Review Profile",
     "creating_your_plan": "Creating Your Plan",
-    "your_personalized_plan": "Your Personalized Plan"
+    "your_personalized_plan": "Your Personalized Plan",
+    "start": "Start",
+    "current": "Current",
+    "goal": "Goal"
   },
   "auth": {
     "sign_in": "Sign In",
+    "sign_in_upper": "SIGN IN",
+    "sign_in_subtitle": "Sign in to continue your fitness journey",
     "sign_up": "Sign Up",
+    "sign_up_upper": "SIGN UP",
+    "welcome_back": "Welcome Back",
+    "join_gocal_today": "Join GoCal AI Today",
+    "fitness_goals_subtitle": "Achieve your fitness goals with AI coaching",
+    "start_journey_subtitle": "Start your fitness journey today",
+    "create_account": "Create Account",
+    "create_account_upper": "CREATE ACCOUNT",
+    "full_name": "Full Name",
     "email": "Email",
     "password": "Password",
     "confirm_password": "Confirm Password",
-    "forgot_password": "Forgot Password?",
-    "remember_me": "Remember Me",
-    "login_with_google": "Login with Google",
-    "dont_have_account": "Don't have an account?",
+    "forgot_password_q": "Forgot Password?",
+    "no_account_label": "Don't have an account?",
     "already_have_account": "Already have an account?",
-    "reset_password": "Reset Password",
-    "send_reset_link": "Send Reset Link",
+    "by_signing_up_agree": "By signing up, you agree to our",
+    "terms": "Terms",
+    "and": "and",
+    "privacy_policy": "Privacy Policy",
     "back_to_login": "Back to Login"
   },
   "dashboard": {
     "dashboard": "Dashboard",
     "home": "Home",
     "profile": "Profile",
+    "workout": "Workout",
     "today": "Today",
     "this_week": "This Week",
     "this_month": "This Month"
+  },
+  "home": {
+    "good_morning": "Good morning,",
+    "day_streak": "Day Streak",
+    "keep_it_up": "Keep it up! 🔥",
+    "workouts": "Workouts",
+    "daily_logs": "Daily Logs",
+    "cal_remaining": "cal remaining",
+    "start_logging_meals": "Start logging meals",
+    "log_activity": "+ Log Activity",
+    "view_workouts": "View Workouts →",
+    "rest_day_no_workout": "Rest day or no workout scheduled",
+    "rest_recovery_day": "Rest & Recovery day"
   },
   "ai": {
     "generating": "Generating...",

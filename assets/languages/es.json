@@ -17,6 +17,15 @@
     "no": "No",
     "confirm": "Confirmar"
   },
+  "days": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+  },
   "profile": {
     "personal_information": "Información personal",
     "full_name": "Nombre completo",
@@ -41,6 +50,8 @@
     "language": "Idioma",
     "select_language": "Seleccionar idioma",
     "privacy_security": "Privacidad y seguridad",
+    "ssl_protected": "Protegido con cifrado SSL",
+    "security_placeholder": "La configuración de seguridad aparecerá aquí",
     "profile_updated": "Perfil actualizado correctamente",
     "save_new_weight": "Guardar nuevo peso",
     "logout": "Cerrar sesión",
@@ -57,7 +68,7 @@
   "workout": {
     "todays_workout": "Entrenamiento de hoy",
     "workout_plan": "Plan de entrenamiento",
-    "exercises": "Ejercicios",
+    "exercises": "ejercicios",
     "sets": "Series",
     "reps": "Repeticiones",
     "duration": "Duración",
@@ -66,7 +77,13 @@
     "complete_workout": "Completar entrenamiento",
     "skip_workout": "Saltar entrenamiento",
     "workout_history": "Historial de entrenamientos",
-    "cal_burned": "calorías quemadas"
+    "cal_burned": "calorías quemadas",
+    "completed": "Completado",
+    "total": "Total",
+    "progress": "Progreso",
+    "this_week": "Esta semana",
+    "recovery": "Recuperación / Movilidad",
+    "week": "Semana"
   },
   "nutrition": {
     "nutrition": "Nutrición",
@@ -88,7 +105,11 @@
     "remaining": "Restante",
     "exceeded": "Excedido",
     "scan_food": "Escanear comida",
-    "food_analysis": "Análisis de alimentos"
+    "food_analysis": "Análisis de alimentos",
+    "cal_unit": "cal",
+    "add_more": "Agregar más",
+    "no_meals_yet": "Aún no se han registrado comidas",
+    "add_meal_prompt": "Añadir comida"
   },
   "progress": {
     "progress": "Progreso",
@@ -96,7 +117,23 @@
     "burn_history": "Historial de calorías quemadas",
     "this_month": "Este mes",
     "total_burn": "Total quemado",
-    "total_workouts": "Total de entrenamientos"
+    "total_workouts": "Total de entrenamientos",
+    "journey_desc": "Seguimiento de su viaje de fitness",
+    "weekly_summary": "Resumen de esta semana",
+    "workouts_completed": "Entrenamientos completados",
+    "average_calories": "Promedio de calorías",
+    "on_target_days": "Días en el objetivo",
+    "consumption": "Consumo",
+    "weight_change": "Cambio de peso",
+    "workout_consistency": "Consistencia del entrenamiento",
+    "complete": "completo",
+    "initial": "Inicial",
+    "recent_changes": "Cambios recientes",
+    "no_history": "Aún no hay historial de peso",
+    "weight_stat_update": "Actualice su peso en Perfil para realizar un seguimiento de los cambios",
+    "calorie_tracking": "Seguimiento de calorías",
+    "target": "Objetivo",
+    "consumed": "Consumido"
   },
   "onboarding": {
     "welcome": "Bienvenido",
@@ -128,7 +165,10 @@
     "timezone": "Zona horaria",
     "review_profile": "Revisar perfil",
     "creating_your_plan": "Creando tu plan",
-    "your_personalized_plan": "Tu plan personalizado"
+    "your_personalized_plan": "Tu plan personalizado",
+    "start": "Inicio",
+    "current": "Actual",
+    "goal": "Meta"
   },
   "auth": {
     "sign_in": "Iniciar sesión",
@@ -149,9 +189,23 @@
     "dashboard": "Panel",
     "home": "Inicio",
     "profile": "Perfil",
+    "workout": "Entrenamiento",
     "today": "Hoy",
     "this_week": "Esta semana",
     "this_month": "Este mes"
+  },
+  "home": {
+    "good_morning": "Buenos días,",
+    "day_streak": "Racha de días",
+    "keep_it_up": "¡Sigue así! 🔥",
+    "workouts": "Entrenamientos",
+    "daily_logs": "Registros diarios",
+    "cal_remaining": "cal restantes",
+    "start_logging_meals": "Empieza a registrar comidas",
+    "log_activity": "+ Registrar actividad",
+    "view_workouts": "Ver entrenamientos →",
+    "rest_day_no_workout": "Día de descanso o sin entrenamiento programado",
+    "rest_recovery_day": "Día de descanso y recuperación"
   },
   "ai": {
     "generating": "Generando...",

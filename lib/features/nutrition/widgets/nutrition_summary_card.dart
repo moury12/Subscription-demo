@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/providers/language_provider.dart';
 
 class NutritionSummaryCard extends StatelessWidget {
   const NutritionSummaryCard({
@@ -22,6 +25,7 @@ class NutritionSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceRaised,
@@ -45,9 +49,9 @@ class NutritionSummaryCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Today\'s Calories', style: AppTextStyles.h3),
-                        Text('$consumed/', style: AppTextStyles.valueLarge),
-                        Text('$remaining cal remaining', style: AppTextStyles.body14Soft),
+                        Text(l10n.getString('nutrition.today_calories'), style: AppTextStyles.h3),
+                        Text('${l10n.formatCalories(consumed)}/', style: AppTextStyles.valueLarge),
+                        Text('${l10n.formatCalories(remaining)} ${l10n.getString('home.cal_remaining')}', style: AppTextStyles.body14Soft),
                       ],
                     ),
                   ),
@@ -91,9 +95,9 @@ class NutritionSummaryCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _MacroColumn(value: '${protein}g', label: 'Protein', glow: const Color.fromRGBO(96, 165, 250, 1)),
-                _MacroColumn(value: '${carbs}g', label: 'Carbs', glow: const Color.fromRGBO(251, 146, 60, 1)),
-                _MacroColumn(value: '${fat}g', label: 'Fat', glow: const Color.fromRGBO(167, 139, 250, 1)),
+                _MacroColumn(value: l10n.formatMacro(protein), label: l10n.getString('nutrition.protein'), glow: const Color.fromRGBO(96, 165, 250, 1)),
+                _MacroColumn(value: l10n.formatMacro(carbs), label: l10n.getString('nutrition.carbs'), glow: const Color.fromRGBO(251, 146, 60, 1)),
+                _MacroColumn(value: l10n.formatMacro(fat), label: l10n.getString('nutrition.fat'), glow: const Color.fromRGBO(167, 139, 250, 1)),
               ],
             ),
           ),

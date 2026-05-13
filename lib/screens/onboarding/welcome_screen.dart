@@ -34,7 +34,7 @@ class WelcomeScreen extends StatelessWidget {
               const GradientLogo(size: 100),
               const SizedBox(height: 32),
               const Text(
-                'Welcome to FitnessPro!',
+                'Welcome to GoCal AI !',
                 style: AppTextStyles.splashTitle,
                 textAlign: TextAlign.center,
               ),
