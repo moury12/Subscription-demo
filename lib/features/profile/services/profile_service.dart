@@ -32,10 +32,8 @@ class ProfileService {
 
   Future<bool> updateLanguagePreference(String languageCode) async {
     try {
-      final languageName =
-          LocalizationService().languageNames[languageCode] ?? 'English';
       final response = await _api.put('/user/profile', {
-        'language': languageName,
+        'language': languageCode,
       });
       return response.statusCode == 200;
     } catch (e) {

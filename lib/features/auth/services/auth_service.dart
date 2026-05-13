@@ -31,10 +31,14 @@ class AuthService {
 
   Future<bool> signup(String email, String password, String name) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final currentLang = prefs.getString('app_language') ?? 'en';
+      
       final response = await _api.post('/auth/register', {
         'email': email,
         'password': password,
         'name': name,
+        'language': currentLang,
       }, requiresAuth: false);
 
       if (response.statusCode == 201) {
