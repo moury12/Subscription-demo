@@ -26,6 +26,20 @@
     "saturday": "Samedi",
     "sunday": "Dimanche"
   },
+  "months": {
+    "january": "Janvier",
+    "february": "Février",
+    "march": "Mars",
+    "april": "Avril",
+    "may": "Mai",
+    "june": "Juin",
+    "july": "Juillet",
+    "august": "Août",
+    "september": "Septembre",
+    "october": "Octobre",
+    "november": "Novembre",
+    "december": "Décembre"
+  },
   "profile": {
     "personal_information": "Informations personnelles",
     "full_name": "Nom complet",

@@ -115,4 +115,6 @@ class LanguageProvider extends ChangeNotifier {
 
   String translateDigits(String text) =>
       _localizationService.translateDigits(text);
+
+  String formatDate(DateTime date) => _localizationService.formatDate(date);
 }

@@ -35,12 +35,14 @@ class LocalizationService {
   /// Load language JSON file from assets
   Future<void> _loadLanguage(String languageCode) async {
     try {
-      final jsonString = await rootBundle.loadString(
-        'assets/languages/$languageCode.json',
-      );
+      // rootBundle.loadString already handles UTF-8 by default, but let's be explicit
+      // if there are issues with local dev environments or asset encoding.
+      final ByteData data = await rootBundle.load('assets/languages/$languageCode.json');
+      final String jsonString = utf8.decode(data.buffer.asUint8List());
       _translations = json.decode(jsonString);
     } catch (e) {
-      // Fallback to English if language file not found
+      print('Error loading language file: $e');
+      // Fallback to English if language file not found or corrupted
       if (languageCode != 'en') {
         await _loadLanguage('en');
       }
@@ -171,6 +173,33 @@ class LocalizationService {
 
   /// Format macros (protein, carbs, fat) with localized number
   String formatMacro(num macro) => '${formatInteger(macro.toInt())}g';
+
+  /// Format date (e.g., "Monday, May 13") using localized days and months
+  String formatDate(DateTime date) {
+    // Ensure we use lowercase keys for the JSON lookup as defined in assets
+    final weekDayName = _getWeekdayName(date.weekday).toLowerCase();
+    final monthNameKey = _getMonthName(date.month).toLowerCase();
+    
+    final dayName = getString('days.$weekDayName');
+    final monthName = getString('months.$monthNameKey');
+    final day = formatInteger(date.day);
+    
+    // Format: "बुधवार, मई १३"
+    return translateDigits('$dayName, $monthName $day');
+  }
+
+  String _getWeekdayName(int weekday) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days[weekday - 1];
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1];
+  }
 
   /// Localize any string containing Western digits (like dates, times)
   String translateDigits(String text) {

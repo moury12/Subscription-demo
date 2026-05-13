@@ -26,6 +26,20 @@
     "saturday": "शनिवार",
     "sunday": "रविवार"
   },
+  "months": {
+    "january": "जनवरी",
+    "february": "फरवरी",
+    "march": "मार्च",
+    "april": "अप्रैल",
+    "may": "मई",
+    "june": "जून",
+    "july": "जुलाई",
+    "august": "अगस्त",
+    "september": "सितंबर",
+    "october": "अक्टूबर",
+    "november": "नवंबर",
+    "december": "दिसंबर"
+  },
   "profile": {
     "personal_information": "व्यक्तिगत जानकारी",
     "full_name": "पूरा नाम",

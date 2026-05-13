@@ -52,7 +52,7 @@ class _HomeHeaderState extends State<HomeHeader> {
   Widget build(BuildContext context) {
     final l10n = context.watch<LanguageProvider>();
     final scale = widget.scale;
-    final dateStr = l10n.translateDigits(DateFormat('EEEE, MMMM d,').format(_currentTime));
+    final dateStr = l10n.formatDate(_currentTime);
     final timeStr = l10n.translateDigits(DateFormat('hh:mm a').format(_currentTime));
 
     return Container(
@@ -168,7 +168,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${widget.streakDays} ${l10n.getString('home.day_streak')}',
+                          '${l10n.formatInteger(widget.streakDays)} ${l10n.getString('home.day_streak')}',
                           style: AppTextStyles.h3.copyWith(fontSize: scale.s(18)),
                         ),
                         Text(
