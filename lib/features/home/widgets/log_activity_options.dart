@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../nutrition/widgets/meal_logging_options.dart';
 import '../../main/controllers/navigation_controller.dart';
+import '../../../core/providers/language_provider.dart';
 import 'burn_log_popup.dart';
 
 class LogActivityOptions extends StatelessWidget {
@@ -17,6 +19,8 @@ class LogActivityOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF111111),
@@ -41,9 +45,9 @@ class LogActivityOptions extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Log Activity',
-                style: TextStyle(
+              Text(
+                l10n.getString('home.log_activity_title'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -69,8 +73,8 @@ class LogActivityOptions extends StatelessWidget {
             context,
             icon: Icons.restaurant_menu,
             iconColor: const Color(0xFF34D399),
-            title: 'Log a Meal',
-            subtitle: 'Track calories and macros',
+            title: l10n.getString('home.log_a_meal'),
+            subtitle: l10n.getString('home.log_a_meal_desc'),
             onTap: () {
               Navigator.pop(context);
               MealLoggingOptions.showAddOptions(context);
@@ -81,8 +85,8 @@ class LogActivityOptions extends StatelessWidget {
             context,
             icon: Icons.fitness_center,
             iconColor: const Color(0xFF60A5FA),
-            title: 'Start Workout',
-            subtitle: 'Follow your daily plan',
+            title: l10n.getString('home.start_workout'),
+            subtitle: l10n.getString('home.start_workout_desc'),
             onTap: () {
               Navigator.pop(context);
               NavigationController().setIndex(1); // Workout tab
@@ -93,8 +97,8 @@ class LogActivityOptions extends StatelessWidget {
             context,
             icon: Icons.local_fire_department,
             iconColor: const Color(0xFFFB923C),
-            title: 'Burn Activity',
-            subtitle: 'Log extra calories burned',
+            title: l10n.getString('home.burn_activity'),
+            subtitle: l10n.getString('home.burn_activity_desc'),
             onTap: () {
               Navigator.pop(context);
               BurnLogPopup.show(context);
@@ -105,8 +109,8 @@ class LogActivityOptions extends StatelessWidget {
             context,
             icon: Icons.scale_outlined,
             iconColor: const Color(0xFFA78BFA),
-            title: 'Update Weight',
-            subtitle: 'Track your body progress',
+            title: l10n.getString('home.update_weight'),
+            subtitle: l10n.getString('home.update_weight_desc'),
             onTap: () {
               Navigator.pop(context);
               NavigationController().setIndex(4); // Profile tab
