@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers/language_provider.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysis_result_screen.dart';
 import '../controllers/ai_food_service.dart';
@@ -32,6 +34,8 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
   }
 
   void _performAnalysis() async {
+    final languageCode = context.read<LanguageProvider>().currentLanguage;
+
     // Phase 1: Processing
     setState(() => _currentStep = 1);
     await Future.delayed(const Duration(milliseconds: 1000));
@@ -39,12 +43,13 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
     // Phase 2: Identifying (Trigger AI Call)
     setState(() => _currentStep = 2);
     
-    final result = await _aiService.analyzeFood(widget.imageFile);
+    final result = await _aiService.analyzeFood(widget.imageFile, languageCode: languageCode);
 
     if (result == null) {
       if (mounted) {
+        final l10n = context.read<LanguageProvider>();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to analyze image. Please check backend connection.')),
+          SnackBar(content: Text(l10n.getString('ai_food.failed_analysis'))),
         );
         Navigator.of(context).pop();
       }
@@ -71,9 +76,11 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      appBar: const NutritionGreenAppBar(title: 'AI Food Scanner'),
+      appBar: NutritionGreenAppBar(title: l10n.getString('ai_food.scanner_title')),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -114,13 +121,13 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'Analyzing Image',
-                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            Text(
+                              l10n.getString('ai_food.analyzing_image'),
+                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Ai is identifying your food',
+                              l10n.getString('ai_food.identifying_food'),
                               style: TextStyle(color: Colors.white.withAlpha(180), fontSize: 13),
                             ),
                           ],
@@ -129,11 +136,11 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _buildStepItem('Processing image...', _currentStep >= 1),
+                  _buildStepItem(l10n.getString('ai_food.processing_image'), _currentStep >= 1),
                   const SizedBox(height: 16),
-                  _buildStepItem('Identifying food items...', _currentStep >= 2),
+                  _buildStepItem(l10n.getString('ai_food.identifying_items'), _currentStep >= 2),
                   const SizedBox(height: 16),
-                  _buildStepItem('Calculating nutrition...', _currentStep >= 3),
+                  _buildStepItem(l10n.getString('ai_food.calculating_nutrition'), _currentStep >= 3),
                 ],
               ),
             ),

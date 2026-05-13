@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers/language_provider.dart';
 import '../controllers/nutrition_controller.dart';
 import '../models/food.dart';
 import '../widgets/nutrition_green_app_bar.dart';
@@ -16,20 +18,22 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      appBar: const NutritionGreenAppBar(title: 'AI Food Scanner'),
+      appBar: NutritionGreenAppBar(title: l10n.getString('ai_food.scanner_title')),
       body: SingleChildScrollView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSummaryCard(),
+            _buildSummaryCard(l10n),
             const SizedBox(height: 32),
-            const Text(
-              'IDENTIFIED INGREDIENTS',
-              style: TextStyle(
+            Text(
+              l10n.getString('ai_food.identified_ingredients'),
+              style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
@@ -39,22 +43,22 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ...analysisResult.ingredients.map((food) {
               final details = {
-                'Protein': '${food.protein.toInt()}g',
-                'Carbs': '${food.carbs.toInt()}g',
-                'Fat': '${food.fat.toInt()}g',
+                l10n.getString('nutrition.protein'): '${l10n.formatInteger(food.protein.toInt())}g',
+                l10n.getString('nutrition.carbs'): '${l10n.formatInteger(food.carbs.toInt())}g',
+                l10n.getString('nutrition.fat'): '${l10n.formatInteger(food.fat.toInt())}g',
               };
-              if (food.fiber != null) details['Fiber'] = '${food.fiber!.toInt()}g';
+              if (food.fiber != null) details['Fiber'] = '${l10n.formatInteger(food.fiber!.toInt())}g';
               if (food.sodium != null) details['Sodium'] = food.sodium!;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: _buildIngredientCard(food.name, '${food.calories.toInt()} kcal', details),
+                child: _buildIngredientCard(food.name, '${l10n.formatInteger(food.calories.toInt())} kcal', details),
               );
             }).toList(),
             const SizedBox(height: 12),
-            _buildAiInsights(),
+            _buildAiInsights(l10n),
             const SizedBox(height: 32),
-            _buildBottomButtons(context),
+            _buildBottomButtons(context, l10n),
             const SizedBox(height: 40),
           ],
         ),
@@ -62,7 +66,7 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(LanguageProvider l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -92,10 +96,10 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryItem('${analysisResult.totalCalories.toInt()}', 'Calories'),
-              _buildSummaryItem('${analysisResult.totalProtein.toInt()}g', 'Protein'),
-              _buildSummaryItem('${analysisResult.totalCarbs.toInt()}g', 'Carbs'),
-              _buildSummaryItem('${analysisResult.totalFat.toInt()}g', 'Fat'),
+              _buildSummaryItem(l10n.formatInteger(analysisResult.totalCalories.toInt()), l10n.getString('nutrition.calories')),
+              _buildSummaryItem('${l10n.formatInteger(analysisResult.totalProtein.toInt())}g', l10n.getString('nutrition.protein')),
+              _buildSummaryItem('${l10n.formatInteger(analysisResult.totalCarbs.toInt())}g', l10n.getString('nutrition.carbs')),
+              _buildSummaryItem('${l10n.formatInteger(analysisResult.totalFat.toInt())}g', l10n.getString('nutrition.fat')),
             ],
           ),
         ],
@@ -206,7 +210,7 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildAiInsights() {
+  Widget _buildAiInsights(LanguageProvider l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -216,17 +220,17 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
                 color: Color(0xFFA78BFA),
                 size: 20,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
-                'AI Insights',
-                style: TextStyle(
+                l10n.getString('ai_food.ai_insights'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -266,7 +270,7 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomButtons(BuildContext context) {
+  Widget _buildBottomButtons(BuildContext context, LanguageProvider l10n) {
     return Column(
       children: [
         Container(
@@ -301,14 +305,14 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
                 Navigator.of(context).pop(); 
                 Navigator.of(context).pop();
               },
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check, color: Colors.white, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.check, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
                   Text(
-                    'Add to Nutrition Log',
-                    style: TextStyle(
+                    l10n.getString('ai_food.add_to_log'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -332,14 +336,14 @@ class AiFoodAnalysisResultScreen extends StatelessWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
               onTap: () => Navigator.of(context).pop(),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.close, color: Colors.white, size: 20),
-                  SizedBox(width: 12),
+                  const Icon(Icons.close, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
                   Text(
-                    'Scan Different Food',
-                    style: TextStyle(
+                    l10n.getString('ai_food.scan_different'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers/language_provider.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysing_screen.dart';
 import '../controllers/ai_food_service.dart';
@@ -13,23 +15,25 @@ class AiFoodScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      appBar: const NutritionGreenAppBar(title: 'AI Food Scanner'),
+      appBar: NutritionGreenAppBar(title: l10n.getString('ai_food.scanner_title')),
       body: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(
           children: [
-            _buildActionCard(context),
+            _buildActionCard(context, l10n),
             const SizedBox(height: 32),
-            _buildHowItWorks(),
+            _buildHowItWorks(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionCard(BuildContext context) {
+  Widget _buildActionCard(BuildContext context, LanguageProvider l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -56,20 +60,20 @@ class AiFoodScanScreen extends StatelessWidget {
             child: const Icon(Icons.camera_alt_outlined, color: AppColors.accentGreen, size: 40),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Take or Upload a Photo',
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            l10n.getString('ai_food.take_upload_photo'),
+            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Text(
-            'Our AI will analyze your food and\nprovide detailed nutrition information',
+            l10n.getString('ai_food.scanner_desc'),
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 14),
           ),
           const SizedBox(height: 32),
           _buildButton(
             context,
-            label: 'Take Photo',
+            label: l10n.getString('ai_food.take_photo'),
             icon: Icons.camera_alt,
             isPrimary: true,
             onPressed: () => _pickAndStart(context, ImageSource.camera),
@@ -77,7 +81,7 @@ class AiFoodScanScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildButton(
             context,
-            label: 'Upload from Gallery',
+            label: l10n.getString('ai_food.upload_gallery'),
             icon: Icons.upload,
             isPrimary: false,
             onPressed: () => _pickAndStart(context, ImageSource.gallery),
@@ -138,7 +142,7 @@ class AiFoodScanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHowItWorks() {
+  Widget _buildHowItWorks(LanguageProvider l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -149,16 +153,16 @@ class AiFoodScanScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'How it works',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            l10n.getString('ai_food.how_it_works'),
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          _buildStep(1, 'Take a photo', 'Capture your meal clearly', const Color(0xFF4A90E2)),
+          _buildStep(1, l10n.getString('ai_food.step1_title'), l10n.getString('ai_food.step1_desc'), const Color(0xFF4A90E2)),
           const SizedBox(height: 16),
-          _buildStep(2, 'AI analyzes', 'We identify the food and macros', const Color(0xFF9B51E0)),
+          _buildStep(2, l10n.getString('ai_food.step2_title'), l10n.getString('ai_food.step2_desc'), const Color(0xFF9B51E0)),
           const SizedBox(height: 16),
-          _buildStep(3, 'Review & add', 'Confirm and track your meal', const Color(0xFF27AE60)),
+          _buildStep(3, l10n.getString('ai_food.step3_title'), l10n.getString('ai_food.step3_desc'), const Color(0xFF27AE60)),
         ],
       ),
     );

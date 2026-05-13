@@ -37,9 +37,9 @@ class AiFoodService {
     }
   }
 
-  Future<AiFoodAnalysisResult?> analyzeFood(XFile imageFile) async {
+  Future<AiFoodAnalysisResult?> analyzeFood(XFile imageFile, {String languageCode = 'en'}) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/food-scan'));
+      var request = http.MultipartRequest('POST', Uri.parse('$_baseUrl/food-scan?lang=$languageCode'));
       
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
