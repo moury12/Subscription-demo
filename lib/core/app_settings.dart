@@ -19,6 +19,7 @@ class AppSettings {
   String? dietPreference;
   double? targetWeight;
   String? timezone;
+  String language = 'English';
   String weekStartDay = 'Monday';
   int targetCalories = 2000;
   int targetProtein = 150;
@@ -55,6 +56,7 @@ class AppSettings {
     dietPreference = json['dietaryPreference'];
     targetWeight = (json['targetWeight'] as num?)?.toDouble();
     timezone = json['timezone'];
+    language = json['language'] ?? 'English';
     weekStartDay = json['weekStart'] ?? 'Monday';
 
     // Restore AI-generated nutritional targets

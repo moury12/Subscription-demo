@@ -1,4 +1,4 @@
-package com.example.ramsai
+package com.example.gocalai
 
 import io.flutter.embedding.android.FlutterActivity
 

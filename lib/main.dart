@@ -8,16 +8,16 @@ import 'features/onboarding/screens/onboarding_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().initialize();
-  runApp(const RamsaiApp());
+  runApp(const GocalAiApp());
 }
 
-class RamsaiApp extends StatelessWidget {
-  const RamsaiApp({super.key});
+class GocalAiApp extends StatelessWidget {
+  const GocalAiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ramsai',
+      title: 'GoCal AI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
       builder: (context, child) {

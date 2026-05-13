@@ -20,6 +20,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditingWeight = false;
   late final AppSettings _settings;
 
+  // Language selection
+  String _selectedLanguage = 'English';
+  final List<Map<String, String>> _languages = [
+    {'name': 'English', 'flag': '🇺🇸'},
+    {'name': 'Hindi', 'flag': '🇮🇳'},
+    {'name': 'French', 'flag': '🇫🇷'},
+    {'name': 'Spanish', 'flag': '🇪🇸'},
+  ];
+
   // Notification toggles
   bool _pushNotifications = true;
   bool _drinkWaterNotification = false;
@@ -38,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _settings = AppSettings();
+    _selectedLanguage = _settings.language;
     if (_settings.entryWeight == null && _settings.currentWeight != null) {
       _settings.entryWeight = _settings.currentWeight;
     }
@@ -116,6 +126,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildFitnessGoalsSection(),
                   const SizedBox(height: 16),
                   _buildNotificationsSection(),
+                  const SizedBox(height: 16),
+                  _buildLanguageSection(),
                   const SizedBox(height: 16),
                   _buildPrivacySecuritySection(),
                   const SizedBox(height: 32),
@@ -805,6 +817,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             secondChild: const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSection() {
+    return _buildCollapsibleCard(
+      index: 4,
+      icon: Icons.language_outlined,
+      title: 'Language',
+      subtitle: _selectedLanguage.toUpperCase(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 16),
+          _buildInputLabel('SELECT LANGUAGE'),
+          const SizedBox(height: 8),
+          ..._languages.map((lang) {
+            final isSelected = _selectedLanguage == lang['name'];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedLanguage = lang['name']!;
+                    _settings.language = _selectedLanguage;
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withOpacity(0.08)
+                        : Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.blueAccent.withOpacity(0.5)
+                          : Colors.white.withOpacity(0.05),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        lang['flag']!,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(width: 14),
+                      Text(
+                        lang['name']!,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white60,
+                          fontSize: 15,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.w400,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (isSelected)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.blueAccent,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+          const SizedBox(height: 16),
+          _buildDoneButton(
+            onPressed: () {
+              setState(() {
+                _settings.language = _selectedLanguage;
+                _expandedIndex = null;
+              });
+              ProfileService().updateProfile({
+                'language': _selectedLanguage,
+              });
+            },
           ),
         ],
       ),

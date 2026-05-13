@@ -7,11 +7,11 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ramsai/main.dart';
+import 'package:gocal_ai/main.dart';
 
 void main() {
   testWidgets('Renders home dashboard shell', (WidgetTester tester) async {
-    await tester.pumpWidget(const RamsaiApp());
+    await tester.pumpWidget(const GocalAiApp());
 
     expect(find.text('Dashboard'), findsOneWidget);
     expect(find.text('Daily Calories'), findsOneWidget);

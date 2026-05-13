@@ -1,6 +1,6 @@
 {
-    "name": "ramsai",
-    "short_name": "ramsai",
+    "name": "GoCal AI",
+    "short_name": "GoCal AI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
