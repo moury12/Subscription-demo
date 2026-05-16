@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers/language_provider.dart';
 import '../models/ai_workout_plan.dart';
 import '../controllers/workout_controller.dart';
 
@@ -31,6 +33,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
   }
 
   void _onCtaPressed() {
+    final l10n = context.read<LanguageProvider>();
     setState(() {
       _currentRepClickCount++;
       
@@ -47,7 +50,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Nicely done! Next: ${widget.exercises[_currentExerciseIndex].name}',
+                '${l10n.getString('workout.well_done')} ${l10n.getString('workout.next_exercise')}: ${widget.exercises[_currentExerciseIndex].name}',
                 style: const TextStyle(color: Colors.white),
               ),
               duration: const Duration(seconds: 1),
@@ -69,20 +72,21 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
   }
 
   void _showWorkoutCompleteDialog() {
+    final l10n = context.read<LanguageProvider>();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF161616),
-        title: const Text('Workout Complete! \u{1F389}', style: TextStyle(color: Colors.white)),
-        content: const Text('You have completed all exercises for today. Great job!', style: TextStyle(color: Colors.white70)),
+        title: Text(l10n.getString('workout.workout_complete'), style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.getString('workout.workout_complete_msg'), style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
               Navigator.pop(context); // Back to workout list
             },
-            child: const Text('Finish', style: TextStyle(color: AppColors.workoutPurple)),
+            child: Text(l10n.getString('workout.finish'), style: const TextStyle(color: AppColors.workoutPurple)),
           ),
         ],
       ),
@@ -91,6 +95,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     if (widget.exercises.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.workoutPurple,
@@ -98,8 +103,8 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('No exercises for this session.', style: TextStyle(color: Colors.white)),
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Go Back', style: TextStyle(color: Colors.white))),
+              Text(l10n.getString('workout.no_exercises'), style: const TextStyle(color: Colors.white)),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.getString('workout.go_back'), style: const TextStyle(color: Colors.white))),
             ],
           ),
         ),
@@ -115,17 +120,17 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           children: [
             _buildAppBar(context),
             const SizedBox(height: 20),
-            _buildProgressSection(),
+            _buildProgressSection(l10n),
             const Spacer(),
-            _buildExerciseDetail(currentExercise),
+            _buildExerciseDetail(currentExercise, l10n),
             const Spacer(),
-            _buildCompleteButton(currentExercise),
+            _buildCompleteButton(currentExercise, l10n),
             const SizedBox(height: 20),
             TextButton(
               onPressed: _onPausePressed,
-              child: const Text(
-                'Pause Workout',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+              child: Text(
+                l10n.getString('workout.pause_workout'),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
             const SizedBox(height: 20),
@@ -156,7 +161,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
     );
   }
 
-  Widget _buildProgressSection() {
+  Widget _buildProgressSection(LanguageProvider l10n) {
     double progress = (_currentExerciseIndex) / widget.exercises.length;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -164,7 +169,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Exercise ${_currentExerciseIndex + 1} of ${widget.exercises.length}',
+            '${l10n.getString('workout.exercise')} ${l10n.formatInteger(_currentExerciseIndex + 1)} ${l10n.getString('workout.of')} ${l10n.formatInteger(widget.exercises.length)}',
             style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
           ),
           const SizedBox(height: 8),
@@ -182,7 +187,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
     );
   }
 
-  Widget _buildExerciseDetail(AiWorkoutExercise exercise) {
+  Widget _buildExerciseDetail(AiWorkoutExercise exercise, LanguageProvider l10n) {
     return Column(
       children: [
         const Text(
@@ -206,7 +211,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Text(
-            exercise.reps,
+            l10n.translateDigits(exercise.reps),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
@@ -217,7 +222,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
         ),
         const SizedBox(height: 24),
         Text(
-          'Goal: ${exercise.reps}',
+          '${l10n.getString('workout.goal')}: ${l10n.translateDigits(exercise.reps)}',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -225,7 +230,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
           ),
         ),
         Text(
-          'Count: $_currentRepClickCount',
+          '${l10n.getString('workout.count')}: ${l10n.formatInteger(_currentRepClickCount)}',
           style: TextStyle(
             color: Colors.white.withOpacity(0.7),
             fontSize: 16,
@@ -235,7 +240,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
     );
   }
 
-  Widget _buildCompleteButton(AiWorkoutExercise exercise) {
+  Widget _buildCompleteButton(AiWorkoutExercise exercise, LanguageProvider l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: SizedBox(
@@ -257,7 +262,7 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
               const Icon(Icons.fitness_center, size: 20),
               const SizedBox(width: 12),
               Text(
-                'COMPLETE SET',
+                l10n.getString('workout.complete_set'),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],

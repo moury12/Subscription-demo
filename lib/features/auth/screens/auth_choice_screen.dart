@@ -25,19 +25,19 @@ class AuthChoiceScreen extends StatelessWidget {
             const GradientLogo(size: 100),
             const SizedBox(height: 32),
             Text(
-              l.getString('join_gocal_today'),
+              l.getString('auth.join_gocal_today'),
               style: AppTextStyles.authTitle,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              l.getString('fitness_goals_subtitle'),
+              l.getString('auth.fitness_goals_subtitle'),
               style: AppTextStyles.authSubtitle.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const Spacer(),
             PrimaryGlowButton(
-              label: l.getString('sign_in_upper'),
+              label: l.getString('auth.sign_in_upper'),
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SignInScreen()));
@@ -56,7 +56,7 @@ class AuthChoiceScreen extends StatelessWidget {
                   side: BorderSide(color: AppColors.textPrimary.withOpacity(0.2)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text(l.getString('create_account_upper'), style: AppTextStyles.buttonLabel),
+                child: Text(l.getString('auth.create_account_upper'), style: AppTextStyles.buttonLabel),
               ),
             ),
             const SizedBox(height: 48),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -28,21 +30,25 @@ class _GoalScreenState extends State<GoalScreen> {
   final List<Map<String, dynamic>> _goals = [
     {
       'title': 'Lose Weight',
+      'key': 'onboarding.lose_weight',
       'icon': Icons.trending_down,
       'color': Colors.redAccent,
     },
     {
       'title': 'Gain Muscle',
+      'key': 'onboarding.gain_muscle',
       'icon': Icons.trending_up,
       'color': Colors.greenAccent,
     },
     {
       'title': 'Maintain Weight',
+      'key': 'onboarding.maintain_weight',
       'icon': Icons.sync,
       'color': Colors.blueAccent,
     },
     {
       'title': 'Improve Endurance',
+      'key': 'onboarding.improve_endurance',
       'icon': Icons.bolt,
       'color': Colors.purpleAccent,
     },
@@ -56,6 +62,7 @@ class _GoalScreenState extends State<GoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -66,16 +73,20 @@ class _GoalScreenState extends State<GoalScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("What's your goal?", style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.what_is_your_goal'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'Choose your primary fitness objective',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.fitness_objective'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
                     Column(
@@ -85,24 +96,24 @@ class _GoalScreenState extends State<GoalScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: OptionCard(
-                            title: goal['title'],
+                            title: l10n.getString(goal['key']),
                             icon: Icon(
                               goal['icon'],
                               color: isSelected ? Colors.white : goal['color'],
                               size: 20,
                             ),
                             isSelected: isSelected,
-                            onTap: () => setState(() => _selectedGoal = goal['title']),
+                            onTap: () =>
+                                setState(() => _selectedGoal = goal['title']),
                           ),
                         );
                       }),
                     ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_selectedGoal),
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -113,3 +124,4 @@ class _GoalScreenState extends State<GoalScreen> {
     );
   }
 }
+

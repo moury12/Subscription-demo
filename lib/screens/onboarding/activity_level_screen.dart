@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -28,23 +30,28 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
   final List<Map<String, String>> _levels = [
     {
       'title': 'Sedentary',
-      'subtitle': 'Little to no exercise',
+      'titleKey': 'onboarding.sedentary',
+      'subtitleKey': 'onboarding.little_exercise',
     },
     {
       'title': 'Lightly Active',
-      'subtitle': 'Exercise 1-3 days/week',
+      'titleKey': 'onboarding.lightly_active',
+      'subtitleKey': 'onboarding.exercise_1_3',
     },
     {
       'title': 'Moderately Active',
-      'subtitle': 'Exercise 3-5 days/week',
+      'titleKey': 'onboarding.moderately_active',
+      'subtitleKey': 'onboarding.exercise_3_5',
     },
     {
       'title': 'Very Active',
-      'subtitle': 'Exercise 6-7 days/week',
+      'titleKey': 'onboarding.very_active',
+      'subtitleKey': 'onboarding.exercise_6_7',
     },
     {
       'title': 'Extra Active',
-      'subtitle': 'Very intense exercise daily',
+      'titleKey': 'onboarding.extra_active',
+      'subtitleKey': 'onboarding.intense_exercise_daily',
     },
   ];
 
@@ -56,6 +63,7 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -66,16 +74,20 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Activity Level', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.activity_level'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'How active are you currently?',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.how_active'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
                     Column(
@@ -85,17 +97,18 @@ class _ActivityLevelScreenState extends State<ActivityLevelScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: OptionCard(
-                            title: level['title']!,
-                            subtitle: level['subtitle']!,
+                            title: l10n.getString(level['titleKey']!),
+                            subtitle: l10n.getString(level['subtitleKey']!),
                             isSelected: isSelected,
-                            onTap: () => setState(() => _selectedLevel = level['title']!),
+                            onTap: () => setState(
+                                () => _selectedLevel = level['title']!),
                           ),
                         );
                       }),
                     ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_selectedLevel),
                     ),
                     const SizedBox(height: 24),

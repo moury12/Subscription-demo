@@ -198,7 +198,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             return DropdownMenuItem<AiWeeklyWorkoutPlan>(
                               value: value,
                               child: Text(
-                                '${value.planTitle} (${value.startDate != null ? DateFormat('MMM d, yyyy').format(value.startDate!) : 'N/A'})',
+                                '${value.planTitle} (${value.startDate != null ? l10n.translateDigits(DateFormat('MMM d, yyyy').format(value.startDate!)) : 'N/A'})',
                                 style: const TextStyle(color: Colors.white, fontSize: 16),
                               ),
                             );

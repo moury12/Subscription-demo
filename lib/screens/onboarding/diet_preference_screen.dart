@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -19,19 +21,32 @@ class DietaryPreferenceScreen extends StatefulWidget {
   });
 
   @override
-  State<DietaryPreferenceScreen> createState() => _DietaryPreferenceScreenState();
+  State<DietaryPreferenceScreen> createState() =>
+      _DietaryPreferenceScreenState();
 }
 
 class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
   late String _selectedDiet;
 
   final List<Map<String, String>> _diets = [
-    {'title': 'Everything', 'emoji': '🍽️'},
-    {'title': 'Vegetarian', 'emoji': '🥗'},
-    {'title': 'Vegan', 'emoji': '🌱'},
-    {'title': 'Pescatarian', 'emoji': '🐟'},
-    {'title': 'Keto', 'emoji': '🥑'},
-    {'title': 'Paleo', 'emoji': '🥩'},
+    {
+      'title': 'Everything',
+      'titleKey': 'onboarding.everything',
+      'emoji': '🍽️'
+    },
+    {
+      'title': 'Vegetarian',
+      'titleKey': 'onboarding.vegetarian',
+      'emoji': '🥗'
+    },
+    {'title': 'Vegan', 'titleKey': 'onboarding.vegan', 'emoji': '🌱'},
+    {
+      'title': 'Pescatarian',
+      'titleKey': 'onboarding.pescatarian',
+      'emoji': '🐟'
+    },
+    {'title': 'Keto', 'titleKey': 'onboarding.keto', 'emoji': '🥑'},
+    {'title': 'Paleo', 'titleKey': 'onboarding.paleo', 'emoji': '🥩'},
   ];
 
   @override
@@ -42,6 +57,7 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -52,22 +68,27 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Dietary Preference', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.dietary_preference'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'Select your eating style for personalized nutrition',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.eating_style'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -77,17 +98,18 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
                       itemBuilder: (context, index) {
                         final diet = _diets[index];
                         return DietOptionCard(
-                          title: diet['title']!,
+                          title: l10n.getString(diet['titleKey']!),
                           iconAsset: '',
                           emoji: diet['emoji'],
                           isSelected: _selectedDiet == diet['title'],
-                          onTap: () => setState(() => _selectedDiet = diet['title']!),
+                          onTap: () => setState(
+                              () => _selectedDiet = diet['title']!),
                         );
                       },
                     ),
                     const SizedBox(height: 64),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_selectedDiet),
                     ),
                   ],
@@ -100,3 +122,4 @@ class _DietaryPreferenceScreenState extends State<DietaryPreferenceScreen> {
     );
   }
 }
+

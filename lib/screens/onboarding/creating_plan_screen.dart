@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/onboarding/onboarding_background.dart';
@@ -24,11 +26,11 @@ class CreatingPlanScreen extends StatefulWidget {
 
 class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
   int _completedSteps = 0;
-  final List<String> _steps = [
-    'Analyzing your profile',
-    'Generating personalized workout routine',
-    'Optimizing exercises for your goal',
-    'Finalizing your weekly plan',
+  final List<String> _stepKeys = [
+    'onboarding.step_analyzing_profile',
+    'onboarding.step_generating_routine',
+    'onboarding.step_optimizing_exercises',
+    'onboarding.step_finalizing_plan',
   ];
   
   final AiWorkoutService _workoutService = AiWorkoutService();
@@ -58,8 +60,9 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
     // Done
     if (mounted) {
       if (plan == null) {
+        final l10n = context.read<LanguageProvider>();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to generate plan. Using default template.')),
+          SnackBar(content: Text(l10n.getString('common.error'))), // "Error" text localized
         );
       } else {
         AppSettings().addWorkoutPlan(plan);
@@ -110,20 +113,20 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
                   child: const Icon(Icons.auto_awesome, color: Colors.white, size: 48),
                 ),
                 const SizedBox(height: 48),
-                const Text(
-                  'Creating Your Plan',
+                Text(
+                  context.read<LanguageProvider>().getString('onboarding.creating_your_plan'),
                   style: AppTextStyles.splashTitle,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Our AI is personalizing your workout and nutrition plan...',
+                  context.read<LanguageProvider>().getString('onboarding.personalized_plan_desc'),
                   style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 64),
                 Column(
-                  children: List.generate(_steps.length, (index) {
+                  children: List.generate(_stepKeys.length, (index) {
                     final isCompleted = index < _completedSteps;
                     final isCurrent = index == _completedSteps;
                     return Padding(
@@ -143,7 +146,7 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
                           const SizedBox(width: 16),
                           Expanded(
                             child: Text(
-                              _steps[index],
+                              context.read<LanguageProvider>().getString(_stepKeys[index]),
                               style: AppTextStyles.body.copyWith(
                                 color: isCompleted ? Colors.white : AppColors.textSecondary,
                               ),

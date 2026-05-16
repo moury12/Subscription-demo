@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/reminder_scheduler.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
+import 'features/onboarding/screens/language_selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,11 @@ class GocalAiApp extends StatelessWidget {
           return MaterialApp(
             title: 'GoCal AI',
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.dark,
+            theme: AppTheme.dark.copyWith(
+              textTheme: languageProvider.currentLanguage == 'hi'
+                  ? AppTheme.dark.textTheme.apply(fontFamily: 'NotoSansDevanagari')
+                  : AppTheme.dark.textTheme,
+            ),
             builder: (context, child) {
               return GestureDetector(
                 onTap: () {
@@ -39,7 +44,7 @@ class GocalAiApp extends StatelessWidget {
                 child: child!,
               );
             },
-            home: const OnboardingScreen(),
+            home: const LanguageSelectionScreen(),
           );
         },
       ),

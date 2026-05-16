@@ -87,33 +87,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             const SizedBox(height: 40),
             AuthHeader(
-              title: l.getString('create_account'),
-              subtitle: l.getString('start_journey_subtitle'),
+              title: l.getString('auth.create_account'),
+              subtitle: l.getString('auth.start_journey_subtitle'),
             ),
             const SizedBox(height: AppSpacing.authHeaderGap),
             AppTextInput(
               controller: _nameController,
-              hint: l.getString('full_name'),
+              hint: l.getString('auth.full_name'),
               prefixIcon: const Icon(Icons.person_outline,
                   color: AppColors.textSecondary, size: AppSpacing.iconSize),
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _emailController,
-              hint: l.getString('email'),
+              hint: l.getString('auth.email'),
               svgIcon: 'assets/icons/email_icon.svg',
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _passwordController,
-              hint: l.getString('password'),
+              hint: l.getString('auth.password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
             const SizedBox(height: AppSpacing.authSignUpInputGap),
             AppTextInput(
               controller: _confirmPasswordController,
-              hint: l.getString('confirm_password'),
+              hint: l.getString('auth.confirm_password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
@@ -121,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
               : PrimaryGlowButton(
-                  label: l.getString('sign_up'),
+                  label: l.getString('auth.sign_up'),
                   onPressed: _handleSignUp,
                 ),
             const SizedBox(height: AppSpacing.md),
@@ -133,9 +133,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 text: TextSpan(
                   style: AppTextStyles.label.copyWith(color: AppColors.textMuted),
                   children: [
-                    TextSpan(text: l.getString('by_signing_up_agree') + ' '),
+                    TextSpan(text: l.getString('auth.by_signing_up_agree') + ' '),
                     TextSpan(
-                      text: l.getString('terms'),
+                      text: l.getString('auth.terms'),
                       style: AppTextStyles.label.copyWith(
                         color: AppColors.brandPrimary,
                         fontWeight: FontWeight.w600,
@@ -143,9 +143,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => launchUrl(Uri.parse('https://github.com')),
                     ),
-                    TextSpan(text: ' ' + l.getString('and') + ' '),
+                    TextSpan(text: ' ' + l.getString('auth.and') + ' '),
                     TextSpan(
-                      text: l.getString('privacy_policy'),
+                      text: l.getString('auth.privacy_policy'),
                       style: AppTextStyles.label.copyWith(
                         color: AppColors.brandPrimary,
                         fontWeight: FontWeight.w600,
@@ -159,8 +159,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             const SizedBox(height: AppSpacing.lg),
             AuthCtaRow(
-              label: l.getString('already_have_account') + ' ',
-              action: l.getString('sign_in'),
+              label: l.getString('auth.already_have_account') + ' ',
+              action: l.getString('auth.sign_in'),
               onTap: () => Navigator.of(context).pop(),
             ),
             const SizedBox(height: 40),

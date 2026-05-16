@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -32,12 +34,15 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
   @override
   void initState() {
     super.initState();
-    _heightController = TextEditingController(text: widget.height > 0 ? widget.height.toString() : '');
-    _weightController = TextEditingController(text: widget.weight > 0 ? widget.weight.toString() : '');
+    _heightController = TextEditingController(
+        text: widget.height > 0 ? widget.height.toString() : '');
+    _weightController = TextEditingController(
+        text: widget.weight > 0 ? widget.weight.toString() : '');
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -48,16 +53,20 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Physical Stats', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.physical_stats'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'Help us calculate your calorie needs',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.calorie_needs'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
                     // Metric/Imperial Toggle
@@ -71,38 +80,53 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: _buildUnitToggle('Metric', _isMetric, () => setState(() => _isMetric = true)),
+                            child: _buildUnitToggle(
+                                l10n.getString('onboarding.metric'),
+                                _isMetric,
+                                () => setState(() => _isMetric = true)),
                           ),
                           Expanded(
-                            child: _buildUnitToggle('Imperial', !_isMetric, () => setState(() => _isMetric = false)),
+                            child: _buildUnitToggle(
+                                l10n.getString('onboarding.imperial'),
+                                !_isMetric,
+                                () => setState(() => _isMetric = false)),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 32),
-                    Text('Height (${_isMetric ? 'cm' : 'ft'})', style: AppTextStyles.labelMedium),
+                    Text(
+                        '${l10n.getString('onboarding.height')} (${_isMetric ? l10n.getString('onboarding.cm') : l10n.getString('onboarding.ft')})',
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     AppTextInput(
                       hint: _isMetric ? 'e.g., 175' : 'e.g., 5.9',
                       controller: _heightController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                     ),
                     const SizedBox(height: 24),
-                    Text('Current Weight (${_isMetric ? 'kg' : 'lbs'})', style: AppTextStyles.labelMedium),
+                    Text(
+                        '${l10n.getString('onboarding.current_weight')} (${_isMetric ? l10n.getString('onboarding.kg') : l10n.getString('onboarding.lbs')})',
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     AppTextInput(
                       hint: _isMetric ? 'e.g., 70' : 'e.g., 154',
                       controller: _weightController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                     ),
                     const SizedBox(height: 64),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () {
-                        final h = double.tryParse(_heightController.text) ?? 170.0;
-                        final w = double.tryParse(_weightController.text) ?? 70.0;
+                        final h =
+                            double.tryParse(_heightController.text) ?? 170.0;
+                        final w =
+                            double.tryParse(_weightController.text) ?? 70.0;
                         widget.onContinue(h, w);
                       },
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -136,3 +160,4 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
     );
   }
 }
+

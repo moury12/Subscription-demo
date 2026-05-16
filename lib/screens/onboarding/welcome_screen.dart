@@ -5,6 +5,9 @@ import '../../widgets/branding/gradient_logo.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
 import '../../widgets/onboarding/onboarding_background.dart';
 
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
+
 class WelcomeScreen extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onSkip;
@@ -13,6 +16,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lp = context.watch<LanguageProvider>();
+    
     return Scaffold(
       body: OnboardingBackground(
         child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -25,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: onSkip,
                   child: Text(
-                    'Skip',
+                    lp.getString('onboarding.skip'),
                     style: AppTextStyles.label.copyWith(color: AppColors.textSecondary),
                   ),
                 ),
@@ -33,14 +38,14 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 48),
               const GradientLogo(size: 100),
               const SizedBox(height: 32),
-              const Text(
-                'Welcome to GoCal AI !',
+              Text(
+                lp.getString('onboarding.welcome_title'),
                 style: AppTextStyles.splashTitle,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                "Let's personalize your fitness journey",
+                lp.getString('onboarding.welcome_subtitle'),
                 style: AppTextStyles.splashSubtitle.copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
@@ -48,26 +53,26 @@ class WelcomeScreen extends StatelessWidget {
               _buildFeatureItem(
                 context,
                 icon: Icons.track_changes,
-                title: 'Personalized Plans',
-                subtitle: 'Get custom workouts and nutrition plans tailored to your goals',
+                title: lp.getString('onboarding.feature1_title'),
+                subtitle: lp.getString('onboarding.feature1_subtitle'),
               ),
               const SizedBox(height: 24),
               _buildFeatureItem(
                 context,
                 icon: Icons.trending_up,
-                title: 'Track Progress',
-                subtitle: 'Monitor your fitness journey with detailed analytics',
+                title: lp.getString('onboarding.feature2_title'),
+                subtitle: lp.getString('onboarding.feature2_subtitle'),
               ),
               const SizedBox(height: 24),
               _buildFeatureItem(
                 context,
                 icon: Icons.bolt,
-                title: 'AI-Powered',
-                subtitle: 'Smart recommendations that adapt to your progress',
+                title: lp.getString('onboarding.feature3_title'),
+                subtitle: lp.getString('onboarding.feature3_subtitle'),
               ),
               const SizedBox(height: 64),
               PrimaryGlowButton(
-                label: 'Get Started',
+                label: lp.getString('onboarding.get_started'),
                 onPressed: onStart,
               ),
               const SizedBox(height: 24),

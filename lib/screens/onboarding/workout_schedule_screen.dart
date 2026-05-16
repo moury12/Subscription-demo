@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -32,6 +34,7 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -42,31 +45,36 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Workout Schedule', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.workout_schedule'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'How many days per week can you commit to working out?',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.days_commit'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 48),
                     Center(
                       child: Column(
                         children: [
                           Text(
-                            '${_days.round()}',
+                            l10n.formatInteger(_days.round()),
                             style: AppTextStyles.splashTitle.copyWith(
                               fontSize: 64,
                               color: AppColors.brandPrimary,
                             ),
                           ),
                           Text(
-                            'days per week',
-                            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                            l10n.getString('onboarding.days_per_week'),
+                            style: AppTextStyles.body
+                                .copyWith(color: AppColors.textSecondary),
                           ),
                         ],
                       ),
@@ -79,7 +87,8 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
                         thumbColor: Colors.white,
                         overlayColor: AppColors.brandPrimary.withAlpha(30),
                         valueIndicatorColor: AppColors.brandPrimary,
-                        valueIndicatorTextStyle: const TextStyle(color: Colors.white),
+                        valueIndicatorTextStyle:
+                            const TextStyle(color: Colors.white),
                         tickMarkShape: const RoundSliderTickMarkShape(),
                         activeTickMarkColor: Colors.white.withAlpha(100),
                         inactiveTickMarkColor: Colors.white.withAlpha(50),
@@ -100,8 +109,9 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
                         children: List.generate(
                           7,
                           (index) => Text(
-                            '${index + 1}',
-                            style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                            l10n.formatInteger(index + 1),
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textSecondary),
                           ),
                         ),
                       ),
@@ -112,16 +122,19 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.brandPrimary.withAlpha(10),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.brandPrimary.withAlpha(20)),
+                        border: Border.all(
+                            color: AppColors.brandPrimary.withAlpha(20)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.lightbulb_outline, color: AppColors.brandPrimary),
+                          const Icon(Icons.lightbulb_outline,
+                              color: AppColors.brandPrimary),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Text(
-                              'Start with a realistic goal. You can always adjust later!',
-                              style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary70),
+                              l10n.getString('onboarding.realistic_goal'),
+                              style: AppTextStyles.caption
+                                  .copyWith(color: AppColors.textPrimary70),
                             ),
                           ),
                         ],
@@ -129,10 +142,9 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
                     ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_days.round()),
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -143,3 +155,4 @@ class _WorkoutScheduleScreenState extends State<WorkoutScheduleScreen> {
     );
   }
 }
+

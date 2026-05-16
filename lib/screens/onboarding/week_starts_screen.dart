@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -42,6 +44,7 @@ class _WeekStartsScreenState extends State<WeekStartsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     final int initialIndex = _days.indexOf(_tempSelectedDay);
 
     return Scaffold(
@@ -59,11 +62,13 @@ class _WeekStartsScreenState extends State<WeekStartsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Week Starts From', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.week_starts_from'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'Select the day your week begins.',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.select_day_begins'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const Spacer(),
                     Center(
@@ -89,7 +94,8 @@ class _WeekStartsScreenState extends State<WeekStartsScreen> {
                             ),
                             CupertinoPicker(
                               scrollController: FixedExtentScrollController(
-                                initialItem: initialIndex != -1 ? initialIndex : 2,
+                                initialItem:
+                                    initialIndex != -1 ? initialIndex : 2,
                               ),
                               itemExtent: 60,
                               onSelectedItemChanged: (index) {
@@ -103,12 +109,17 @@ class _WeekStartsScreenState extends State<WeekStartsScreen> {
                                   child: AnimatedDefaultTextStyle(
                                     duration: const Duration(milliseconds: 200),
                                     style: TextStyle(
-                                      color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white.withOpacity(0.2),
                                       fontSize: isSelected ? 28 : 22,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
                                       fontFamily: 'Inter',
                                     ),
-                                    child: Text(day),
+                                    child: Text(l10n.getString(
+                                        'onboarding.${day.toLowerCase()}')),
                                   ),
                                 );
                               }).toList(),
@@ -119,7 +130,7 @@ class _WeekStartsScreenState extends State<WeekStartsScreen> {
                     ),
                     const Spacer(),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_tempSelectedDay),
                     ),
                     const SizedBox(height: 24),

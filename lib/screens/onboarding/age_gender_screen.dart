@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -31,12 +33,14 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
   @override
   void initState() {
     super.initState();
-    _ageController = TextEditingController(text: widget.age > 0 ? widget.age.toString() : '');
+    _ageController =
+        TextEditingController(text: widget.age > 0 ? widget.age.toString() : '');
     _selectedGender = widget.gender;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -49,39 +53,49 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
               onSkip: () => widget.onContinue(25, 'Male'), // Default skip values
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Tell us about yourself', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.tell_us_about_yourself'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'This helps us personalize your experience',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.personalize_experience'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 48),
-                    const Text('Age', style: AppTextStyles.labelMedium),
+                    Text(l10n.getString('onboarding.age'),
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     AppTextInput(
-                      hint: 'Enter your age',
+                      hint: l10n.getString('onboarding.enter_your_age'),
                       controller: _ageController,
+                      keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 32),
-                    const Text('Gender', style: AppTextStyles.labelMedium),
+                    Text(l10n.getString('onboarding.gender'),
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        _buildGenderButton('Male', Icons.male),
+                        _buildGenderButton(
+                            'Male', Icons.male, l10n.getString('onboarding.male')),
                         const SizedBox(width: 12),
-                        _buildGenderButton('Female', Icons.female),
+                        _buildGenderButton('Female', Icons.female,
+                            l10n.getString('onboarding.female')),
                         const SizedBox(width: 12),
-                        _buildGenderButton('Other', Icons.transgender),
+                        _buildGenderButton('Other', Icons.transgender,
+                            l10n.getString('onboarding.other')),
                       ],
                     ),
                     const SizedBox(height: 64),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () {
                         final age = int.tryParse(_ageController.text) ?? 25;
                         widget.onContinue(age, _selectedGender);
@@ -97,30 +111,22 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
     );
   }
 
-  Widget _buildGenderButton(String gender, IconData icon) {
+  Widget _buildGenderButton(String gender, IconData icon, String label) {
     final isSelected = _selectedGender == gender;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedGender = gender),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.surfaceRaised : AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
+            color: isSelected
+                ? AppColors.brandPrimary.withOpacity(0.1)
+                : AppColors.surface,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected ? AppColors.brandPrimary : AppColors.inputBorder,
-              width: 1.5,
+              width: 2,
             ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: AppColors.brandPrimary.withAlpha(50),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    )
-                  ]
-                : [],
           ),
           child: Column(
             children: [
@@ -131,10 +137,11 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                gender,
+                label,
                 style: AppTextStyles.label.copyWith(
-                  color: isSelected ? Colors.white : AppColors.textSecondary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color:
+                      isSelected ? AppColors.brandPrimary : AppColors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
             ],
@@ -144,3 +151,4 @@ class _AgeGenderScreenState extends State<AgeGenderScreen> {
     );
   }
 }
+

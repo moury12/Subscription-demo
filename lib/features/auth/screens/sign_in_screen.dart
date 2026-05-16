@@ -87,19 +87,19 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             const SizedBox(height: 40),
             AuthHeader(
-              title: l.getString('welcome_back'),
-              subtitle: l.getString('sign_in_subtitle'),
+              title: l.getString('auth.welcome_back'),
+              subtitle: l.getString('auth.sign_in_subtitle'),
             ),
             const SizedBox(height: AppSpacing.authHeaderGap),
             AppTextInput(
               controller: _emailController,
-              hint: l.getString('email'),
+              hint: l.getString('auth.email'),
               svgIcon: 'assets/icons/email_icon.svg',
             ),
             const SizedBox(height: AppSpacing.authFormGap),
             AppTextInput(
               controller: _passwordController,
-              hint: l.getString('password'),
+              hint: l.getString('auth.password'),
               svgIcon: 'assets/icons/password_icon.svg',
               obscureText: true,
             ),
@@ -110,20 +110,20 @@ class _SignInScreenState extends State<SignInScreen> {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
                 },
-                child: Text(l.getString('forgot_password_q'), style: AppTextStyles.authHelp),
+                child: Text(l.getString('auth.forgot_password_q'), style: AppTextStyles.authHelp),
               ),
             ),
             const SizedBox(height: AppSpacing.authForgotToButton),
             _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
               : PrimaryGlowButton(
-                  label: l.getString('sign_in'),
+                  label: l.getString('auth.sign_in'),
                   onPressed: _handleSignIn,
                 ),
             const SizedBox(height: AppSpacing.lg),
             AuthCtaRow(
-              label: l.getString('no_account_label') + ' ',
-              action: l.getString('sign_up'),
+              label: l.getString('auth.no_account_label') + ' ',
+              action: l.getString('auth.sign_up'),
               onTap: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const SignUpScreen()));

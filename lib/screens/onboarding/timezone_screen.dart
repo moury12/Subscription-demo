@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -25,7 +27,7 @@ class TimezoneScreen extends StatefulWidget {
 class _TimezoneScreenState extends State<TimezoneScreen> {
   late String _selectedTimezone;
   final TextEditingController _searchController = TextEditingController();
-  
+
   final List<Map<String, String>> _allTimezones = [
     {'title': 'UTC-08:00', 'subtitle': 'Pacific Time (US & Canada)'},
     {'title': 'UTC-07:00', 'subtitle': 'Mountain Time (US & Canada)'},
@@ -60,14 +62,15 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredTimezones = _allTimezones.where((tz) {
-        return tz['title']!.toLowerCase().contains(query) || 
-               tz['subtitle']!.toLowerCase().contains(query);
+        return tz['title']!.toLowerCase().contains(query) ||
+            tz['subtitle']!.toLowerCase().contains(query);
       }).toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -78,28 +81,36 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Select Timezone', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.select_timezone'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      'This helps us sync your schedule and reminders.',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.sync_schedule'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
                     TextField(
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white),
                       textInputAction: TextInputAction.done,
-                      onEditingComplete: () => FocusManager.instance.primaryFocus?.unfocus(),
-                      onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                      onEditingComplete: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      onSubmitted: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                       decoration: InputDecoration(
-                        hintText: 'Search timezones...',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                        prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.5)),
+                        hintText: l10n.getString('onboarding.search_timezones'),
+                        hintStyle:
+                            TextStyle(color: Colors.white.withOpacity(0.3)),
+                        prefixIcon: Icon(Icons.search,
+                            color: Colors.white.withOpacity(0.5)),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.05),
                         border: OutlineInputBorder(
@@ -119,27 +130,27 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
                             title: tz['title']!,
                             subtitle: tz['subtitle']!,
                             isSelected: isSelected,
-                            onTap: () => setState(() => _selectedTimezone = tz['title']!),
+                            onTap: () =>
+                                setState(() => _selectedTimezone = tz['title']!),
                           ),
                         );
                       }),
                     ),
                     if (_filteredTimezones.isEmpty)
-                      const Center(
+                      Center(
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 40),
+                          padding: const EdgeInsets.symmetric(vertical: 40),
                           child: Text(
-                            'No timezones found',
-                            style: TextStyle(color: Colors.white38),
+                            l10n.getString('onboarding.no_timezones_found'),
+                            style: const TextStyle(color: Colors.white38),
                           ),
                         ),
                       ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () => widget.onContinue(_selectedTimezone),
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -156,3 +167,4 @@ class _TimezoneScreenState extends State<TimezoneScreen> {
     super.dispose();
   }
 }
+

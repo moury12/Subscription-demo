@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/buttons/primary_glow_button.dart';
@@ -37,6 +39,7 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -47,19 +50,24 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
               onBack: widget.onBack,
             ),
             Expanded(
-              child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Target Weight', style: AppTextStyles.h1),
+                    Text(l10n.getString('onboarding.target_weight'),
+                        style: AppTextStyles.h1),
                     const SizedBox(height: 8),
                     Text(
-                      "What's your goal weight?",
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                      l10n.getString('onboarding.goal_weight'),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 32),
-                    const Text('Current Weight', style: AppTextStyles.labelMedium),
+                    Text(l10n.getString('onboarding.current_weight'),
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
@@ -70,26 +78,30 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
                         border: Border.all(color: AppColors.inputBorder),
                       ),
                       child: Text(
-                        '${widget.currentWeight} kg',
+                        '${l10n.formatWeight(widget.currentWeight)} ${l10n.getString('onboarding.kg')}',
                         style: AppTextStyles.inputText,
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Text('Target Weight (kg)', style: AppTextStyles.labelMedium),
+                    Text(
+                        '${l10n.getString('onboarding.target_weight')} (${l10n.getString('onboarding.kg')})',
+                        style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     AppTextInput(
-                      hint: 'Enter your target weight',
+                      hint: l10n.getString('onboarding.enter_target_weight'),
                       controller: _targetWeightController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                     ),
                     const SizedBox(height: 64),
                     PrimaryGlowButton(
-                      label: 'Continue',
+                      label: l10n.getString('onboarding.continue'),
                       onPressed: () {
-                        final tw = double.tryParse(_targetWeightController.text) ?? widget.currentWeight;
+                        final tw = double.tryParse(_targetWeightController.text) ??
+                            widget.currentWeight;
                         widget.onContinue(tw);
                       },
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -100,3 +112,4 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
     );
   }
 }
+
