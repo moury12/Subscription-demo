@@ -9,6 +9,9 @@ import '../models/food.dart';
 
 class AiFoodService {
   static String get _baseUrl {
+    if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
+      return 'http://10.0.2.2:3000/api/ai';
+    }
     return 'http://localhost:3000/api/ai';
   }
 

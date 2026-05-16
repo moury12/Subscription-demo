@@ -9,7 +9,9 @@ class ApiService {
   ApiService._internal();
 
   static String get baseUrl {
-    // adb reverse tcp:3000 tcp:3000 must be run for emulator
+    if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
+      return 'http://10.0.2.2:3000/api';
+    }
     return 'http://localhost:3000/api';
   }
 
