@@ -5,6 +5,7 @@ import '../../../core/app_settings.dart';
 import '../../../core/providers/language_provider.dart';
 import '../controllers/nutrition_controller.dart';
 import '../widgets/meal_logging_options.dart';
+import '../screens/ai_food_scan_screen.dart';
 
 class NutritionScreen extends StatefulWidget {
   const NutritionScreen({super.key});
@@ -64,7 +65,10 @@ class _NutritionScreenState extends State<NutritionScreen> {
             bottom: 110,
             right: 20,
             child: FloatingActionButton(
-              onPressed: () => MealLoggingOptions.showAddOptions(context),
+              onPressed: () {
+                // Skip popup and go to meal time selection for AI Scan
+                MealLoggingOptions.showMealTimeSelection(context, isAiScan: true);
+              },
               backgroundColor: const Color(0xFF2E6FFC),
               elevation: 8,
               child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -333,7 +337,12 @@ class _NutritionScreenState extends State<NutritionScreen> {
         const SizedBox(height: 12),
         if (meals.isEmpty)
           GestureDetector(
-            onTap: () => MealLoggingOptions.showAddOptionsForMealType(context, title),
+            onTap: () {
+              // Skip popup and go directly to AI Scan for this meal type
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => AiFoodScanScreen(mealType: title)),
+              );
+            },
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -355,7 +364,12 @@ class _NutritionScreenState extends State<NutritionScreen> {
           ...meals.map((m) => _buildLoggedMealCard(m)),
           const SizedBox(height: 12),
           GestureDetector(
-            onTap: () => MealLoggingOptions.showAddOptionsForMealType(context, title),
+            onTap: () {
+              // Skip popup and go directly to AI Scan for this meal type
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => AiFoodScanScreen(mealType: title)),
+              );
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
