@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../../../core/providers/language_provider.dart';
@@ -15,15 +16,37 @@ class WorkoutScreen extends StatefulWidget {
   State<WorkoutScreen> createState() => _WorkoutScreenState();
 }
 
-class _WorkoutScreenState extends State<WorkoutScreen> {
+class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateMixin {
   final _workoutController = WorkoutController();
   AiWeeklyWorkoutPlan? _selectedPlan;
+  late AnimationController _lottieController;
+  int _currentLottieIndex = 0;
+  final List<String> _lottieFiles = [
+    'assets/lotties/wo_ani1.json',
+    'assets/lotties/wo_ani2.json',
+    'assets/lotties/wo_ani3.json',
+  ];
 
   @override
   void initState() {
     super.initState();
     _workoutController.addListener(_update);
     _selectCurrentWeekPlan();
+    
+    _lottieController = AnimationController(vsync: this);
+    _lottieController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _advanceToNextLottie();
+      }
+    });
+  }
+
+  void _advanceToNextLottie() {
+    if (mounted) {
+      setState(() {
+        _currentLottieIndex = (_currentLottieIndex + 1) % _lottieFiles.length;
+      });
+    }
   }
 
   void _selectCurrentWeekPlan() {
@@ -43,11 +66,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   void dispose() {
     _workoutController.removeListener(_update);
+    _lottieController.dispose();
     super.dispose();
   }
 
   void _update() {
     if (mounted) setState(() {});
+  }
+
+  void _advanceLottie() {
+    _advanceToNextLottie();
   }
 
   @override
@@ -143,7 +171,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     int progress = totalWorkouts > 0 ? (completedCount * 100 ~/ totalWorkouts) : 0;
 
     return SliverAppBar(
-      expandedHeight: 420, // Increased height to accommodate dropdown
+      expandedHeight: 620, // Increased height to accommodate animations and space
       backgroundColor: Colors.transparent,
       pinned: false,
       automaticallyImplyLeading: false,
@@ -183,35 +211,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      // Dropdown for selecting workout plans
-                      if (allPlans.length > 1) // Only show dropdown if there's more than one plan
-                        DropdownButton<AiWeeklyWorkoutPlan>(
-                          value: _selectedPlan,
-                          dropdownColor: AppColors.darkBackground,
-                          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                          onChanged: (AiWeeklyWorkoutPlan? newValue) {
-                            setState(() {
-                              _selectedPlan = newValue;
-                            });
-                          },
-                          items: allPlans.map<DropdownMenuItem<AiWeeklyWorkoutPlan>>((AiWeeklyWorkoutPlan value) {
-                            return DropdownMenuItem<AiWeeklyWorkoutPlan>(
-                              value: value,
-                              child: Text(
-                                '${value.planTitle} (${value.startDate != null ? l10n.translateDigits(DateFormat('MMM d, yyyy').format(value.startDate!)) : 'N/A'})',
-                                style: const TextStyle(color: Colors.white, fontSize: 16),
-                              ),
-                            );
-                          }).toList(),
-                        ) else if (plan != null) // If only one plan, just display its title
-                        Text(
-                          plan.planTitle,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Text(
+                        l10n.getString('home.workouts'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         plan != null
@@ -240,7 +247,37 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 40), // Increased space between Progress box and calendar
+                      Center(
+                        child: SizedBox(
+                          height: 150,
+                          child: Lottie.asset(
+                            _lottieFiles[_currentLottieIndex],
+                            key: ValueKey(_currentLottieIndex),
+                            onLoaded: (composition) {
+                              debugPrint('Lottie $_currentLottieIndex loaded: ${composition.duration}');
+                              _lottieController.duration = composition.duration;
+                              _lottieController.forward(from: 0);
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint('Lottie Error on index $_currentLottieIndex: $error');
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.fitness_center, color: Colors.white54, size: 40),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Animation Error: $error',
+                                    style: const TextStyle(color: Colors.white54, fontSize: 10),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
                       Text(
                         l10n.getString('workout.this_week'),
                         style: const TextStyle(color: Colors.white, fontSize: 14),
