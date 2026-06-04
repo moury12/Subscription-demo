@@ -149,12 +149,16 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: _onPausePressed,
           ),
-          const Spacer(),
-          Text(
-            widget.workoutName,
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          Expanded(
+            child: Center(
+              child: Text(
+                widget.workoutName,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
           ),
-          const Spacer(),
           const SizedBox(width: 48), // Balance for arrow
         ],
       ),

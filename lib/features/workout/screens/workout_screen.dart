@@ -423,22 +423,29 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dayPlan.isRestDay ? l10n.getString('workout.rest_recovery') : dayPlan.title,
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    dayPlan.isRestDay 
-                      ? l10n.getString('workout.active_recovery') 
-                      : '${l10n.getString('workout.exercise')} ${l10n.formatInteger(currentIndex + 1)} ${l10n.getString('workout.of')} ${l10n.formatInteger(dayPlan.exercises.length)}',
-                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dayPlan.isRestDay ? l10n.getString('workout.rest_recovery') : dayPlan.title,
+                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      dayPlan.isRestDay 
+                        ? l10n.getString('workout.active_recovery') 
+                        : '${l10n.getString('workout.exercise')} ${l10n.formatInteger(currentIndex + 1)} ${l10n.getString('workout.of')} ${l10n.formatInteger(dayPlan.exercises.length)}',
+                      style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
@@ -504,7 +511,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     if (isCompleted) ...[
                       const SizedBox(width: 8),
                       const Icon(Icons.check_circle, color: Colors.green, size: 16),
@@ -516,7 +529,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
                   children: [
                     Icon(Icons.access_time, color: Colors.white.withOpacity(0.5), size: 14),
                     const SizedBox(width: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                    Expanded(
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ],
