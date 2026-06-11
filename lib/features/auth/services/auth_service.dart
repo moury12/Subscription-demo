@@ -52,6 +52,54 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> sendOtp(String email) async {
+    try {
+      final response = await _api.post('/auth/forgot-password', {
+        'email': email,
+      }, requiresAuth: false);
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      }
+      return {'success': false, 'message': data['error'] ?? 'Failed to send OTP'};
+    } catch (e) {
+      return {'success': false, 'message': 'Network error. Please try again.'};
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
+    try {
+      final response = await _api.post('/auth/verify-otp', {
+        'email': email,
+        'otp': otp,
+      }, requiresAuth: false);
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      }
+      return {'success': false, 'message': data['error'] ?? 'Invalid OTP'};
+    } catch (e) {
+      return {'success': false, 'message': 'Network error. Please try again.'};
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(String email, String otp, String newPassword) async {
+    try {
+      final response = await _api.post('/auth/reset-password', {
+        'email': email,
+        'otp': otp,
+        'newPassword': newPassword,
+      }, requiresAuth: false);
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      }
+      return {'success': false, 'message': data['error'] ?? 'Failed to reset password'};
+    } catch (e) {
+      return {'success': false, 'message': 'Network error. Please try again.'};
+    }
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
