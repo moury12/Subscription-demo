@@ -10,6 +10,7 @@ import '../../../widgets/cards/app_surface_card.dart';
 import 'log_activity_options.dart';
 import '../../nutrition/controllers/nutrition_controller.dart';
 import '../../../core/app_settings.dart';
+import '../../nutrition/screens/barcode_scan_screen.dart';
 
 class CalorieOverviewCard extends StatelessWidget {
   const CalorieOverviewCard({
@@ -89,6 +90,18 @@ class CalorieOverviewCard extends StatelessWidget {
             label: l10n.getString('home.log_activity'),
             height: 56,
             onPressed: () => LogActivityOptions.show(context),
+          ),
+          const SizedBox(height: 10),
+          PrimaryGlowButton(
+            label: l10n.getString('home.scan_product') ?? 'Scan Product',
+            height: 56,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const BarcodeScanScreen(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 10),
         ],

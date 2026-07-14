@@ -15,7 +15,8 @@
     "warning": "Avertissement",
     "yes": "Oui",
     "no": "No",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "press_back_to_exit": "Appuyez à nouveau sur retour pour quitter"
   },
   "days": {
     "monday": "Lundi",
@@ -274,7 +275,9 @@
     "daily_logs": "Journaux quotidiens",
     "cal_remaining": "cal restantes",
     "start_logging_meals": "Commencez à enregistrer les repas",
-    "log_activity": "+ Enregistrer l'activité",    "log_activity_title": "Enregistrer l'activité",
+    "log_activity": "+ Enregistrer l'activité",
+    "scan_product": "Scanner le produit",
+    "log_activity_title": "Enregistrer l'activité",
     "log_a_meal": "Enregistrer un repas",
     "log_a_meal_desc": "Suivre les calories et les macros",
     "start_workout": "Commencer l'entraînement",

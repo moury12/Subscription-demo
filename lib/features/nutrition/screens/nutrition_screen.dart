@@ -54,7 +54,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                       const SizedBox(height: 24),
                       _buildMealSection(l10n, 'Dinner', Icons.mode_night_rounded, const Color(0xFF00E676)),
                       const SizedBox(height: 24),
-                      _buildMealSection(l10n, 'Snacks', Icons.cookie_rounded, const Color(0xFF00C853)),
+                      _buildMealSection(l10n, 'Snack', Icons.cookie_rounded, const Color(0xFF00C853)),
                     ],
                   ),
                 ),
@@ -298,6 +298,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
       'Lunch': l10n.getString('nutrition.lunch'),
       'Dinner': l10n.getString('nutrition.dinner'),
       'Snacks': l10n.getString('nutrition.snacks'),
+      'Snack': l10n.getString('nutrition.snacks'),
     }[title] ?? title;
 
     final meals = _controller.loggedMeals.where((m) => m.type == title).toList();

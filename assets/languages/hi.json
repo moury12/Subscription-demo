@@ -15,7 +15,8 @@
     "warning": "चेतावनी",
     "yes": "हाँ",
     "no": "नहीं",
-    "confirm": "पुष्टि करें"
+    "confirm": "पुष्टि करें",
+    "press_back_to_exit": "बाहर निकलने के लिए फिर से वापस दबाएं"
   },
   "days": {
     "monday": "सोमवार",
@@ -305,6 +306,7 @@
     "cal_remaining": "कैलोरी शेष",
     "start_logging_meals": "भोजन लॉग करना शुरू करें",
     "log_activity": "+ गतिविधि लॉग करें",
+    "scan_product": "उत्पाद स्कैन करें",
     "log_activity_title": "गतिविधि लॉग करें",
     "log_a_meal": "भोजन लॉग करें",
     "log_a_meal_desc": "कैलोरी और मैक्रोज़ ट्रैक करें",

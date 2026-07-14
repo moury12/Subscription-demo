@@ -57,8 +57,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const MainShellScreen()));
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => const MainShellScreen(),
+                settings: const RouteSettings(name: '/main'),
+              ),
+              (route) => false,
+            );
           } else {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()));

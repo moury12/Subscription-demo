@@ -213,6 +213,80 @@ class MealLoggingOptions {
     );
   }
 
+  static Future<String?> showMealTypeSelector(BuildContext context) async {
+    final l10n = context.read<LanguageProvider>();
+    final mealTimes = [
+      {'title': l10n.getString('nutrition.breakfast'), 'icon': Icons.coffee_rounded, 'key': 'Breakfast'},
+      {'title': l10n.getString('nutrition.lunch'), 'icon': Icons.wb_sunny_rounded, 'key': 'Lunch'},
+      {'title': l10n.getString('nutrition.dinner'), 'icon': Icons.mode_night_rounded, 'key': 'Dinner'},
+      {'title': l10n.getString('nutrition.snacks'), 'icon': Icons.cookie_rounded, 'key': 'Snack'},
+    ];
+
+    return showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF111111),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(50),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.getString('nutrition.add_meal'),
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            ...mealTimes.map((meal) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context, meal['key'] as String);
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withAlpha(5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(meal['icon'] as IconData, color: AppColors.accentGreen, size: 24),
+                      const SizedBox(width: 16),
+                      Text(
+                        meal['title'] as String,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.chevron_right, color: Colors.white24),
+                    ],
+                  ),
+                ),
+              ),
+            )),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
   static void _openAddMeal(BuildContext context, String type) async {
     final result = await Navigator.of(context).push<Map<String, dynamic>>(
       MaterialPageRoute(builder: (_) => AddMealScreen(initialMealType: type)),

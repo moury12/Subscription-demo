@@ -60,7 +60,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           context.read<LanguageProvider>().syncLanguage(langCode);
 
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const MainShellScreen()),
+            MaterialPageRoute(
+              builder: (_) => const MainShellScreen(),
+              settings: const RouteSettings(name: '/main'),
+            ),
           );
         } else if (profile != null) {
           debugPrint('[SPLASH] Profile incomplete. Going to Onboarding Survey.');

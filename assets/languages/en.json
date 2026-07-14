@@ -16,7 +16,8 @@
     "yes": "Yes",
     "no": "No",
     "confirm": "Confirm",
-    "skip": "Skip"
+    "skip": "Skip",
+    "press_back_to_exit": "Press back again to exit"
   },
   "days": {
     "monday": "Monday",
@@ -306,6 +307,7 @@
     "cal_remaining": "cal remaining",
     "start_logging_meals": "Start logging meals",
     "log_activity": "+ Log Activity",
+    "scan_product": "Scan Product",
     "log_activity_title": "Log Activity",
     "log_a_meal": "Log a Meal",
     "log_a_meal_desc": "Track calories and macros",

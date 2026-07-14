@@ -67,8 +67,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     await ProfileService().updateProfile(_data.toJson());
     
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainShellScreen()),
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const MainShellScreen(),
+          settings: const RouteSettings(name: '/main'),
+        ),
+        (route) => false,
       );
     }
   }
