@@ -150,42 +150,23 @@ class _NutritionScreenState extends State<NutritionScreen> {
                         onTap: () {
                           MealLoggingOptions.showMealTimeSelection(context, isAiScan: true);
                         },
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 4),
-                          width: 156,
-                          height: 156,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.22),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.35),
-                              width: 2.0,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.12),
-                                blurRadius: 15,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: Lottie.asset(
-                              'assets/lotties/nutrition.json',
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.contain,
-                              repeat: true,
-                              animate: true,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.auto_awesome,
-                                  color: Colors.white,
-                                  size: 72,
-                                );
-                              },
-                            ),
+                        child: SizedBox(
+                          width: 140,
+                          height: 140,
+                          child: Lottie.asset(
+                            'assets/lotties/nutrition.json',
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.contain,
+                            repeat: true,
+                            animate: true,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.auto_awesome,
+                                color: Colors.white,
+                                size: 48,
+                              );
+                            },
                           ),
                         ),
                       ),
