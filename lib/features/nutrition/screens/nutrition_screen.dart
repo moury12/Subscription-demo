@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../../../core/providers/language_provider.dart';
@@ -82,7 +83,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
 
   Widget _buildNutritionHeader(LanguageProvider l10n) {
     return SliverAppBar(
-      expandedHeight: 140,
+      expandedHeight: 190,
       backgroundColor: Colors.transparent,
       pinned: true,
       automaticallyImplyLeading: false,
@@ -145,17 +146,47 @@ class _NutritionScreenState extends State<NutritionScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.auto_awesome,
-                          color: Colors.white,
-                          size: 24,
+                      GestureDetector(
+                        onTap: () {
+                          MealLoggingOptions.showMealTimeSelection(context, isAiScan: true);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          width: 156,
+                          height: 156,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.22),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.35),
+                              width: 2.0,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Lottie.asset(
+                              'assets/lotties/nutrition.json',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.contain,
+                              repeat: true,
+                              animate: true,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.auto_awesome,
+                                  color: Colors.white,
+                                  size: 72,
+                                );
+                              },
+                            ),
+                          ),
                         ),
                       ),
                     ],
