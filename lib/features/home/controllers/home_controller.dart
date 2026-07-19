@@ -18,6 +18,15 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Refresh all dashboard data from backend database
+  Future<void> refreshData() async {
+    await Future.wait([
+      NutritionController().loadFromDatabase(),
+      WorkoutController().loadFromDatabase(),
+    ]);
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     NutritionController().removeListener(_onNutritionChanged);

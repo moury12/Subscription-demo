@@ -133,35 +133,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _l10n = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SingleChildScrollView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 35, 20, 24),
-              child: Column(
-                children: [
-                  _buildWeightCard(),
-                  const SizedBox(height: 16),
-                  _buildSubscriptionSection(),
-                  const SizedBox(height: 16),
-                  _buildPersonalInformationSection(),
-                  const SizedBox(height: 16),
-                  _buildFitnessGoalsSection(),
-                  const SizedBox(height: 16),
-                  _buildNotificationsSection(),
-                  const SizedBox(height: 16),
-                  _buildLanguageSection(),
-                  const SizedBox(height: 16),
-                  _buildPrivacySecuritySection(),
-                  const SizedBox(height: 32),
-                  _buildLogOutButton(),
-                  const SizedBox(height: 100),
-                ],
+      body: RefreshIndicator(
+        color: AppColors.accentGreen,
+        backgroundColor: const Color(0xFF1E293B),
+        onRefresh: () async {
+          final profileData = await ProfileService().getProfile();
+          if (profileData != null) {
+            _settings.syncFromProfile(profileData);
+          }
+          if (mounted) setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            children: [
+              _buildProfileHeader(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 35, 20, 24),
+                child: Column(
+                  children: [
+                    _buildWeightCard(),
+                    const SizedBox(height: 16),
+                    _buildSubscriptionSection(),
+                    const SizedBox(height: 16),
+                    _buildPersonalInformationSection(),
+                    const SizedBox(height: 16),
+                    _buildFitnessGoalsSection(),
+                    const SizedBox(height: 16),
+                    _buildNotificationsSection(),
+                    const SizedBox(height: 16),
+                    _buildLanguageSection(),
+                    const SizedBox(height: 16),
+                    _buildPrivacySecuritySection(),
+                    const SizedBox(height: 32),
+                    _buildLogOutButton(),
+                    const SizedBox(height: 100),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

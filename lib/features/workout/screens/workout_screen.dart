@@ -99,65 +99,74 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      body: CustomScrollView(
-        slivers: [
-          _buildWorkoutHeader(context, l10n),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_workoutController.activeWorkout != null && _workoutController.isPaused)
-                    _buildInProgressSection(context, l10n, _workoutController.activeWorkout!),
-                  
-                  const SizedBox(height: 32),
-                  Text(
-                    l10n.getString('workout.this_week'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        color: AppColors.accentGreen,
+        backgroundColor: const Color(0xFF1E293B),
+        onRefresh: () async {
+          await _workoutController.loadFromDatabase();
+          if (mounted) setState(() { _selectCurrentWeekPlan(); });
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            _buildWorkoutHeader(context, l10n),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_workoutController.activeWorkout != null && _workoutController.isPaused)
+                      _buildInProgressSection(context, l10n, _workoutController.activeWorkout!),
+                    
+                    const SizedBox(height: 32),
+                    Text(
+                      l10n.getString('workout.this_week'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  if (_selectedPlan != null)
-                    ..._selectedPlan!.days.asMap().entries.map((entry) {
-                      final dayPlan = entry.value;
-                      final localizedExercises = l10n.getString('workout.exercises');
-                      final localizedRecovery = l10n.getString('workout.recovery');
-                      
-                      // Translate Day Name
-                      final dayName = l10n.getString('days.${dayPlan.day.toLowerCase()}');
-                      
-                      return _buildWorkoutCard(
-                        context,
-                        dayPlan.title,
-                        dayPlan.isRestDay ? localizedRecovery : '${l10n.formatInteger(dayPlan.exercises.length)} $localizedExercises',
-                        dayName,
-                        dayPlan,
-                      );
-                    }).toList()
-                  else
-                    ...List.generate(7, (index) {
-                      final date = weekStart.add(Duration(days: index));
-                      final dayNameRaw = DateFormat('EEEE').format(date);
-                      final dayName = l10n.getString('days.${dayNameRaw.toLowerCase()}');
-                      final isRestDay = index > 0;
-                      return _buildWorkoutCard(
-                        context,
-                        isRestDay ? l10n.getString('workout.rest_day') : 'Push Up',
-                        isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
-                        dayName,
-                        null,
-                      );
-                    }),
-                  const SizedBox(height: 100),
-                ],
+                    const SizedBox(height: 16),
+                    if (_selectedPlan != null)
+                      ..._selectedPlan!.days.asMap().entries.map((entry) {
+                        final dayPlan = entry.value;
+                        final localizedExercises = l10n.getString('workout.exercises');
+                        final localizedRecovery = l10n.getString('workout.recovery');
+                        
+                        // Translate Day Name
+                        final dayName = l10n.getString('days.${dayPlan.day.toLowerCase()}');
+                        
+                        return _buildWorkoutCard(
+                          context,
+                          dayPlan.title,
+                          dayPlan.isRestDay ? localizedRecovery : '${l10n.formatInteger(dayPlan.exercises.length)} $localizedExercises',
+                          dayName,
+                          dayPlan,
+                        );
+                      }).toList()
+                    else
+                      ...List.generate(7, (index) {
+                        final date = weekStart.add(Duration(days: index));
+                        final dayNameRaw = DateFormat('EEEE').format(date);
+                        final dayName = l10n.getString('days.${dayNameRaw.toLowerCase()}');
+                        final isRestDay = index > 0;
+                        return _buildWorkoutCard(
+                          context,
+                          isRestDay ? l10n.getString('workout.rest_day') : 'Push Up',
+                          isRestDay ? '0 0/0 completed' : '35 min • 0/5 completed',
+                          dayName,
+                          null,
+                        );
+                      }),
+                    const SizedBox(height: 100),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

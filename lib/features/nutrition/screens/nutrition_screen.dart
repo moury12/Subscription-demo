@@ -39,28 +39,36 @@ class _NutritionScreenState extends State<NutritionScreen> {
       backgroundColor: AppColors.darkBackground,
       body: Stack(
         children: [
-          CustomScrollView(
-            slivers: [
-              _buildNutritionHeader(l10n),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
-                  child: Column(
-                    children: [
-                      _buildCalorieCard(l10n),
-                      const SizedBox(height: 32),
-                      _buildMealSection(l10n, 'Breakfast', Icons.coffee_rounded, const Color(0xFF00C853)),
-                      const SizedBox(height: 24),
-                      _buildMealSection(l10n, 'Lunch', Icons.wb_sunny_rounded, const Color(0xFF34D399)),
-                      const SizedBox(height: 24),
-                      _buildMealSection(l10n, 'Dinner', Icons.mode_night_rounded, const Color(0xFF00E676)),
-                      const SizedBox(height: 24),
-                      _buildMealSection(l10n, 'Snack', Icons.cookie_rounded, const Color(0xFF00C853)),
-                    ],
+          RefreshIndicator(
+            color: AppColors.accentGreen,
+            backgroundColor: const Color(0xFF1E293B),
+            onRefresh: () async {
+              await _controller.loadFromDatabase();
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                _buildNutritionHeader(l10n),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+                    child: Column(
+                      children: [
+                        _buildCalorieCard(l10n),
+                        const SizedBox(height: 32),
+                        _buildMealSection(l10n, 'Breakfast', Icons.coffee_rounded, const Color(0xFF00C853)),
+                        const SizedBox(height: 24),
+                        _buildMealSection(l10n, 'Lunch', Icons.wb_sunny_rounded, const Color(0xFF34D399)),
+                        const SizedBox(height: 24),
+                        _buildMealSection(l10n, 'Dinner', Icons.mode_night_rounded, const Color(0xFF00E676)),
+                        const SizedBox(height: 24),
+                        _buildMealSection(l10n, 'Snack', Icons.cookie_rounded, const Color(0xFF00C853)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           Positioned(
             bottom: 110,

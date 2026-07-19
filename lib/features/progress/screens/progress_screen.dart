@@ -63,27 +63,41 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final l10n = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
-      body: CustomScrollView(
-        slivers: [
-          _buildProgressHeader(context, l10n),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _buildSummaryCard(l10n),
-                const SizedBox(height: 16),
-                _buildStatsRow(l10n),
-                const SizedBox(height: 24),
-                _buildWorkoutConsistencyCard(l10n),
-                const SizedBox(height: 16),
-                _buildWeightProgressCard(l10n),
-                const SizedBox(height: 16),
-                _buildCalorieTrackingCard(l10n),
-                const SizedBox(height: 100),
-              ]),
+      body: RefreshIndicator(
+        color: AppColors.accentGreen,
+        backgroundColor: const Color(0xFF1E293B),
+        onRefresh: () async {
+          await Future.wait([
+            _nutritionController.loadFromDatabase(),
+            _workoutController.loadFromDatabase(),
+            _burnController.loadFromDatabase(),
+            _weightController.loadFromDatabase(),
+          ]);
+          if (mounted) setState(() {});
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            _buildProgressHeader(context, l10n),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  _buildSummaryCard(l10n),
+                  const SizedBox(height: 16),
+                  _buildStatsRow(l10n),
+                  const SizedBox(height: 24),
+                  _buildWorkoutConsistencyCard(l10n),
+                  const SizedBox(height: 16),
+                  _buildWeightProgressCard(l10n),
+                  const SizedBox(height: 16),
+                  _buildCalorieTrackingCard(l10n),
+                  const SizedBox(height: 100),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

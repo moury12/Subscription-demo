@@ -62,36 +62,45 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: EdgeInsets.only(bottom: scale.s(90)),
-                    child: Column(
-                      children: [
-                        HomeHeader(
-                          userName: model.userName,
-                          streakDays: model.streakDays,
-                          scale: scale,
-                        ),
-                        SizedBox(height: scale.s(12.84)),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: scale.s(AppSpacing.lg)),
-                          child: Column(
-                            children: [
-                              CalorieOverviewCard(
-                                consumed: model.consumedCalories,
-                                target: model.targetCalories,
-                                progress: model.caloriesProgress,
-                              ),
-                              SizedBox(height: scale.s(AppSpacing.md)),
-                              const TodaysWorkoutCard(),
-                              SizedBox(height: scale.s(AppSpacing.md)),
-                              QuickStatsRow(
-                                workouts: model.workoutsCompleted,
-                                streak: model.dayStreak,
-                              ),
-                            ],
+                  child: RefreshIndicator(
+                    color: AppColors.accentGreen,
+                    backgroundColor: const Color(0xFF1E293B),
+                    onRefresh: () async {
+                      await _controller.refreshData();
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: EdgeInsets.only(bottom: scale.s(90)),
+                      child: Column(
+                        children: [
+                          HomeHeader(
+                            userName: model.userName,
+                            streakDays: model.streakDays,
+                            scale: scale,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: scale.s(12.84)),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: scale.s(AppSpacing.lg)),
+                            child: Column(
+                              children: [
+                                CalorieOverviewCard(
+                                  consumed: model.consumedCalories,
+                                  target: model.targetCalories,
+                                  progress: model.caloriesProgress,
+                                ),
+                                SizedBox(height: scale.s(AppSpacing.md)),
+                                const TodaysWorkoutCard(),
+                                SizedBox(height: scale.s(AppSpacing.md)),
+                                QuickStatsRow(
+                                  workouts: model.workoutsCompleted,
+                                  streak: model.dayStreak,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
