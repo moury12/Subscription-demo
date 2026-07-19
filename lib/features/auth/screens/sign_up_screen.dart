@@ -15,6 +15,7 @@ import '../../../screens/onboarding/onboarding_flow_screen.dart';
 import '../services/auth_service.dart';
 import '../../profile/services/profile_service.dart';
 import '../../main/screens/main_shell_screen.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -57,13 +58,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const MainShellScreen(),
-                settings: const RouteSettings(name: '/main'),
-              ),
-              (route) => false,
-            );
+            final hasSelectedSub = profile['hasSelectedSubscription'] == true;
+            if (!hasSelectedSub) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen()),
+                (route) => false,
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const MainShellScreen(),
+                  settings: const RouteSettings(name: '/main'),
+                ),
+                (route) => false,
+              );
+            }
           } else {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()));

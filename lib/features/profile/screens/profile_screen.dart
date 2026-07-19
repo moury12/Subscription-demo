@@ -9,6 +9,7 @@ import '../../auth/services/auth_service.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import '../../progress/controllers/weight_history_controller.dart';
 import '../services/profile_service.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -143,6 +144,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   _buildWeightCard(),
                   const SizedBox(height: 16),
+                  _buildSubscriptionSection(),
+                  const SizedBox(height: 16),
                   _buildPersonalInformationSection(),
                   const SizedBox(height: 16),
                   _buildFitnessGoalsSection(),
@@ -257,6 +260,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
         ),
       ],
+    );
+  }
+
+  Widget _buildSubscriptionSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFF59E0B).withOpacity(0.12),
+            blurRadius: 16,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF59E0B).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.star_rounded,
+              color: Color(0xFFF59E0B),
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Membership & Plan',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Manage or Upgrade Subscription',
+                  style: TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF59E0B),
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const SubscriptionPlanScreen(isFromSettings: true),
+                ),
+              );
+              if (mounted) {
+                setState(() {});
+              }
+            },
+            child: const Text(
+              'Manage',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

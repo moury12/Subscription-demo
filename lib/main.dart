@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
-import 'core/services/reminder_scheduler.dart';
-import 'features/onboarding/screens/onboarding_screen.dart';
 import 'features/onboarding/screens/language_selection_screen.dart';
 
 void main() async {

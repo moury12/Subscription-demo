@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../features/onboarding/models/onboarding_data.dart';
-import '../../features/main/screens/main_shell_screen.dart';
 import '../../core/app_settings.dart';
-import 'welcome_screen.dart';
 import 'age_gender_screen.dart';
 import 'physical_stats_screen.dart';
 import 'goal_screen.dart';
@@ -15,6 +13,7 @@ import 'target_weight_screen.dart';
 import 'review_profile_screen.dart';
 import 'creating_plan_screen.dart';
 import '../../features/profile/services/profile_service.dart';
+import '../../features/subscription/screens/subscription_plan_screen.dart';
 
 class OnboardingFlowScreen extends StatefulWidget {
   const OnboardingFlowScreen({super.key});
@@ -69,8 +68,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => const MainShellScreen(),
-          settings: const RouteSettings(name: '/main'),
+          builder: (_) => const SubscriptionPlanScreen(),
         ),
         (route) => false,
       );

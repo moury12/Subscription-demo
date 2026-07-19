@@ -20,12 +20,12 @@ class GradientLogo extends StatelessWidget {
     this.gradient = AppColors.splashLogoGradient,
     this.shadows,
     this.child,
-    this.svgAsset,
+    this.svgAsset = 'assets/icons/gocalai-logo.svg',
   });
 
   @override
   Widget build(BuildContext context) {
-    // If SVG asset is provided, use it directly (it contains gradient and glow)
+    // If SVG asset is provided, use it directly (it contains logo and layout)
     if (svgAsset != null) {
       return SizedBox(
         width: size,
@@ -39,7 +39,7 @@ class GradientLogo extends StatelessWidget {
       );
     }
 
-    // Fallback to gradient container with icon
+    // Fallback to gradient container with child
     return Container(
       width: size,
       height: size,
@@ -53,11 +53,12 @@ class GradientLogo extends StatelessWidget {
   }
 
   Widget _defaultLogoContent() {
-    return const Center(
-      child: Icon(
-        Icons.fitness_center_rounded,
-        size: 48,
-        color: Colors.white,
+    return Center(
+      child: SvgPicture.asset(
+        'assets/icons/gocalai-logo.svg',
+        width: size * 0.7,
+        height: size * 0.7,
+        fit: BoxFit.contain,
       ),
     );
   }

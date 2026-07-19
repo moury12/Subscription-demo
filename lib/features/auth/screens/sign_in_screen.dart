@@ -17,6 +17,7 @@ import '../widgets/auth_scaffold.dart';
 import '../services/auth_service.dart';
 import '../../profile/services/profile_service.dart';
 import '../../main/screens/main_shell_screen.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -58,13 +59,21 @@ class _SignInScreenState extends State<SignInScreen> {
             final langCode = LocalizationService().currentLanguageCode;
             context.read<LanguageProvider>().syncLanguage(langCode);
 
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => const MainShellScreen(),
-                settings: const RouteSettings(name: '/main'),
-              ),
-              (route) => false,
-            );
+            final hasSelectedSub = profile['hasSelectedSubscription'] == true;
+            if (!hasSelectedSub) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen()),
+                (route) => false,
+              );
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const MainShellScreen(),
+                  settings: const RouteSettings(name: '/main'),
+                ),
+                (route) => false,
+              );
+            }
           } else {
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()));
