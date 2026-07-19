@@ -17,7 +17,9 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
   void initState() {
     super.initState();
     _controller.addListener(_onControllerUpdate);
-    _controller.fetchNotifications();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.fetchNotifications();
+    });
   }
 
   @override
@@ -27,7 +29,10 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
   }
 
   void _onControllerUpdate() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -258,6 +263,19 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
                       height: 1.4,
                     ),
                   ),
+                  if (item.imageUrl != null && item.imageUrl!.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Image.network(
+                        item.imageUrl!,
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 10),
 
                   // Category tag & Unread pill
@@ -422,6 +440,13 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
           icon: Icons.star_rounded,
           color: const Color(0xFF8B5CF6),
           gradient: const LinearGradient(colors: [Color(0xFF7C3AED), Color(0xFF8B5CF6)]),
+        );
+      case 'broadcast':
+        return _CategoryMeta(
+          label: 'Announcement',
+          icon: Icons.campaign_rounded,
+          color: const Color(0xFFF97316),
+          gradient: const LinearGradient(colors: [Color(0xFFEA580C), Color(0xFFF97316)]),
         );
       case 'system':
       default:
