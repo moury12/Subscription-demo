@@ -167,10 +167,16 @@
     "weight_stat_update": "बदलावों को ट्रैक करने के लिए प्रोफाइल में अपना वजन अपडेट करें",
     "calorie_tracking": "कैलोरी ट्रैकिंग",
     "target": "लक्ष्य",
-    "consumed": "खपत की गई"
+    "consumed": "खपत की गई",
+    "start": "प्रारंभिक",
+    "current": "वर्तमान",
+    "goal": "लक्ष्य"
   },
   "onboarding": {
     "welcome": "स्वागत है",
+    "start": "प्रारंभिक",
+    "current": "वर्तमान",
+    "goal": "लक्ष्य",
     "welcome_title": "GoCal AI में आपका स्वागत है!",
     "welcome_subtitle": "आइए आपकी फिटनेस यात्रा को व्यक्तिगत बनाएं",
     "feature1_title": "व्यक्तिगत योजनाएं",

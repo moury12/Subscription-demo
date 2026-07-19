@@ -464,19 +464,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Row(
             children: [
               _buildWeightStat(
-                l10n.getString('onboarding.start'),
+                l10n.getString('progress.start'),
                 entry != null ? l10n.formatWeight(entry) : '—',
                 Colors.blue.shade400,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
-                l10n.getString('onboarding.current'),
+                l10n.getString('progress.current'),
                 current != null ? l10n.formatWeight(current) : ' —',
                 AppColors.progressOrange,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
-                l10n.getString('onboarding.goal'),
+                l10n.getString('progress.goal'),
                 target != null ? l10n.formatWeight(target) : '—',
                 Colors.tealAccent.shade400,
               ),

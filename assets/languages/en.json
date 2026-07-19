@@ -168,10 +168,16 @@
     "weight_stat_update": "Update your weight in Profile to track changes",
     "calorie_tracking": "Calorie Tracking",
     "target": "Target",
-    "consumed": "Consumed"
+    "consumed": "Consumed",
+    "start": "Start",
+    "current": "Current",
+    "goal": "Goal"
   },
   "onboarding": {
     "welcome": "Welcome",
+    "start": "Start",
+    "current": "Current",
+    "goal": "Goal",
     "welcome_title": "Welcome to GoCal AI !",
     "welcome_subtitle": "Let's personalize your fitness journey",
     "feature1_title": "Personalized Plans",

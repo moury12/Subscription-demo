@@ -155,10 +155,16 @@
     "weight_stat_update": "Mettez à jour votre poids dans Profil pour suivre les changements",
     "calorie_tracking": "Suivi des calories",
     "target": "Cible",
-    "consumed": "Consommé"
+    "consumed": "Consommé",
+    "start": "Départ",
+    "current": "Actuel",
+    "goal": "Objectif"
   },
   "onboarding": {
     "welcome": "Bienvenue",
+    "start": "Départ",
+    "current": "Actuel",
+    "goal": "Objectif",
     "welcome_title": "Bienvenue sur GoCal AI !",
     "welcome_subtitle": "Personnalisons votre parcours de fitness",
     "feature1_title": "Plans Personnalisés",
