@@ -8,6 +8,8 @@ import '../../../core/providers/language_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../utils/responsive.dart';
+import '../../notifications/screens/all_notifications_screen.dart';
+import '../../notifications/controllers/notification_controller.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({
@@ -124,17 +126,58 @@ class _HomeHeaderState extends State<HomeHeader> {
                     ],
                   ),
                   const SizedBox(width: 8),
-                  Container(
-                    width: scale.s(40),
-                    height: scale.s(40),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.overlayMedium,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_none_rounded,
-                      color: AppColors.textPrimary,
-                      size: 24,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AllNotificationsScreen(),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: scale.s(40),
+                          height: scale.s(40),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.overlayMedium,
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none_rounded,
+                            color: AppColors.textPrimary,
+                            size: 24,
+                          ),
+                        ),
+                        ListenableBuilder(
+                          listenable: NotificationController(),
+                          builder: (context, _) {
+                            final count = NotificationController().unreadCount;
+                            if (count == 0) return const SizedBox.shrink();
+                            return Positioned(
+                              top: 2,
+                              right: 2,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: AppColors.accentGreen,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black, width: 1.5),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.accentGreen,
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],

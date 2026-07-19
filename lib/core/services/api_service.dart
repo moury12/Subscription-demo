@@ -102,6 +102,22 @@ class ApiService {
     return response;
   }
 
+  Future<http.Response> patch(String endpoint, dynamic data, {bool requiresAuth = true}) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+
+    dynamic requestBody = data ?? {};
+    if (data is Map) {
+      requestBody = Map.from(data);
+    }
+    final body = jsonEncode(requestBody);
+
+    debugPrint('[API PATCH] $url');
+    final response = await http.patch(url, headers: headers, body: body);
+    _logResponse(response);
+    return response;
+  }
+
   void _logResponse(http.Response response) {
     debugPrint('[API Response] ${response.statusCode} | ${response.body.length} bytes');
     if (response.statusCode >= 400) {
