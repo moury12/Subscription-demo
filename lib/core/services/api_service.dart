@@ -10,11 +10,11 @@ class ApiService {
 
   static String get baseUrl {
     // Deployed AWS Backend
-    return 'http://98.85.34.11:5000/api';
+    return 'https://backend.getgocal.com/api';
     
     /* Local Development fallbacks:
     if (kReleaseMode) {
-      return 'http://98.85.34.11:5000/api';
+      return 'https://backend.getgocal.com/api';
     }
     if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
       return 'http://10.0.2.2:5000/api';
