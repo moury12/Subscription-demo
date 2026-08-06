@@ -10,6 +10,7 @@ import '../../onboarding/screens/onboarding_screen.dart';
 import '../../progress/controllers/weight_history_controller.dart';
 import '../services/profile_service.dart';
 import '../../subscription/screens/subscription_plan_screen.dart';
+import 'feedback_submit_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -164,6 +165,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildNotificationsSection(),
                     const SizedBox(height: 16),
                     _buildLanguageSection(),
+                    const SizedBox(height: 16),
+                    _buildSubmitFeedbackSection(),
                     const SizedBox(height: 16),
                     _buildPrivacySecuritySection(),
                     const SizedBox(height: 32),
@@ -1140,6 +1143,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubmitFeedbackSection() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const FeedbackSubmitScreen(),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.rate_review_outlined,
+                    color: Colors.white.withOpacity(0.4),
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _l10n.getString('profile.submit_feedback') == 'profile.submit_feedback'
+                            ? 'Submit Feedback'
+                            : _l10n.getString('profile.submit_feedback'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        (_l10n.getString('profile.share_experience') == 'profile.share_experience'
+                                ? 'SHARE YOUR EXPERIENCE'
+                                : _l10n.getString('profile.share_experience'))
+                            .toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.white.withOpacity(0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

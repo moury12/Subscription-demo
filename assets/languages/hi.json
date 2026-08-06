@@ -72,7 +72,16 @@
     "logout": "लॉग आउट करें",
     "weight_kg": "किग्रा",
     "years": "वर्ष",
-    "cm": "सेमी"
+    "cm": "सेमी",
+    "feedback": "प्रतिक्रिया",
+    "feedback_title": "प्रतिक्रिया शीर्षक",
+    "written_review": "लिखित समीक्षा",
+    "share_experience_hint": "अपना अनुभव साझा करें...",
+    "upload_photos": "फ़ोटो अपलोड करें",
+    "add_photos": "फ़ोटो जोड़ें",
+    "submit_review": "समीक्षा सबमिट करें",
+    "submit_feedback": "प्रतिक्रिया सबमिट करें",
+    "share_experience": "अपना अनुभव साझा करें"
   },
   "goals": {
     "lose_weight": "वजन कम करें",

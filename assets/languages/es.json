@@ -72,7 +72,16 @@
     "logout": "Cerrar sesión",
     "weight_kg": "kg",
     "years": "años",
-    "cm": "cm"
+    "cm": "cm",
+    "feedback": "Comentarios",
+    "feedback_title": "Título del comentario",
+    "written_review": "Opinión escrita",
+    "share_experience_hint": "Comparte tu experiencia...",
+    "upload_photos": "Subir fotos",
+    "add_photos": "Añadir fotos",
+    "submit_review": "Enviar opinión",
+    "submit_feedback": "Enviar comentarios",
+    "share_experience": "Comparte tu experiencia"
   },
   "goals": {
     "lose_weight": "Perder peso",

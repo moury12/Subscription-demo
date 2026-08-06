@@ -73,7 +73,16 @@
     "logout": "Log Out",
     "weight_kg": "kg",
     "years": "years",
-    "cm": "cm"
+    "cm": "cm",
+    "feedback": "Feedback",
+    "feedback_title": "Feedback Title",
+    "written_review": "Written Review",
+    "share_experience_hint": "Share your experience...",
+    "upload_photos": "Upload Photos",
+    "add_photos": "Add Photos",
+    "submit_review": "Submit Review",
+    "submit_feedback": "Submit Feedback",
+    "share_experience": "Share Your Experience"
   },
   "goals": {
     "lose_weight": "Lose Weight",

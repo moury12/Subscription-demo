@@ -72,7 +72,16 @@
     "logout": "Déconnexion",
     "weight_kg": "kg",
     "years": "ans",
-    "cm": "cm"
+    "cm": "cm",
+    "feedback": "Commentaires",
+    "feedback_title": "Titre du commentaire",
+    "written_review": "Avis écrit",
+    "share_experience_hint": "Partagez votre expérience...",
+    "upload_photos": "Télécharger des photos",
+    "add_photos": "Ajouter des photos",
+    "submit_review": "Envoyer l'avis",
+    "submit_feedback": "Envoyer des commentaires",
+    "share_experience": "Partagez votre expérience"
   },
   "goals": {
     "lose_weight": "Perdre du poids",
