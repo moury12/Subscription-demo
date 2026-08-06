@@ -316,110 +316,44 @@ class _BarcodeScanScreenState extends State<BarcodeScanScreen> with SingleTicker
 
                 const Spacer(),
 
-                // Simulator / Demo Buttons for Quick Testing
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'SIMULATE SCAN (FOR EMULATOR TESTING):',
-                        style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.blueAccent),
-                                foregroundColor: Colors.blueAccent,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onPressed: () => _processBarcode('7501031302838'),
-                              child: const Text('Alpine Water'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.purpleAccent),
-                                foregroundColor: Colors.purpleAccent,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onPressed: () => _processBarcode('12345678'),
-                              child: const Text('Protein Bar'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
                 // Bottom Menu Actions
                 Padding(
                   padding: const EdgeInsets.only(bottom: 24.0, left: 24.0, right: 24.0),
-                  child: Column(
+                  child: Row(
                     children: [
-                      // Manual Entry Text Button
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const ManualBarcodeEntryScreen(),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Enter Barcode Manually',
-                              style: TextStyle(
-                                color: AppColors.brandPrimary,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.blueAccent),
+                            foregroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const ManualBarcodeEntryScreen(),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 80,
-                              height: 1.5,
-                              color: AppColors.brandPrimary,
-                            ),
-                          ],
+                            );
+                          },
+                          child: const Text('Enter Barcode Manually'),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      
-                      // OCR Scanner Text Button
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const LabelOcrScannerScreen(),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Scan Product Label',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.purpleAccent),
+                            foregroundColor: Colors.purpleAccent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const LabelOcrScannerScreen(),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 60,
-                              height: 1.0,
-                              color: Colors.white30,
-                            ),
-                          ],
+                            );
+                          },
+                          child: const Text('Scan Product Manually'),
                         ),
                       ),
                     ],
