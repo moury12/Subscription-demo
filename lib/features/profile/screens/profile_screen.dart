@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/app_settings.dart';
 import '../../../core/providers/language_provider.dart';
@@ -237,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFF161616),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -272,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(width: 4),
         Text(
           unit,
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
         ),
       ],
     );
@@ -288,10 +289,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.35)),
+        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.35)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFF59E0B).withOpacity(0.12),
+            color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
             blurRadius: 16,
           ),
         ],
@@ -302,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withOpacity(0.15),
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -370,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF0D0D0D),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         children: [
@@ -381,7 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -398,7 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       _l10n.getString('profile.current_weight').toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -423,7 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       _l10n.getString('profile.entry_weight').toUpperCase(),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -433,7 +434,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       '${_l10n.formatWeight(_settings.entryWeight ?? _settings.currentWeight ?? 0)} kg',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
+                        color: Colors.white.withValues(alpha: 0.95),
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -464,7 +465,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Text(
                   _isEditingWeight ? _l10n.getString('common.cancel') : _l10n.getString('common.update'),
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -478,7 +479,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 _l10n.getString('profile.current_weight').toUpperCase(),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
+                  color: Colors.white.withValues(alpha: 0.35),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -489,9 +490,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               alignment: Alignment.center,
               child: TextField(
@@ -512,7 +513,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 _l10n.getString('profile.entry_weight').toUpperCase(),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
+                  color: Colors.white.withValues(alpha: 0.35),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -523,9 +524,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               height: 56,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               alignment: Alignment.center,
               child: TextField(
@@ -600,7 +601,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF0D0D0D),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         children: [
@@ -616,12 +617,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       icon,
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       size: 24,
                     ),
                   ),
@@ -641,7 +642,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           subtitle,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -653,7 +654,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     isExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ],
               ),
@@ -784,19 +785,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? color.withOpacity(0.08)
-                        : Colors.white.withOpacity(0.03),
+                        ? color.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
-                          ? color.withOpacity(0.5)
-                          : Colors.white.withOpacity(0.05),
+                          ? color.withValues(alpha: 0.5)
+                          : Colors.white.withValues(alpha: 0.05),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: color.withOpacity(0.15),
+                              color: color.withValues(alpha: 0.15),
                               blurRadius: 12,
                               spreadRadius: 1,
                             ),
@@ -880,7 +881,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Divider(color: Colors.white10),
           const SizedBox(height: 8),
           _buildNotificationToggle(
-            title: _l10n.getString('profile.push_notifications'),
+            title: _l10n.getString('profile.notifications'),
             subtitle: _l10n.getString('profile.reminders_for_workouts'),
             icon: Icons.notifications_active_outlined,
             iconColor: const Color(0xFF60A5FA),
@@ -985,13 +986,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.white.withOpacity(0.03),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.white.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
-                          ? Colors.blueAccent.withOpacity(0.5)
-                          : Colors.white.withOpacity(0.05),
+                          ? Colors.blueAccent.withValues(alpha: 0.5)
+                          : Colors.white.withValues(alpha: 0.05),
                       width: 1.5,
                     ),
                   ),
@@ -1070,13 +1071,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: isMain
-            ? Colors.white.withOpacity(0.04)
-            : Colors.white.withOpacity(0.02),
+            ? Colors.white.withValues(alpha: 0.04)
+            : Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: value
-              ? iconColor.withOpacity(0.2)
-              : Colors.white.withOpacity(0.04),
+              ? iconColor.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.04),
         ),
       ),
       child: Row(
@@ -1084,7 +1085,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.08),
+              color: iconColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: iconColor, size: 18),
@@ -1105,7 +1106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.35),
+                    color: Colors.white.withValues(alpha: 0.35),
                     fontSize: 11,
                   ),
                 ),
@@ -1117,13 +1118,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onChanged: onChanged,
             activeThumbColor: Colors.white,
             activeTrackColor: iconColor,
-            inactiveTrackColor: Colors.white.withOpacity(0.08),
+            inactiveTrackColor: Colors.white.withValues(alpha: 0.08),
             inactiveThumbColor: Colors.white38,
             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri uri = Uri.parse(urlString);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri);
+      }
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
+    }
   }
 
   Widget _buildPrivacySecuritySection() {
@@ -1135,14 +1149,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           const Divider(color: Colors.white10),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              _l10n.getString('profile.security_placeholder'),
-              style: const TextStyle(color: Colors.white38),
-            ),
+          const SizedBox(height: 8),
+          _buildLinkTile(
+            title: 'Privacy Policy',
+            url: 'https://getgocal.com/privacy',
+            icon: Icons.privacy_tip_outlined,
+            iconColor: const Color(0xFF38BDF8),
           ),
+          const SizedBox(height: 10),
+          _buildLinkTile(
+            title: 'Terms of Service',
+            url: 'https://getgocal.com/terms',
+            icon: Icons.description_outlined,
+            iconColor: const Color(0xFFA78BFA),
+          ),
+          const SizedBox(height: 4),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLinkTile({
+    required String title,
+    required String url,
+    required IconData icon,
+    required Color iconColor,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _launchUrl(url),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      url,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.4),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.open_in_new_rounded,
+                color: Colors.white.withValues(alpha: 0.4),
+                size: 18,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1153,7 +1240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF161616),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1174,12 +1261,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.rate_review_outlined,
-                    color: Colors.white.withOpacity(0.4),
+                    color: Colors.white.withValues(alpha: 0.4),
                     size: 24,
                   ),
                 ),
@@ -1204,7 +1291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 : _l10n.getString('profile.share_experience'))
                             .toUpperCase(),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1214,7 +1301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Icon(
                   Icons.chevron_right,
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ],
             ),
@@ -1230,7 +1317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Text(
         label,
         style: TextStyle(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           fontSize: 10,
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
@@ -1243,9 +1330,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: TextField(
         controller: controller,
@@ -1287,7 +1374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF161616),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1295,12 +1382,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(16),
           onTap: () async {
             await AuthService().logout();
-            if (context.mounted) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-                (route) => false,
-              );
-            }
+            if (!mounted) return;
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+              (route) => false,
+            );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

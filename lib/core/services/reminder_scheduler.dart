@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'notification_service.dart';
 import '../../features/nutrition/controllers/nutrition_controller.dart';
 import '../../features/workout/controllers/workout_controller.dart';
+import '../../features/notifications/controllers/notification_controller.dart';
 
 /// Orchestrates all smart reminder scheduling.
 ///
@@ -90,6 +91,12 @@ class ReminderScheduler {
       scheduledTime: next,
       channel: _notif.waterChannel,
     );
+
+    await NotificationController().sendReminderNotification(
+      title: 'Stay Hydrated 💧',
+      message: 'Time to drink some water! Your body needs it.',
+      type: 'reminder',
+    );
   }
 
   /// Initial water reminder — schedules from now + 2 hours.
@@ -103,7 +110,10 @@ class ReminderScheduler {
     final today = DateTime.now();
     final meals = NutritionController().loggedMeals;
 
+    bool hasScheduledMeal = false;
+
     if (!hasLoggedMealTypeToday(meals, 'Breakfast')) {
+      hasScheduledMeal = true;
       await _scheduleMealPair(
         softId: NotificationIds.breakfastSoft,
         finalId: NotificationIds.breakfastFinal,
@@ -114,6 +124,7 @@ class ReminderScheduler {
     }
 
     if (!hasLoggedMealTypeToday(meals, 'Lunch')) {
+      hasScheduledMeal = true;
       await _scheduleMealPair(
         softId: NotificationIds.lunchSoft,
         finalId: NotificationIds.lunchFinal,
@@ -124,12 +135,21 @@ class ReminderScheduler {
     }
 
     if (!hasLoggedMealTypeToday(meals, 'Dinner')) {
+      hasScheduledMeal = true;
       await _scheduleMealPair(
         softId: NotificationIds.dinnerSoft,
         finalId: NotificationIds.dinnerFinal,
         mealName: 'Dinner',
         softTime: _todayAt(today, 20, 30),
         finalTime: _todayAt(today, 22, 30),
+      );
+    }
+
+    if (hasScheduledMeal) {
+      await NotificationController().sendReminderNotification(
+        title: 'Meal Log Reminder 🥗',
+        message: 'Don\'t forget to log your meals today to stay on track!',
+        type: 'nutrition',
       );
     }
   }
@@ -168,6 +188,12 @@ class ReminderScheduler {
       body: 'Last reminder — even 15 minutes counts!',
       scheduledTime: _todayAt(today, 18, 0),
       channel: _notif.workoutChannel,
+    );
+
+    await NotificationController().sendReminderNotification(
+      title: 'Time to Work Out 🏋️‍♂️',
+      message: "You haven't logged a workout today. Let's get moving!",
+      type: 'workout',
     );
   }
 

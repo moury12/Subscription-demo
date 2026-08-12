@@ -182,4 +182,25 @@ class NotificationController extends ChangeNotifier {
       debugPrint('Error clearing all notifications: $e');
     }
   }
+
+  /// Create a user reminder notification in DB (Drink Water, Meal Log, Workout)
+  Future<void> sendReminderNotification({
+    required String title,
+    required String message,
+    required String type,
+  }) async {
+    try {
+      final response = await ApiService().post('/notifications/reminder', {
+        'title': title,
+        'message': message,
+        'type': type,
+      });
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        fetchNotifications(isRefresh: true);
+      }
+    } catch (e) {
+      debugPrint('Error sending reminder notification to API: $e');
+    }
+  }
 }
