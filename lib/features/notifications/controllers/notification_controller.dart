@@ -149,4 +149,37 @@ class NotificationController extends ChangeNotifier {
       debugPrint('Error marking all as read: $e');
     }
   }
+
+  /// Delete a single notification
+  Future<void> deleteNotification(String id) async {
+    final index = _notifications.indexWhere((n) => n.id == id);
+    if (index != -1) {
+      final removed = _notifications.removeAt(index);
+      if (!removed.isRead && _unreadCount > 0) {
+        _unreadCount--;
+      }
+      notifyListeners();
+
+      try {
+        await ApiService().delete('/notifications/$id');
+      } catch (e) {
+        debugPrint('Error deleting notification: $e');
+      }
+    }
+  }
+
+  /// Clear all notifications
+  Future<void> clearAll() async {
+    if (_notifications.isEmpty) return;
+
+    _notifications.clear();
+    _unreadCount = 0;
+    notifyListeners();
+
+    try {
+      await ApiService().delete('/notifications/clear-all');
+    } catch (e) {
+      debugPrint('Error clearing all notifications: $e');
+    }
+  }
 }

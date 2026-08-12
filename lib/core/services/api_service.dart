@@ -118,6 +118,16 @@ class ApiService {
     return response;
   }
 
+  Future<http.Response> delete(String endpoint, {bool requiresAuth = true}) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = await _getHeaders(requiresAuth: requiresAuth);
+
+    debugPrint('[API DELETE] $url');
+    final response = await http.delete(url, headers: headers);
+    _logResponse(response);
+    return response;
+  }
+
   void _logResponse(http.Response response) {
     debugPrint('[API Response] ${response.statusCode} | ${response.body.length} bytes');
     if (response.statusCode >= 400) {

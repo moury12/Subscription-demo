@@ -98,7 +98,13 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
                 ),
               ),
             ),
-          const SizedBox(width: 8),
+          if (_controller.notifications.isNotEmpty)
+            IconButton(
+              tooltip: 'Clear All Notifications',
+              icon: const Icon(Icons.delete_sweep_rounded, color: Colors.white70, size: 20),
+              onPressed: () => _confirmClearAll(context),
+            ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
@@ -244,13 +250,31 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        _formatTimeAgo(item.createdAt),
-                        style: TextStyle(
-                          color: item.isRead ? Colors.white38 : AppColors.accentGreen,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _formatTimeAgo(item.createdAt),
+                            style: TextStyle(
+                              color: item.isRead ? Colors.white38 : AppColors.accentGreen,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          InkWell(
+                            onTap: () => _controller.deleteNotification(item.id),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Icon(
+                                Icons.close_rounded,
+                                color: Colors.white.withValues(alpha: 0.4),
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -466,6 +490,44 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     if (diff.inDays < 7) return '${diff.inDays}d ago';
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  void _confirmClearAll(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_sweep_rounded, color: Colors.redAccent),
+            SizedBox(width: 10),
+            Text('Clear Notifications', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to delete all notifications? This action cannot be undone.',
+          style: TextStyle(color: Colors.white70, fontSize: 13.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _controller.clearAll();
+            },
+            child: const Text('Clear All', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 }
 
