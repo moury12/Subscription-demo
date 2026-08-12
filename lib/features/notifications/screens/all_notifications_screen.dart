@@ -46,21 +46,26 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        titleSpacing: 0,
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Notifications',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.5,
+            const Flexible(
+              child: Text(
+                'Notifications',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (_controller.unreadCount > 0) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.accentGreen,
                   borderRadius: BorderRadius.circular(12),
@@ -76,7 +81,7 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
                   '${_controller.unreadCount} new',
                   style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -86,17 +91,10 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
         ),
         actions: [
           if (_controller.notifications.any((n) => !n.isRead))
-            TextButton.icon(
+            IconButton(
+              tooltip: 'Mark All Read',
+              icon: const Icon(Icons.done_all_rounded, size: 20, color: AppColors.accentGreen),
               onPressed: () => _controller.markAllAsRead(),
-              icon: const Icon(Icons.done_all_rounded, size: 16, color: AppColors.accentGreen),
-              label: const Text(
-                'Mark Read',
-                style: TextStyle(
-                  color: AppColors.accentGreen,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ),
           if (_controller.notifications.isNotEmpty)
             IconButton(
@@ -104,7 +102,6 @@ class _AllNotificationsScreenState extends State<AllNotificationsScreen> {
               icon: const Icon(Icons.delete_sweep_rounded, color: Colors.white70, size: 20),
               onPressed: () => _confirmClearAll(context),
             ),
-          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
