@@ -7,6 +7,9 @@ import '../../../core/app_settings.dart';
 import '../../../core/providers/language_provider.dart';
 import '../models/ai_workout_plan.dart';
 import '../controllers/workout_controller.dart';
+import '../controllers/ai_workout_service.dart';
+import '../../../core/services/log_service.dart';
+import '../../profile/services/profile_service.dart';
 import 'single_workout_screen.dart';
 
 class WorkoutScreen extends StatefulWidget {
@@ -18,7 +21,9 @@ class WorkoutScreen extends StatefulWidget {
 
 class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateMixin {
   final _workoutController = WorkoutController();
+  final _workoutService = AiWorkoutService();
   AiWeeklyWorkoutPlan? _selectedPlan;
+  bool _isRegenerating = false;
   late AnimationController _lottieController;
   int _currentLottieIndex = 0;
   final List<String> _lottieFiles = [
@@ -136,7 +141,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
                         final localizedRecovery = l10n.getString('workout.recovery');
                         
                         // Translate Day Name
-                        final dayName = l10n.getString('days.${dayPlan.day.toLowerCase()}');
+                        final dayName = _getDayDisplayName(dayPlan.day, l10n);
                         
                         return _buildWorkoutCard(
                           context,
@@ -160,6 +165,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
                           null,
                         );
                       }),
+                    const SizedBox(height: 24),
+                    _buildRegenerateButton(context, l10n),
                     const SizedBox(height: 100),
                   ],
                 ),
@@ -581,6 +588,210 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _handleRegenerateNextWeekWorkouts() async {
+    if (_isRegenerating) return;
+
+    setState(() {
+      _isRegenerating = true;
+    });
+
+    final l10n = context.read<LanguageProvider>();
+
+    try {
+      final profile = await ProfileService().getProfile() ?? {};
+      final settings = AppSettings();
+      final profileData = <String, dynamic>{
+        'age': profile['age'] ?? settings.age ?? 25,
+        'gender': profile['gender'] ?? settings.gender ?? 'Male',
+        'height': profile['height'] ?? settings.height ?? 175,
+        'currentWeight': profile['currentWeight'] ?? settings.currentWeight ?? 70,
+        'goal': profile['goal'] ?? settings.goal ?? 'Gain Muscle',
+        'activityLevel': profile['activityLevel'] ?? settings.activityLevel ?? 'Moderately Active',
+        'workoutSchedule': profile['workoutSchedule'] ?? {
+          'daysPerWeek': settings.workoutDays,
+        },
+        'dietaryPreference': profile['dietaryPreference'] ?? settings.dietPreference ?? 'Everything',
+        'targetWeight': profile['targetWeight'] ?? settings.targetWeight ?? 75,
+      };
+
+      final rawPlan = await _workoutService.generateMyPlan(profileData);
+
+      if (!mounted) return;
+
+      if (rawPlan == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.getString('common.error')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
+
+      final weekStartDay = settings.weekStartDay;
+      final now = DateTime.now();
+      final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      int currentWeekday = now.weekday;
+      int targetWeekdayIndex = daysOfWeek.indexOf(weekStartDay) + 1;
+      if (targetWeekdayIndex < 1) targetWeekdayIndex = 1;
+
+      int daysToBack = (currentWeekday - targetWeekdayIndex) % 7;
+      if (daysToBack < 0) daysToBack += 7;
+      DateTime thisWeekStart = now.subtract(Duration(days: daysToBack));
+      DateTime nextWeekStart = DateTime(thisWeekStart.year, thisWeekStart.month, thisWeekStart.day).add(const Duration(days: 7));
+      DateTime nextWeekEnd = nextWeekStart.add(const Duration(days: 6));
+
+      final currentPlan = _selectedPlan ?? settings.currentWeekPlan;
+      final nextWeekNumber = (currentPlan?.weekNumber ?? 1) + 1;
+
+      final nextWeekPlan = AiWeeklyWorkoutPlan(
+        planTitle: rawPlan.planTitle.isNotEmpty ? rawPlan.planTitle : 'Week $nextWeekNumber Routine',
+        weekNumber: nextWeekNumber,
+        startDate: nextWeekStart,
+        endDate: nextWeekEnd,
+        days: rawPlan.days,
+        nutritionalTargets: rawPlan.nutritionalTargets,
+      );
+
+      settings.addWorkoutPlan(nextWeekPlan);
+      await LogService().saveWorkoutPlan(nextWeekPlan.toJson());
+
+      if (mounted) {
+        setState(() {
+          _selectedPlan = nextWeekPlan;
+        });
+
+        final rawSuccessMsg = l10n.getString('workout.workouts_regenerated');
+        final successMsg = (rawSuccessMsg == 'workout.workouts_regenerated')
+            ? "Next week's workout plan regenerated successfully!"
+            : rawSuccessMsg;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(successMsg)),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error regenerating next week workout plan: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.getString('common.error')}: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRegenerating = false;
+        });
+      }
+    }
+  }
+
+  String _getDayDisplayName(String rawDay, LanguageProvider l10n) {
+    if (rawDay.isEmpty) return rawDay;
+    final key = 'days.${rawDay.toLowerCase()}';
+    if (l10n.localizationService.hasKey(key)) {
+      return l10n.getString(key);
+    }
+    final dayMatch = RegExp(r'^day\s*(\d+)$', caseSensitive: false).firstMatch(rawDay.trim());
+    if (dayMatch != null) {
+      final num = dayMatch.group(1)!;
+      final dayLabel = l10n.localizationService.hasKey('workout.day')
+          ? l10n.getString('workout.day')
+          : 'Day';
+      return '$dayLabel ${l10n.translateDigits(num)}';
+    }
+    return rawDay;
+  }
+
+  Widget _buildRegenerateButton(BuildContext context, LanguageProvider l10n) {
+    final rawRegenerating = l10n.getString('workout.regenerating_workouts');
+    final rawRegenerate = l10n.getString('workout.regenerate_next_week');
+
+    final labelRegenerating = (rawRegenerating == 'workout.regenerating_workouts')
+        ? "Generating Next Week's Routine..."
+        : rawRegenerating;
+
+    final labelRegenerate = (rawRegenerate == 'workout.regenerate_next_week')
+        ? "Regenerate Workouts"
+        : rawRegenerate;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF8B5CF6).withOpacity(0.35),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _isRegenerating ? null : _handleRegenerateNextWeekWorkouts,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isRegenerating)
+                  const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                else
+                  const Icon(
+                    Icons.auto_awesome,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                const SizedBox(width: 12),
+                Flexible(
+                  child: Text(
+                    _isRegenerating ? labelRegenerating : labelRegenerate,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

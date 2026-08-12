@@ -126,7 +126,10 @@
     "goal": "लक्ष्य",
     "count": "गिनती",
     "complete_set": "सेट पूरा करें",
-    "congratulations": "बधाई हो!"
+    "congratulations": "बधाई हो!",
+    "regenerate_next_week": "वर्कआउट पुन: जनरेट करें",
+    "regenerating_workouts": "अगले सप्ताह का रूटीन जनरेट हो रहा है...",
+    "workouts_regenerated": "अगले सप्ताह का वर्कआउट प्लान सफलतापूर्वक जनरेट हुआ!"
   },
   "nutrition": {
     "nutrition": "पोषण",

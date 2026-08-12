@@ -114,7 +114,10 @@
     "resume_workout": "Reprendre l'entraînement",
     "rest_day": "Jour de repos",
     "rest_recovery": "Repos et récupération",
-    "active_recovery": "Récupération active"
+    "active_recovery": "Récupération active",
+    "regenerate_next_week": "Régénérer les entraînements",
+    "regenerating_workouts": "Génération de la routine de la semaine prochaine...",
+    "workouts_regenerated": "Le plan de la semaine prochaine a été régénéré avec succès !"
   },
   "nutrition": {
     "nutrition": "Nutrition",

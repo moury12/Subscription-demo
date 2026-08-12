@@ -127,7 +127,10 @@
     "goal": "Goal",
     "count": "Count",
     "complete_set": "COMPLETE SET",
-    "congratulations": "Congratulations!"
+    "congratulations": "Congratulations!",
+    "regenerate_next_week": "Regenerate Workouts",
+    "regenerating_workouts": "Generating Next Week's Routine...",
+    "workouts_regenerated": "Next week's workout plan regenerated successfully!"
   },
   "nutrition": {
     "nutrition": "Nutrition",

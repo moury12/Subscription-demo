@@ -9,6 +9,10 @@ class ApiService {
   ApiService._internal();
 
   static String get baseUrl {
+    // Deployed AWS Backend
+    return 'https://backend.getgocal.com/api';
+
+    /* Local Development fallbacks:
     if (kReleaseMode) {
       return 'https://backend.getgocal.com/api';
     }
@@ -16,6 +20,7 @@ class ApiService {
       return 'http://10.0.2.2:5000/api';
     }
     return 'http://localhost:5000/api';
+    */
   }
 
   Future<String?> _getToken() async {
