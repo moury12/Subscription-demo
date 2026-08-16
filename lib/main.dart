@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
@@ -7,8 +10,14 @@ import 'core/services/notification_service.dart';
 import 'features/onboarding/screens/language_selection_screen.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().initialize();
+ WidgetsFlutterBinding.ensureInitialized();
+
+  // অ্যাপ শুরুতেই কনফিগার করুন
+  if (Platform.isAndroid) {
+    await Purchases.configure(PurchasesConfiguration("goog_your_api_key_here"));
+  } else if (Platform.isIOS) {
+    await Purchases.configure(PurchasesConfiguration("appl_your_api_key_here"));
+  }  await NotificationService().initialize();
   runApp(const GocalAiApp());
 }
 
