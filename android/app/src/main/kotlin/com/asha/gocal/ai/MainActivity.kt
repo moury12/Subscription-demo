@@ -1,4 +1,4 @@
-package com.example.gocalai
+package com.asha.gocal.ai
 
 import io.flutter.embedding.android.FlutterActivity
 
