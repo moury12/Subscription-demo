@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "719142155853",
+    "project_id": "gocal-ai",
+    "storage_bucket": "gocal-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719142155853:android:cdd51879c814f7dc3a0e04",
+        "android_client_info": {
+          "package_name": "com.asha.gocal.ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgxda3NO74GJrGoskOtSBor-bnHPZ0pSE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

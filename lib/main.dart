@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gocal_ai/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -18,6 +20,9 @@ void main() async {
   } else if (Platform.isIOS) {
     await Purchases.configure(PurchasesConfiguration("appl_your_api_key_here"));
   }  await NotificationService().initialize();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const GocalAiApp());
 }
 
