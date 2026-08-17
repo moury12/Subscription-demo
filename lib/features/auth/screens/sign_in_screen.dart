@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/language_provider.dart';
@@ -27,8 +28,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(text: kDebugMode?"tanzibamouri28@gmail.com":"");
+  final _passwordController = TextEditingController(text: kDebugMode?"123456":"");
   bool _isLoading = false;
 
   void _handleSignIn() async {
