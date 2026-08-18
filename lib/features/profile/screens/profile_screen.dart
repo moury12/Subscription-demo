@@ -40,6 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _drinkWaterNotification = false;
   bool _mealLogNotification = false;
   bool _workoutNotification = false;
+  bool _broadcastNotification = true;
 
   // Controllers
   late final TextEditingController _nameController;
@@ -90,12 +91,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final water = await notif.isWaterEnabled;
     final meal = await notif.isMealEnabled;
     final workout = await notif.isWorkoutEnabled;
+    final broadcast = await notif.isBroadcastEnabled;
     if (mounted) {
       setState(() {
         _pushNotifications = master;
         _drinkWaterNotification = water;
         _mealLogNotification = meal;
         _workoutNotification = workout;
+        _broadcastNotification = broadcast;
       });
     }
   }
@@ -106,6 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     notif.setWaterEnabled(_drinkWaterNotification);
     notif.setMealEnabled(_mealLogNotification);
     notif.setWorkoutEnabled(_workoutNotification);
+    notif.setBroadcastEnabled(_broadcastNotification);
     ReminderScheduler().forceReschedule();
   }
 
@@ -870,7 +874,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _pushNotifications ||
         _drinkWaterNotification ||
         _mealLogNotification ||
-        _workoutNotification;
+        _workoutNotification ||
+        _broadcastNotification;
     return _buildCollapsibleCard(
       index: 2,
       icon: Icons.notifications_none,
@@ -893,6 +898,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _drinkWaterNotification = false;
                   _mealLogNotification = false;
                   _workoutNotification = false;
+                  _broadcastNotification = false;
                 }
               });
               _onToggleChanged();
@@ -937,6 +943,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   value: _workoutNotification,
                   onChanged: (v) {
                     setState(() => _workoutNotification = v);
+                    _onToggleChanged();
+                  },
+                ),
+                _buildNotificationToggle(
+                  title: _l10n.getString('profile.broadcast_messages') != 'profile.broadcast_messages'
+                      ? _l10n.getString('profile.broadcast_messages')
+                      : 'Broadcast Messages',
+                  subtitle: 'Announcements & system updates',
+                  icon: Icons.campaign_outlined,
+                  iconColor: const Color(0xFFF59E0B),
+                  value: _broadcastNotification,
+                  onChanged: (v) {
+                    setState(() => _broadcastNotification = v);
                     _onToggleChanged();
                   },
                 ),
