@@ -17,6 +17,7 @@ import '../../profile/services/profile_service.dart';
 import '../../main/screens/main_shell_screen.dart';
 import '../../../core/app_settings.dart';
 import '../../../screens/onboarding/welcome_screen.dart';
+import '../../../core/services/notification_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -40,6 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     
     if (isLoggedIn) {
       debugPrint('[SPLASH] User is logged in, fetching profile...');
+      NotificationService().syncFcmToken();
       final profile = await ProfileService().getProfile();
       
       // Calculate remaining delay

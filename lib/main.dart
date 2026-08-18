@@ -9,20 +9,28 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/navigation_service.dart';
 import 'features/onboarding/screens/language_selection_screen.dart';
 
-void main() async {
- WidgetsFlutterBinding.ensureInitialized();
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-  // অ্যাপ শুরুতেই কনফিগার করুন
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   if (Platform.isAndroid) {
     await Purchases.configure(PurchasesConfiguration("goog_your_api_key_here"));
   } else if (Platform.isIOS) {
     await Purchases.configure(PurchasesConfiguration("appl_your_api_key_here"));
-  }  await NotificationService().initialize();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-);
+  }
+
+  await NotificationService().initialize();
+
   runApp(const GocalAiApp());
 }
 
@@ -40,6 +48,7 @@ class GocalAiApp extends StatelessWidget {
       child: Consumer<LanguageProvider>(
         builder: (context, languageProvider, _) {
           return MaterialApp(
+            navigatorKey: NavigationService.navigatorKey,
             title: 'GoCal AI',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.dark.copyWith(
