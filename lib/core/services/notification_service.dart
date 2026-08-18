@@ -6,6 +6,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
+import 'navigation_service.dart';
 
 /// Top-level background message handler for Firebase Messaging
 @pragma('vm:entry-point')
@@ -157,6 +158,21 @@ class NotificationService {
         debugPrint('[FCM] Foreground notification received: ${message.messageId}');
         _showForegroundNotification(message);
       });
+
+      // Handle when user taps notification while app is in background
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint('[FCM] App opened from background notification: ${message.messageId}');
+        NavigationService.navigateToNotifications();
+      });
+
+      // Handle when user taps notification while app was terminated
+      final initialMessage = await messaging.getInitialMessage();
+      if (initialMessage != null) {
+        debugPrint('[FCM] App opened from terminated notification: ${initialMessage.messageId}');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          NavigationService.navigateToNotifications();
+        });
+      }
     } catch (e) {
       debugPrint('[FCM ERROR] FirebaseMessaging setup failed: $e');
     }
@@ -359,6 +375,7 @@ class NotificationService {
 
   static void _onNotificationTapped(NotificationResponse response) {
     debugPrint('[NOTIF] Tapped: ${response.id} / ${response.payload}');
+    NavigationService.navigateToNotifications();
   }
 
   String _resolveTimezone() {

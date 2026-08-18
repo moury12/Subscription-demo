@@ -9,6 +9,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/navigation_service.dart';
 import 'features/onboarding/screens/language_selection_screen.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -47,6 +48,7 @@ class GocalAiApp extends StatelessWidget {
       child: Consumer<LanguageProvider>(
         builder: (context, languageProvider, _) {
           return MaterialApp(
+            navigatorKey: NavigationService.navigatorKey,
             title: 'GoCal AI',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.dark.copyWith(
