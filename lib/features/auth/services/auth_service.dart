@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/app_settings.dart';
 import '../../../core/services/user_data_sync.dart';
+import '../../../core/services/notification_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -115,6 +116,7 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await _fetchAndSyncProfile();
+    await NotificationService().syncFcmToken();
   }
 
   Future<void> _fetchAndSyncProfile() async {

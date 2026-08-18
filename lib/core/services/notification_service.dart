@@ -193,12 +193,18 @@ class NotificationService {
 
   Future<void> _sendTokenToBackend(String token) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final authToken = prefs.getString('auth_token');
+      if (authToken == null || authToken.isEmpty) {
+        debugPrint('[FCM] Postponing token sync: user not authenticated yet');
+        return;
+      }
       final deviceType = Platform.isIOS ? 'ios' : 'android';
       await ApiService().post('/notifications/fcm-token', {
         'token': token,
         'deviceType': deviceType,
       });
-      debugPrint('[FCM] Token synced with backend');
+      debugPrint('[FCM] Token successfully synced with backend');
     } catch (e) {
       debugPrint('[FCM ERROR] Failed to sync token with backend: $e');
     }
