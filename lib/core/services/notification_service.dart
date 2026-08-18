@@ -180,14 +180,25 @@ class NotificationService {
   }
 
   Future<void> syncFcmToken() async {
-    try {
-      final token = await FirebaseMessaging.instance.getToken();
-      if (token != null) {
-        debugPrint('[FCM] FCM Token: $token');
-        await _sendTokenToBackend(token);
+    int attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      try {
+        attempts++;
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          debugPrint('[FCM] FCM Token fetched successfully: $token');
+          await _sendTokenToBackend(token);
+          return;
+        }
+      } catch (e) {
+        debugPrint('[FCM ERROR] Attempt $attempts/$maxAttempts failed to fetch FCM token: $e');
+        if (attempts < maxAttempts) {
+          // Exponential backoff delay (3s, 6s, 9s...) to allow Google Play Services to connect
+          await Future.delayed(Duration(seconds: attempts * 3));
+        }
       }
-    } catch (e) {
-      debugPrint('[FCM ERROR] Failed to fetch FCM token: $e');
     }
   }
 
