@@ -117,12 +117,8 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     final basicPlan = _plans.firstWhere((p) => p['type'] == 'basic', orElse: () => {});
     final premiumPlan = _plans.firstWhere((p) => p['type'] == 'premium', orElse: () => {});
 
-    final basicPrice = basicPlan['price'] != null
-        ? '\$${(basicPlan['price'] as num).toStringAsFixed(2)}'
-        : '\$0.00';
-    final premiumPrice = premiumPlan['price'] != null
-        ? '\$${(premiumPlan['price'] as num).toStringAsFixed(2)}'
-        : '\$4.99';
+    final basicPrice = basicPlan['priceString']?.toString() ?? 'Free';
+    final premiumPrice = premiumPlan['priceString']?.toString() ?? '\$4.99';
 
     final basicFeatures = (basicPlan['features'] as List?)?.cast<String>() ?? [
       '3 AI Food Scans per day',
@@ -138,7 +134,9 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
       'Detailed Macro & Nutrient Reports',
     ];
 
-    final isSameAsCurrent = _selectedPlan == _currentActivePlan;
+    // If there is no active premium plan, basic is the current active plan
+    final finalActivePlan = (_currentActivePlan == 'premium') ? 'premium' : 'basic';
+    final isSameAsCurrent = _selectedPlan == finalActivePlan;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -223,7 +221,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 title: premiumPlan['name']?.toString() ?? 'Premium Plan',
                 price: premiumPrice,
                 billingCycle: '/monthly',
-                isCurrentPlan: _currentActivePlan == 'premium',
+                isCurrentPlan: finalActivePlan == 'premium',
                 badgeText: 'RECOMMENDED',
                 features: premiumFeatures,
                 accentColor: const Color(0xFFF59E0B),
@@ -241,8 +239,8 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 type: 'basic',
                 title: basicPlan['name']?.toString() ?? 'Basic Plan',
                 price: basicPrice,
-                billingCycle: '/monthly',
-                isCurrentPlan: _currentActivePlan == 'basic',
+                billingCycle: '',
+                isCurrentPlan: finalActivePlan == 'basic',
                 features: basicFeatures,
                 accentColor: const Color(0xFF38BDF8),
                 gradient: const LinearGradient(

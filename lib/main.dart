@@ -24,8 +24,9 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   if (Platform.isAndroid) {
-    await Purchases.configure(PurchasesConfiguration("goog_your_api_key_here"));
+    await Purchases.configure(PurchasesConfiguration("goog_OWqKtkpAIdXrAEDNwDNNhidHOGc"));
   } else if (Platform.isIOS) {
+    // If the user gets the iOS Public API Key, they can replace the placeholder here.
     await Purchases.configure(PurchasesConfiguration("appl_your_api_key_here"));
   }
 

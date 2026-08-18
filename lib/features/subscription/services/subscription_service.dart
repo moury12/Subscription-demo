@@ -8,7 +8,7 @@ class SubscriptionService {
 
   // Replace with your keys from RevenueCat Dashboard
   static const _apiKeyApple = "appl_api_key_here";
-  static const _apiKeyGoogle = "goog_api_key_here";
+  static const _apiKeyGoogle = "goog_OWqKtkpAIdXrAEDNwDNNhidHOGc";
 
   Future<void> init() async {
     await Purchases.setLogLevel(LogLevel.debug);
@@ -46,22 +46,22 @@ class SubscriptionService {
     }
   }
 
- 
- 
-// Purchase a package
-Future<bool> purchasePackage(Package package) async {
-  try {
-    // Create PurchaseParams with the package
-    final PurchaseParams params = PurchaseParams.package(package);
-    
-    // Use the new purchase() method
-    PurchaseResult result = await Purchases.purchase(params);
-    return result.customerInfo.entitlements.all['premium']?.isActive ?? false;
-  } catch (e) {
-    // Handle cancellation or error
-    return false;
+  // Purchase a package
+  Future<bool> purchasePackage(Package package) async {
+    try {
+      // Create PurchaseParams with the package
+      final PurchaseParams params = PurchaseParams.package(package);
+      
+      // Use the new purchase() method
+      PurchaseResult result = await Purchases.purchase(params);
+      return result.customerInfo.entitlements.all['premium']?.isActive ?? false;
+    } catch (e) {
+      // Handle cancellation or error
+      print("Purchase package error: $e");
+      return false;
+    }
   }
-}
+
   // Restore purchases
   Future<bool> restorePurchases() async {
     try {
@@ -77,10 +77,18 @@ Future<bool> purchasePackage(Package package) async {
     final packages = await getOfferings();
     double premiumPriceVal = 4.99;
     String premiumName = 'Premium Plan';
+    String premiumPriceString = '\$4.99';
+    Package? premiumPackage;
     
     if (packages.isNotEmpty) {
-      final package = packages.first;
+      // We look for a package from 'default_offering' containing the premium product
+      final package = packages.firstWhere(
+        (pkg) => pkg.identifier == '\$rc_monthly' || pkg.packageType == PackageType.monthly,
+        orElse: () => packages.first,
+      );
+      premiumPackage = package;
       premiumPriceVal = package.storeProduct.price;
+      premiumPriceString = package.storeProduct.priceString;
       premiumName = package.storeProduct.title;
       if (premiumName.contains('(')) {
         premiumName = premiumName.split('(').first.trim();
@@ -92,6 +100,7 @@ Future<bool> purchasePackage(Package package) async {
         'type': 'basic',
         'name': 'Basic Plan',
         'price': 0.00,
+        'priceString': 'Free',
         'features': [
           '3 AI Food Scans per day',
           '2 Product scan per day (barcode+ocr)',
@@ -103,6 +112,8 @@ Future<bool> purchasePackage(Package package) async {
         'type': 'premium',
         'name': premiumName,
         'price': premiumPriceVal,
+        'priceString': premiumPriceString,
+        'package': premiumPackage,
         'features': [
           'Unlimited AI Food Scans',
           'Unlimited Product scan per day (barcode+ocr)',
@@ -124,9 +135,11 @@ Future<bool> purchasePackage(Package package) async {
   // Select a plan (upgrade/purchase package or downgrade)
   Future<bool> selectPlan(String planId) async {
     if (planId == 'premium') {
-      final packages = await getOfferings();
-      if (packages.isNotEmpty) {
-        return await purchasePackage(packages.first);
+      final plans = await getPlans();
+      final premiumPlan = plans.firstWhere((p) => p['type'] == 'premium', orElse: () => {});
+      final package = premiumPlan['package'] as Package?;
+      if (package != null) {
+        return await purchasePackage(package);
       }
       return false;
     } else {
