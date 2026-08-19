@@ -12,7 +12,7 @@ class SubscriptionService {
 
   Future<void> init() async {
     await Purchases.setLogLevel(LogLevel.debug);
-    
+
     PurchasesConfiguration configuration;
     if (Platform.isAndroid) {
       configuration = PurchasesConfiguration(_apiKeyGoogle);
@@ -26,7 +26,8 @@ class SubscriptionService {
   Future<List<Package>> getOfferings() async {
     try {
       Offerings offerings = await Purchases.getOfferings();
-      if (offerings.current != null && offerings.current!.availablePackages.isNotEmpty) {
+      if (offerings.current != null &&
+          offerings.current!.availablePackages.isNotEmpty) {
         return offerings.current!.availablePackages;
       }
     } catch (e) {
@@ -51,7 +52,7 @@ class SubscriptionService {
     try {
       // Create PurchaseParams with the package
       final PurchaseParams params = PurchaseParams.package(package);
-      
+
       // Use the new purchase() method
       PurchaseResult result = await Purchases.purchase(params);
       return result.customerInfo.entitlements.all['premium']?.isActive ?? false;
@@ -79,11 +80,13 @@ class SubscriptionService {
     String premiumName = 'Premium Plan';
     String premiumPriceString = '\$4.99';
     Package? premiumPackage;
-    
+
     if (packages.isNotEmpty) {
       // We look for a package from 'default_offering' containing the premium product
       final package = packages.firstWhere(
-        (pkg) => pkg.identifier == '\$rc_monthly' || pkg.packageType == PackageType.monthly,
+        (pkg) =>
+            pkg.identifier == '\$rc_monthly' ||
+            pkg.packageType == PackageType.monthly,
         orElse: () => packages.first,
       );
       premiumPackage = package;
@@ -94,7 +97,7 @@ class SubscriptionService {
         premiumName = premiumName.split('(').first.trim();
       }
     }
-    
+
     return [
       {
         'type': 'basic',
@@ -120,32 +123,26 @@ class SubscriptionService {
           'Personalized AI Workout Plans',
           'Detailed Macro & Nutrient Reports',
         ],
-      }
+      },
     ];
   }
 
   // Get user's current subscription details
   Future<Map<String, dynamic>?> getMySubscription() async {
     final active = await isPremiumActive();
-    return {
-      'currentPlan': active ? 'premium' : 'basic',
-    };
+    return {'currentPlan': active ? 'premium' : 'basic'};
   }
 
-  // Select a plan (upgrade/purchase package or downgrade)
   Future<bool> selectPlan(String planId) async {
     if (planId == 'premium') {
-      final plans = await getPlans();
-      final premiumPlan = plans.firstWhere((p) => p['type'] == 'premium', orElse: () => {});
-      final package = premiumPlan['package'] as Package?;
-      if (package != null) {
-        return await purchasePackage(package);
+      final packages = await getOfferings();
+      if (packages.isEmpty) {
+        print("❌ ERROR: No packages found in RevenueCat offerings!");
+        return false;
       }
-      return false;
-    } else {
-      // Switching to basic is typically handled by canceling subscription in app store settings,
-      // but returning true here allows UI to update gracefully.
-      return true;
+      // প্রথম প্যাকেজটি পারচেজ করার চেষ্টা করুন
+      return await purchasePackage(packages.first);
     }
+    return true;
   }
 }

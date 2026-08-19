@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gocal_ai/features/subscription/services/subscription_service.dart';
 import 'package:gocal_ai/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -22,6 +23,7 @@ void main() async {
   );
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await SubscriptionService().init(); 
 
   if (Platform.isAndroid) {
     await Purchases.configure(PurchasesConfiguration("goog_OWqKtkpAIdXrAEDNwDNNhidHOGc"));
