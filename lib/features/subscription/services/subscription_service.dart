@@ -7,7 +7,7 @@ class SubscriptionService {
   SubscriptionService._internal();
 
   // Replace with your keys from RevenueCat Dashboard
-  static const _apiKeyApple = "appl_api_key_here";
+  static const _apiKeyApple = "appl_wbMGOljlImDhZbYcUtjMdAixMKX";
   static const _apiKeyGoogle = "goog_OWqKtkpAIdXrAEDNwDNNhidHOGc";
 
   Future<void> init() async {
@@ -20,6 +20,24 @@ class SubscriptionService {
       configuration = PurchasesConfiguration(_apiKeyApple);
     }
     await Purchases.configure(configuration);
+  }
+
+  // Associate user ID with RevenueCat
+  Future<void> loginUser(String userId) async {
+    try {
+      await Purchases.logIn(userId);
+    } catch (e) {
+      print("Error logging in user to RevenueCat: $e");
+    }
+  }
+
+  // Unassociate user ID from RevenueCat
+  Future<void> logoutUser() async {
+    try {
+      await Purchases.logOut();
+    } catch (e) {
+      print("Error logging out user from RevenueCat: $e");
+    }
   }
 
   // Fetch real products from RevenueCat

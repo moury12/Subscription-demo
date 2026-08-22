@@ -4,6 +4,7 @@ import '../../../core/services/api_service.dart';
 import '../../../core/app_settings.dart';
 import '../../../core/services/user_data_sync.dart';
 import '../../../core/services/notification_service.dart';
+import '../../subscription/services/subscription_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -105,6 +106,11 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     UserDataSync.clearAll();
+    try {
+      await SubscriptionService().logoutUser();
+    } catch (e) {
+      // Ignore
+    }
   }
 
   Future<bool> isLoggedIn() async {

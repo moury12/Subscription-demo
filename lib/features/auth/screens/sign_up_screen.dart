@@ -16,6 +16,7 @@ import '../services/auth_service.dart';
 import '../../profile/services/profile_service.dart';
 import '../../main/screens/main_shell_screen.dart';
 import '../../subscription/screens/subscription_plan_screen.dart';
+import '../../subscription/services/subscription_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -57,6 +58,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         final profile = await ProfileService().getProfile();
         if (mounted) {
           setState(() => _isLoading = false);
+          if (profile != null) {
+            // Login user in RevenueCat
+            final userId = profile['_id'] ?? profile['id'];
+            if (userId != null) {
+              await SubscriptionService().loginUser(userId.toString());
+            }
+          }
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
             final hasSelectedSub = profile['hasSelectedSubscription'] == true;
             if (!hasSelectedSub) {

@@ -18,6 +18,7 @@ import '../../main/screens/main_shell_screen.dart';
 import '../../../core/app_settings.dart';
 import '../../../screens/onboarding/welcome_screen.dart';
 import '../../../core/services/notification_service.dart';
+import '../../subscription/services/subscription_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -44,6 +45,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       NotificationService().syncFcmToken();
       final profile = await ProfileService().getProfile();
       
+      if (profile != null) {
+        // Login user in RevenueCat
+        final userId = profile['_id'] ?? profile['id'];
+        if (userId != null) {
+          await SubscriptionService().loginUser(userId.toString());
+        }
+      }
+
       // Calculate remaining delay
       final elapsed = DateTime.now().difference(startTime).inMilliseconds;
       if (elapsed < 1500) {

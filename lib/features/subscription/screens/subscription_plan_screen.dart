@@ -110,6 +110,45 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     }
   }
 
+  void _handleRestore() async {
+    setState(() => _isLoading = true);
+    final isPremium = await SubscriptionService().restorePurchases();
+    
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (isPremium) {
+        setState(() {
+          _currentActivePlan = 'premium';
+          _selectedPlan = 'premium';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✨ Purchases successfully restored! Premium is active.'),
+            backgroundColor: Color(0xFFF59E0B),
+          ),
+        );
+        if (widget.isFromSettings) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => const MainShellScreen(),
+              settings: const RouteSettings(name: '/main'),
+            ),
+            (route) => false,
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No active premium subscription found to restore.'),
+            backgroundColor: Colors.grey,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Dynamic price lookup from backend plans
@@ -346,6 +385,24 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                         ),
                       ),
                     ),
+
+              if (!_isLoading) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: _handleRestore,
+                    child: const Text(
+                      'Restore Purchases',
+                      style: TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 16),
 
