@@ -113,7 +113,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   void _handleRestore() async {
     setState(() => _isLoading = true);
     final isPremium = await SubscriptionService().restorePurchases();
-    
+
     if (mounted) {
       setState(() => _isLoading = false);
       if (isPremium) {
@@ -123,7 +123,9 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✨ Purchases successfully restored! Premium is active.'),
+            content: Text(
+              '✨ Purchases successfully restored! Premium is active.',
+            ),
             backgroundColor: Color(0xFFF59E0B),
           ),
         );
@@ -212,7 +214,33 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               ),
               centerTitle: true,
             )
-          : null,
+          : AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const MainShellScreen(),
+                        settings: const RouteSettings(name: '/main'),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
+              title: const Text(
+                'Subscription',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+            ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

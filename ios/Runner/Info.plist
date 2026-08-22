@@ -43,7 +43,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan your meals for nutritional analysis.</string>
+	<string>Go Cal AI needs access to your camera to scan food items and estimate calorie content accurately.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to microphone for voice journaling.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
