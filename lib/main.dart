@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:gocal_ai/features/subscription/services/subscription_service.dart';
 import 'package:gocal_ai/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'core/providers/language_provider.dart';
 import 'core/theme/app_theme.dart';
@@ -22,12 +20,7 @@ void main() async {
   );
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-  if (Platform.isAndroid) {
-    await Purchases.configure(PurchasesConfiguration("goog_your_api_key_here"));
-  } else if (Platform.isIOS) {
-    await Purchases.configure(PurchasesConfiguration("appl_your_api_key_here"));
-  }
+  await SubscriptionService().init(); 
 
   await NotificationService().initialize();
 

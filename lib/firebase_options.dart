@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB8EB0Mz0RuGnXW4a57JZjJ8OYcmwRBk10',
-    appId: '1:719142155853:ios:e3cbf1d817d555083a0e04',
+    appId: '1:719142155853:ios:a75f7d9e579883203a0e04',
     messagingSenderId: '719142155853',
     projectId: 'gocal-ai',
     storageBucket: 'gocal-ai.firebasestorage.app',
-    iosBundleId: 'com.asha.gocal.ai',
+    iosBundleId: 'com.asha.gocal.ios',
   );
 }

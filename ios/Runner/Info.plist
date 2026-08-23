@@ -22,12 +22,28 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLIconFile</key>
+			<string></string>
+			<key>CFBundleURLName</key>
+			<string>revenuecat</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rc-96abcd7399</string>
+			</array>
+		</dict>
+		<dict/>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan your meals for nutritional analysis.</string>
+	<string>Go Cal AI needs access to your camera to scan food items and estimate calorie content accurately.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to microphone for voice journaling.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

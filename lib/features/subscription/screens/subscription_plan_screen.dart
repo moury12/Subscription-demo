@@ -5,10 +5,7 @@ import '../services/subscription_service.dart';
 class SubscriptionPlanScreen extends StatefulWidget {
   final bool isFromSettings;
 
-  const SubscriptionPlanScreen({
-    super.key,
-    this.isFromSettings = false,
-  });
+  const SubscriptionPlanScreen({super.key, this.isFromSettings = false});
 
   @override
   State<SubscriptionPlanScreen> createState() => _SubscriptionPlanScreenState();
@@ -28,7 +25,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
 
   void _fetchPlans() async {
     setState(() => _isLoading = true);
-    
+
     final fetchedPlans = await SubscriptionService().getPlans();
     final mySub = await SubscriptionService().getMySubscription();
 
@@ -85,7 +82,9 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                   ? '✨ Premium Plan Activated!'
                   : 'Basic Plan Selected',
             ),
-            backgroundColor: _selectedPlan == 'premium' ? const Color(0xFFF59E0B) : const Color(0xFF10B981),
+            backgroundColor: _selectedPlan == 'premium'
+                ? const Color(0xFFF59E0B)
+                : const Color(0xFF10B981),
           ),
         );
 
@@ -111,34 +110,85 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     }
   }
 
+  void _handleRestore() async {
+    setState(() => _isLoading = true);
+    final isPremium = await SubscriptionService().restorePurchases();
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (isPremium) {
+        setState(() {
+          _currentActivePlan = 'premium';
+          _selectedPlan = 'premium';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              '✨ Purchases successfully restored! Premium is active.',
+            ),
+            backgroundColor: Color(0xFFF59E0B),
+          ),
+        );
+        if (widget.isFromSettings) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => const MainShellScreen(),
+              settings: const RouteSettings(name: '/main'),
+            ),
+            (route) => false,
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No active premium subscription found to restore.'),
+            backgroundColor: Colors.grey,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Dynamic price lookup from backend plans
-    final basicPlan = _plans.firstWhere((p) => p['type'] == 'basic', orElse: () => {});
-    final premiumPlan = _plans.firstWhere((p) => p['type'] == 'premium', orElse: () => {});
+    final basicPlan = _plans.firstWhere(
+      (p) => p['type'] == 'basic',
+      orElse: () => {},
+    );
+    final premiumPlan = _plans.firstWhere(
+      (p) => p['type'] == 'premium',
+      orElse: () => {},
+    );
 
-    final basicPrice = basicPlan['price'] != null
-        ? '\$${(basicPlan['price'] as num).toStringAsFixed(2)}'
-        : '\$0.00';
-    final premiumPrice = premiumPlan['price'] != null
-        ? '\$${(premiumPlan['price'] as num).toStringAsFixed(2)}'
-        : '\$4.99';
+    final basicPrice = basicPlan['priceString']?.toString() ?? 'Free';
+    final premiumPrice = premiumPlan['priceString']?.toString() ?? '\$4.99';
 
-    final basicFeatures = (basicPlan['features'] as List?)?.cast<String>() ?? [
-      '3 AI Food Scans per day',
-      '2 Product scan per day (barcode+ocr)',
-      'Standard workout routines',
-      'Basic calorie tracking',
-    ];
+    final basicFeatures =
+        (basicPlan['features'] as List?)?.cast<String>() ??
+        [
+          '3 AI Food Scans per day',
+          '2 Product scan per day (barcode+ocr)',
+          'Standard workout routines',
+          'Basic calorie tracking',
+        ];
 
-    final premiumFeatures = (premiumPlan['features'] as List?)?.cast<String>() ?? [
-      'Unlimited AI Food Scans',
-      'Unlimited Product scan per day (barcode+ocr)',
-      'Personalized AI Workout Plans',
-      'Detailed Macro & Nutrient Reports',
-    ];
+    final premiumFeatures =
+        (premiumPlan['features'] as List?)?.cast<String>() ??
+        [
+          'Unlimited AI Food Scans',
+          'Unlimited Product scan per day (barcode+ocr)',
+          'Personalized AI Workout Plans',
+          'Detailed Macro & Nutrient Reports',
+        ];
 
-    final isSameAsCurrent = _selectedPlan == _currentActivePlan;
+    // If there is no active premium plan, basic is the current active plan
+    final finalActivePlan = (_currentActivePlan == 'premium')
+        ? 'premium'
+        : 'basic';
+    final isSameAsCurrent = _selectedPlan == finalActivePlan;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -147,13 +197,50 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              title: const Text('Subscription', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              title: const Text(
+                'Subscription',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               centerTitle: true,
             )
-          : null,
+          : AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const MainShellScreen(),
+                        settings: const RouteSettings(name: '/main'),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
+              title: const Text(
+                'Subscription',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              centerTitle: true,
+            ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -165,16 +252,25 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               // Header Logo & Badge
               Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF59E0B).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.4)),
+                    border: Border.all(
+                      color: const Color(0xFFF59E0B).withOpacity(0.4),
+                    ),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 16),
+                      Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFF59E0B),
+                        size: 16,
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'GO CAL AI MEMBERSHIP',
@@ -223,7 +319,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 title: premiumPlan['name']?.toString() ?? 'Premium Plan',
                 price: premiumPrice,
                 billingCycle: '/monthly',
-                isCurrentPlan: _currentActivePlan == 'premium',
+                isCurrentPlan: finalActivePlan == 'premium',
                 badgeText: 'RECOMMENDED',
                 features: premiumFeatures,
                 accentColor: const Color(0xFFF59E0B),
@@ -241,8 +337,8 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 type: 'basic',
                 title: basicPlan['name']?.toString() ?? 'Basic Plan',
                 price: basicPrice,
-                billingCycle: '/monthly',
-                isCurrentPlan: _currentActivePlan == 'basic',
+                billingCycle: '',
+                isCurrentPlan: finalActivePlan == 'basic',
                 features: basicFeatures,
                 accentColor: const Color(0xFF38BDF8),
                 gradient: const LinearGradient(
@@ -256,7 +352,11 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
 
               // Confirm Action Button
               _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFFF59E0B)))
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFF59E0B),
+                      ),
+                    )
                   : Container(
                       height: 54,
                       decoration: BoxDecoration(
@@ -265,18 +365,22 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                                 colors: [Color(0xFF334155), Color(0xFF1E293B)],
                               )
                             : _selectedPlan == 'premium'
-                                ? const LinearGradient(
-                                    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                                  )
-                                : const LinearGradient(
-                                    colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                                  ),
+                            ? const LinearGradient(
+                                colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                              )
+                            : const LinearGradient(
+                                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                              ),
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: isSameAsCurrent
                             ? []
                             : [
                                 BoxShadow(
-                                  color: (_selectedPlan == 'premium' ? const Color(0xFFF59E0B) : const Color(0xFF2563EB)).withOpacity(0.35),
+                                  color:
+                                      (_selectedPlan == 'premium'
+                                              ? const Color(0xFFF59E0B)
+                                              : const Color(0xFF2563EB))
+                                          .withOpacity(0.35),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -286,21 +390,23 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                         onPressed: _handleConfirmSelection,
                         child: Text(
                           isSameAsCurrent
                               ? 'Current Active Plan'
                               : _selectedPlan == 'premium'
-                                  ? 'Upgrade to Premium ($premiumPrice/mo)'
-                                  : 'Switch to Basic Plan',
+                              ? 'Upgrade to Premium ($premiumPrice/mo)'
+                              : 'Switch to Basic Plan',
                           style: TextStyle(
                             color: isSameAsCurrent
                                 ? const Color(0xFF94A3B8)
                                 : _selectedPlan == 'premium'
-                                    ? Colors.black
-                                    : Colors.white,
+                                ? Colors.black
+                                : Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                           ),
@@ -308,15 +414,30 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                       ),
                     ),
 
+              if (!_isLoading) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: TextButton(
+                    onPressed: _handleRestore,
+                    child: const Text(
+                      'Restore Purchases',
+                      style: TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 16),
 
               const Text(
                 'Cancel or switch plans anytime. Secure connection.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 11,
-                ),
+                style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
               ),
 
               const SizedBox(height: 16),
@@ -351,17 +472,19 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
             color: isCurrentPlan
                 ? const Color(0xFF10B981)
                 : isSelected
-                    ? accentColor
-                    : Colors.white.withOpacity(0.12),
+                ? accentColor
+                : Colors.white.withOpacity(0.12),
             width: (isCurrentPlan || isSelected) ? 2.5 : 1,
           ),
           boxShadow: (isCurrentPlan || isSelected)
               ? [
                   BoxShadow(
-                    color: (isCurrentPlan ? const Color(0xFF10B981) : accentColor).withOpacity(0.25),
+                    color:
+                        (isCurrentPlan ? const Color(0xFF10B981) : accentColor)
+                            .withOpacity(0.25),
                     blurRadius: 16,
                     spreadRadius: 1,
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -373,43 +496,54 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected ? accentColor : Colors.grey,
-                            width: 2,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? accentColor : Colors.grey,
+                              width: 2,
+                            ),
+                            color: isSelected
+                                ? accentColor
+                                : Colors.transparent,
                           ),
-                          color: isSelected ? accentColor : Colors.transparent,
+                          child: isSelected
+                              ? Icon(
+                                  Icons.check,
+                                  size: 14,
+                                  color: type == 'premium'
+                                      ? Colors.black
+                                      : Colors.white,
+                                )
+                              : null,
                         ),
-                        child: isSelected
-                            ? Icon(
-                                Icons.check,
-                                size: 14,
-                                color: type == 'premium' ? Colors.black : Colors.white,
-                              )
-                            : null,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
 
                   // Display CURRENT PLAN badge if active, else display RECOMMENDED badge if applicable
                   if (isCurrentPlan)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF10B981),
                         borderRadius: BorderRadius.circular(12),
@@ -423,7 +557,11 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.check_circle, color: Colors.black, size: 12),
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.black,
+                            size: 12,
+                          ),
                           SizedBox(width: 4),
                           Text(
                             'CURRENT PLAN',
@@ -439,7 +577,10 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                     )
                   else if (badgeText != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: accentColor,
                         borderRadius: BorderRadius.circular(12),
@@ -487,29 +628,33 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               Divider(color: Colors.white.withOpacity(0.08)),
               const SizedBox(height: 12),
 
-              ...features.map((feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 16,
-                          color: isSelected ? accentColor : const Color(0xFF10B981),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            feature,
-                            style: const TextStyle(
-                              color: Color(0xFFE2E8F0),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
+              ...features.map(
+                (feature) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_rounded,
+                        size: 16,
+                        color: isSelected
+                            ? accentColor
+                            : const Color(0xFF10B981),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: const TextStyle(
+                            color: Color(0xFFE2E8F0),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

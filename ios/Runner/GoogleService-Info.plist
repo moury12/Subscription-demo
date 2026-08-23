@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.asha.gocal.ai</string>
+	<string>com.asha.gocal.ios</string>
 	<key>PROJECT_ID</key>
 	<string>gocal-ai</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:719142155853:ios:e3cbf1d817d555083a0e04</string>
+	<string>1:719142155853:ios:a75f7d9e579883203a0e04</string>
 </dict>
 </plist>
