@@ -176,6 +176,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildPrivacySecuritySection(),
                     const SizedBox(height: 32),
                     _buildLogOutButton(),
+                    const SizedBox(height: 16),
+                    _buildDeleteAccountButton(),
                     const SizedBox(height: 100),
                   ],
                 ),
@@ -1429,5 +1431,254 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildStatDivider() {
     return Container(width: 1, height: 20, color: Colors.white10);
+  }
+
+  Widget _buildDeleteAccountButton() {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: _showDeleteAccountDialog,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.delete_forever, color: Colors.redAccent, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                _l10n.getString('profile.delete_account') == 'profile.delete_account'
+                    ? 'Delete Your Account Permanently'
+                    : _l10n.getString('profile.delete_account'),
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDeleteAccountDialog() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppColors.accentGreen),
+      ),
+    );
+
+    final profile = await ProfileService().getProfile();
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
+    if (profile == null || profile['email'] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to retrieve user profile. Please try again.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final String actualEmail = profile['email'] as String;
+    final emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161616),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: const BorderSide(color: Colors.white10),
+          ),
+          title: const Text(
+            'Delete Account Permanently',
+            style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'This action is irreversible. All of your progress, logs, subscriptions, and settings will be permanently deleted.',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Please enter your email to confirm:\n$actualEmail',
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white10),
+                ),
+                child: TextField(
+                  controller: emailController,
+                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter your email address',
+                    hintStyle: TextStyle(color: Colors.white30),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final enteredEmail = emailController.text.trim();
+                if (enteredEmail.toLowerCase() != actualEmail.toLowerCase()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('The email address you entered does not match.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.of(dialogContext).pop();
+                _showConfirmDeleteDialog(actualEmail);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Continue'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showConfirmDeleteDialog(String email) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161616),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: const BorderSide(color: Colors.white10),
+          ),
+          title: const Text(
+            'Final Confirmation',
+            style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you absolutely sure you want to permanently delete your account and all associated data? This cannot be undone.',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CircularProgressIndicator(color: AppColors.accentGreen),
+                  ),
+                );
+
+                final success = await ProfileService().deleteAccount(email);
+
+                if (!mounted) return;
+                Navigator.of(context).pop();
+
+                if (success) {
+                  await AuthService().logout();
+
+                  if (!mounted) return;
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext alertContext) {
+                      return AlertDialog(
+                        backgroundColor: const Color(0xFF161616),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          side: const BorderSide(color: Colors.white10),
+                        ),
+                        title: const Text(
+                          'Account Deleted',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        content: const Text(
+                          'Your account has been successfully deleted permanently.',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(alertContext).pop();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                                (route) => false,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accentGreen,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to delete account. Please try again later.'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Confirm Account Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

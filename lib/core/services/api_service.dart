@@ -118,12 +118,22 @@ class ApiService {
     return response;
   }
 
-  Future<http.Response> delete(String endpoint, {bool requiresAuth = true}) async {
+  Future<http.Response> delete(String endpoint, {dynamic data, bool requiresAuth = true}) async {
     final url = Uri.parse('$baseUrl$endpoint');
     final headers = await _getHeaders(requiresAuth: requiresAuth);
 
+    dynamic requestBody = data;
+    if (data is Map) {
+      requestBody = Map.from(data);
+      if (requestBody['language'] == null) {
+        requestBody['language'] = await _getLanguage();
+      }
+    }
+    
+    final body = requestBody != null ? jsonEncode(requestBody) : null;
+
     debugPrint('[API DELETE] $url');
-    final response = await http.delete(url, headers: headers);
+    final response = await http.delete(url, headers: headers, body: body);
     _logResponse(response);
     return response;
   }

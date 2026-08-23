@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/providers/language_provider.dart';
 import '../models/ai_workout_plan.dart';
@@ -21,15 +22,42 @@ class SingleWorkoutScreen extends StatefulWidget {
   State<SingleWorkoutScreen> createState() => _SingleWorkoutScreenState();
 }
 
-class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
+class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> with TickerProviderStateMixin {
   late int _currentExerciseIndex;
   int _currentRepClickCount = 0;
   final _workoutController = WorkoutController();
+  late AnimationController _lottieController;
+  int _currentLottieIndex = 0;
+  final List<String> _lottieFiles = [
+    'assets/lotties/wo_ani1.json',
+    'assets/lotties/wo_ani2.json',
+    'assets/lotties/wo_ani3.json',
+  ];
 
   @override
   void initState() {
     super.initState();
     _currentExerciseIndex = widget.startIndex;
+    _lottieController = AnimationController(vsync: this);
+    _lottieController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _advanceToNextLottie();
+      }
+    });
+  }
+
+  void _advanceToNextLottie() {
+    if (mounted) {
+      setState(() {
+        _currentLottieIndex = (_currentLottieIndex + 1) % _lottieFiles.length;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _lottieController.dispose();
+    super.dispose();
   }
 
   void _onCtaPressed() {
@@ -194,9 +222,32 @@ class _SingleWorkoutScreenState extends State<SingleWorkoutScreen> {
   Widget _buildExerciseDetail(AiWorkoutExercise exercise, LanguageProvider l10n) {
     return Column(
       children: [
-        const Text(
-          '\u{1F4AA}',
-          style: TextStyle(fontSize: 80),
+        Center(
+          child: SizedBox(
+            height: 150,
+            child: Lottie.asset(
+              _lottieFiles[_currentLottieIndex],
+              key: ValueKey(_currentLottieIndex),
+              onLoaded: (composition) {
+                _lottieController.duration = composition.duration;
+                _lottieController.forward(from: 0);
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.fitness_center, color: Colors.white54, size: 40),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Animation Error: $error',
+                      style: const TextStyle(color: Colors.white54, fontSize: 10),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ),
         const SizedBox(height: 20),
         Padding(

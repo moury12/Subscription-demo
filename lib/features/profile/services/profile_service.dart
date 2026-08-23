@@ -53,4 +53,15 @@ class ProfileService {
       return null;
     }
   }
+
+  Future<bool> deleteAccount(String email) async {
+    try {
+      final response = await _api.delete('/user/profile', data: {
+        'email': email,
+      });
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
 }
