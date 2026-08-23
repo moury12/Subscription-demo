@@ -1,0 +1,5 @@
+git_url("https://github.com/moury12/gocal-ios-certificates.git")
+storage_mode("git")
+type("appstore") # The default type, can be appstore, adhoc, development, enterprise
+app_identifier(["com.asha.gocal.ios"])
+username("reddiasha@gmail.com") # Only needed if not using API Key (API Key bypasses this)
