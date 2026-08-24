@@ -9,13 +9,8 @@ import '../models/food.dart';
 
 class AiFoodService {
   static String get _baseUrl {
-    if (kReleaseMode) {
-      return 'https://backend.getgocal.com/api/ai';
-    }
-    if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
-      return 'http://10.0.2.2:5000/api/ai';
-    }
-    return 'http://localhost:5000/api/ai';
+    // Deployed AWS Backend
+    return 'https://backend.getgocal.com/api/ai';
   }
 
   final ImagePicker _picker = ImagePicker();
