@@ -8,10 +8,6 @@ import '../models/product_analysis.dart';
 
 class ProductScanController {
   static String get _baseUrl {
-    // Deployed AWS Backend
-    return 'https://backend.getgocal.com/api/ai';
-
-    /* Local Development fallbacks:
     if (kReleaseMode) {
       return 'https://backend.getgocal.com/api/ai';
     }
@@ -19,7 +15,6 @@ class ProductScanController {
       return 'http://10.0.2.2:5000/api/ai';
     }
     return 'http://localhost:5000/api/ai';
-    */
   }
 
   /**
