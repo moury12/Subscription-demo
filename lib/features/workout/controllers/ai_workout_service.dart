@@ -14,13 +14,15 @@ class AiWorkoutService {
         final json = jsonDecode(response.body);
         debugPrint('Raw AI Workout Plan JSON: $json');
         return AiWeeklyWorkoutPlan.fromJson(json);
+      } else if (response.statusCode == 402) {
+        throw Exception('PREMIUM_REQUIRED');
       } else {
         debugPrint('Server error: ${response.statusCode}');
         return null;
       }
     } catch (e) {
       debugPrint('Network error generating plan: $e');
-      return null;
+      rethrow;
     }
   }
 }

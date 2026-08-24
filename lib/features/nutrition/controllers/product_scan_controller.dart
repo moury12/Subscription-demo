@@ -51,6 +51,8 @@ class ProductScanController {
       if (response.statusCode == 200) {
         final Map<String, dynamic> json = jsonDecode(response.body);
         return ProductAnalysisResult.fromJson(json);
+      } else if (response.statusCode == 402) {
+        throw Exception('LIMIT_REACHED');
       } else if (response.statusCode == 404) {
         debugPrint('[ProductScanController] Barcode not found: $barcode');
         return null; // Return null so screen knows to offer fallback
@@ -98,6 +100,8 @@ class ProductScanController {
       if (response.statusCode == 200) {
         final Map<String, dynamic> json = jsonDecode(response.body);
         return ProductAnalysisResult.fromJson(json);
+      } else if (response.statusCode == 402) {
+        throw Exception('LIMIT_REACHED');
       } else {
         debugPrint('[ProductScanController] Label scan error: ${response.statusCode} - ${response.body}');
         throw Exception('Server error: ${response.statusCode}');

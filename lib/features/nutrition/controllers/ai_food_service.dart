@@ -73,13 +73,15 @@ class AiFoodService {
         var responseData = await response.stream.bytesToString();
         var json = jsonDecode(responseData);
         return AiFoodAnalysisResult.fromJson(json);
+      } else if (response.statusCode == 402) {
+        throw Exception('LIMIT_REACHED');
       } else {
         debugPrint('Server error: ${response.statusCode}');
         return null;
       }
     } catch (e) {
       debugPrint('Network error: $e');
-      return null;
+      rethrow;
     }
   }
 }
