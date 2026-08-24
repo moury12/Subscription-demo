@@ -1,0 +1,3 @@
+app_identifier("com.asha.gocal.ios")
+itc_team_id("K5A8HTD67V") # App Store Connect Team ID
+team_id("K5A8HTD67V") # Developer Portal Team ID

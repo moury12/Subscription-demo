@@ -31,8 +31,6 @@ class AiFoodService {
       if (source == ImageSource.camera) {
         var status = await Permission.camera.request();
         if (status.isDenied) return null;
-      } else {
-        await Permission.photos.request();
       }
     }
 
