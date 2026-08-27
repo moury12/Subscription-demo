@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../main/screens/main_shell_screen.dart';
 import '../services/subscription_service.dart';
 
@@ -16,6 +17,13 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   String? _currentActivePlan; // plan currently active on user account
   bool _isLoading = false;
   List<Map<String, dynamic>> _plans = [];
+
+  Future<void> _openLink(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   void initState() {
@@ -438,6 +446,29 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 'Cancel or switch plans anytime. Secure connection.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
+              ),
+
+              const SizedBox(height: 8),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () => _openLink('https://getgocal.com/privacy'), // your real Privacy Policy URL
+                    child: const Text(
+                      'Privacy Policy',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, decoration: TextDecoration.underline),
+                    ),
+                  ),
+                  const Text(' • ', style: TextStyle(color: Color(0xFF64748B), fontSize: 11)),
+                  TextButton(
+                    onPressed: () => _openLink('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
+                    child: const Text(
+                      'Terms of Use',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, decoration: TextDecoration.underline),
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 16),

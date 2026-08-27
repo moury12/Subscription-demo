@@ -2,7 +2,7 @@ default_platform(:ios)
 
 platform :ios do
   desc "Push a new Release Build to TestFlight"
-  lane :beta do
+  lane :beta do |options|
     # 1. Authenticate with App Store Connect API Key
     # Using the local .p8 file and credentials provided
     api_key = app_store_connect_api_key(
@@ -11,24 +11,44 @@ platform :ios do
       key_filepath: File.expand_path("../../AuthKey_3BB423WJHG.p8", __dir__)
     )
 
-    # 2. Get latest build number from TestFlight and increment it
-    begin
-      latest_build = latest_testflight_build_number(
-        api_key: api_key,
-        app_identifier: "com.asha.gocal.ios"
-      )
-      new_build_number = latest_build + 1
-    rescue => e
-      UI.important("Could not fetch latest build number from TestFlight: #{e.message}. Defaulting to 1.")
-      new_build_number = 1
+    # Get version from options or parse from pubspec.yaml
+    version = options[:version]
+    if !version
+      begin
+        pubspec_content = File.read(File.expand_path("../../pubspec.yaml", __dir__))
+        version = pubspec_content.match(/^version:\s*([^\s+]+)/)[1]
+      rescue => e
+        UI.important("Could not parse version from pubspec.yaml: #{e.message}. Defaulting to 1.0.0")
+        version = "1.0.0"
+      end
     end
 
-    # Set the build number in Xcode project (flutter build will use this)
+    # Get build number from options or fetch from TestFlight
+    new_build_number = options[:build_number]
+    if !new_build_number
+      begin
+        latest_build = latest_testflight_build_number(
+          api_key: api_key,
+          app_identifier: "com.asha.gocal.ios",
+          version: version
+        )
+        new_build_number = latest_build + 1
+      rescue => e
+        UI.important("Could not fetch latest build number from TestFlight for version #{version}: #{e.message}. Defaulting to 1.")
+        new_build_number = 1
+      end
+    end
+
+    # Set version and build number in Xcode project (flutter build will use this)
+    increment_version_number(
+      version_number: version,
+      xcodeproj: "Runner.xcodeproj"
+    )
     increment_build_number(
       build_number: new_build_number,
       xcodeproj: "Runner.xcodeproj"
     )
-    UI.success("Incremented build number to #{new_build_number}")
+    UI.success("Set version to #{version} and build number to #{new_build_number}")
 
     # 3. Code Signing via match
     # api_key parameter is passed to match for App Store Connect API communication
