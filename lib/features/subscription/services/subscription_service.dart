@@ -23,23 +23,30 @@ class SubscriptionService {
     await Purchases.configure(configuration);
   }
 
-  // Associate user ID with RevenueCat
-  Future<void> loginUser(String userId) async {
-    try {
-      await Purchases.logIn(userId);
-    } catch (e) {
-      debugPrint("Error logging in user to RevenueCat: $e");
-    }
-  }
+// lib/features/subscription/services/subscription_service.dart
 
-  // Unassociate user ID from RevenueCat
-  Future<void> logoutUser() async {
-    try {
-      await Purchases.logOut();
-    } catch (e) {
-      debugPrint("Error logging out user from RevenueCat: $e");
-    }
+Future<void> loginUser(String userId) async {
+  try {
+    // ইউজারের ব্যাকএন্ড আইডি দিয়ে রেভিনিউক্যাটে লগইন
+    await Purchases.logIn(userId);
+    debugPrint("Logged in to RevenueCat with ID: $userId");
+  } catch (e) {
+    debugPrint("Error logging in user to RevenueCat: $e");
   }
+}
+
+Future<void> logoutUser() async {
+  try {
+    // চেক করুন ইউজার অ্যানোনিমাস কি না, অ্যানোনিমাস হলে লগআউট দরকার নেই
+    bool isAnonymous = await Purchases.isAnonymous;
+    if (!isAnonymous) {
+      await Purchases.logOut();
+      debugPrint("Logged out from RevenueCat");
+    }
+  } catch (e) {
+    debugPrint("Error logging out from RevenueCat: $e");
+  }
+}
 
   // Fetch real products from RevenueCat
   Future<List<Package>> getOfferings() async {
@@ -58,8 +65,20 @@ class SubscriptionService {
   /// Single source of truth for active subscription status
   Future<bool> isPremiumActive() async {
     try {
+      await Purchases.invalidateCustomerInfoCache();
+
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-      // 'premium' is the Entitlement ID set in RevenueCat Dashboard
+      // কনসোলে প্রিন্ট করে দেখুন আসল স্ট্যাটাস কী
+      debugPrint("--- RevenueCat Debug Start ---");
+      debugPrint("User ID: ${customerInfo.originalAppUserId}");
+      debugPrint(
+        "Active Entitlements: ${customerInfo.entitlements.active.keys}",
+      );
+      debugPrint(
+        "Is Premium Active: ${customerInfo.entitlements.all['premium']?.isActive}",
+      );
+      debugPrint("--- RevenueCat Debug End ---");
+
       final entitlement = customerInfo.entitlements.all['premium'];
       return entitlement?.isActive ?? false;
     } catch (e) {

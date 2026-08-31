@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -53,8 +55,9 @@ class _SignInScreenState extends State<SignInScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           if (profile != null) {
-            // Login user in RevenueCat
+
             final userId = profile['_id'] ?? profile['id'];
+                       log(userId);
             if (userId != null) {
               await SubscriptionService().loginUser(userId.toString());
             }

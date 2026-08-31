@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,10 +27,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _nameController = TextEditingController(text: kDebugMode ? " Test account" : "");
+  final _emailController = TextEditingController(text: kDebugMode ? "dihoja7950@slotbeer.com" : "");
+  final _passwordController = TextEditingController(text: kDebugMode ? "12345678" : "");
+  final _confirmPasswordController = TextEditingController(text: kDebugMode ? "12345678" : "");
   bool _isLoading = false;
 
   void _handleSignUp() async {
