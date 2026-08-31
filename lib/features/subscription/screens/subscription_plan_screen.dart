@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../main/screens/main_shell_screen.dart';
 import '../services/subscription_service.dart';
@@ -12,9 +13,10 @@ class SubscriptionPlanScreen extends StatefulWidget {
   State<SubscriptionPlanScreen> createState() => _SubscriptionPlanScreenState();
 }
 
-class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
-  String _selectedPlan = 'premium'; // default selection
-  String? _currentActivePlan; // plan currently active on user account
+class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen>
+    with WidgetsBindingObserver {
+  String _selectedPlan = 'premium'; // user's currently selected card
+  String _currentActivePlan = 'basic'; // plan active on RevenueCat account
   bool _isLoading = false;
   List<Map<String, dynamic>> _plans = [];
 
@@ -28,36 +30,170 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fetchPlans();
   }
 
-  void _fetchPlans() async {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _fetchPlans();
+    }
+  }
+
+  /// Fetch available plans and check single source of truth (isPremiumActive)
+  Future<void> _fetchPlans() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
-    final fetchedPlans = await SubscriptionService().getPlans();
-    final mySub = await SubscriptionService().getMySubscription();
+    try {
+      final fetchedPlans = await SubscriptionService().getPlans();
+      // isPremiumActive() is the single source of truth
+      final isPremium = await SubscriptionService().isPremiumActive();
+      final activePlan = isPremium ? 'premium' : 'basic';
 
-    if (mounted) {
-      String? active;
-      if (mySub != null && mySub['currentPlan'] != null) {
-        active = mySub['currentPlan'].toString();
+      if (mounted) {
+        setState(() {
+          if (fetchedPlans.isNotEmpty) {
+            _plans = fetchedPlans;
+          }
+          _currentActivePlan = activePlan;
+          // Set initial selected card to match current active plan
+          _selectedPlan = activePlan;
+          _isLoading = false;
+        });
       }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _currentActivePlan = 'basic';
+          _selectedPlan = 'basic';
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
-      setState(() {
-        if (fetchedPlans.isNotEmpty) {
-          _plans = fetchedPlans;
-        }
-        _currentActivePlan = active;
-        // Select current plan by default if available, else default to premium
-        _selectedPlan = active ?? 'premium';
-        _isLoading = false;
-      });
+  /// Display downgrade instructions dialog required by Apple Review guidelines
+  void _showDowngradeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E293B),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Color(0xFF38BDF8), size: 24),
+              SizedBox(width: 10),
+              Text(
+                'Switch to Basic Plan',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'To switch back to the Basic plan, please cancel your active subscription in iOS Settings > Apple ID > Subscriptions.',
+            style: TextStyle(
+              color: Color(0xFFCBD5E1),
+              fontSize: 14,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  color: Color(0xFFF59E0B),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _onCardTapped(String planType) {
+    setState(() {
+      _selectedPlan = planType;
+    });
+
+    // If user clicks on Basic card while active plan is Premium
+    if (planType == 'basic' && _currentActivePlan == 'premium') {
+      _showDowngradeDialog();
     }
   }
 
   void _handleConfirmSelection() async {
+    // 1. If current == selected: Do nothing (Button is disabled)
     if (_selectedPlan == _currentActivePlan) {
-      // User tapped confirm on their already active plan
+      return;
+    }
+
+    // 2. If current is premium and selected is basic: Show downgrade dialog
+    if (_currentActivePlan == 'premium' && _selectedPlan == 'basic') {
+      _showDowngradeDialog();
+      return;
+    }
+
+    // 3. If current is basic and selected is premium: Trigger upgrade purchase
+    setState(() => _isLoading = true);
+
+    final premiumPkg = _plans.firstWhere(
+      (p) => p['type'] == 'premium',
+      orElse: () => {},
+    )['package'] as Package?;
+
+    final success = await SubscriptionService().selectPlan(
+      _selectedPlan,
+      package: premiumPkg,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (success) {
+      // Refresh single source of truth status immediately
+      final isPremium = await SubscriptionService().isPremiumActive();
+      if (!mounted) return;
+
+      final newActive = isPremium ? 'premium' : 'basic';
+
+      setState(() {
+        _currentActivePlan = newActive;
+        _selectedPlan = newActive;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newActive == 'premium'
+                ? '✨ Premium Plan Activated!'
+                : 'Basic Plan Active',
+          ),
+          backgroundColor: newActive == 'premium'
+              ? const Color(0xFFF59E0B)
+              : const Color(0xFF10B981),
+        ),
+      );
+
       if (widget.isFromSettings) {
         Navigator.of(context).pop();
       } else {
@@ -69,90 +205,55 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
           (route) => false,
         );
       }
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final success = await SubscriptionService().selectPlan(_selectedPlan);
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      if (success) {
-        setState(() {
-          _currentActivePlan = _selectedPlan;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _selectedPlan == 'premium'
-                  ? '✨ Premium Plan Activated!'
-                  : 'Basic Plan Selected',
-            ),
-            backgroundColor: _selectedPlan == 'premium'
-                ? const Color(0xFFF59E0B)
-                : const Color(0xFF10B981),
-          ),
-        );
-
-        if (widget.isFromSettings) {
-          Navigator.of(context).pop();
-        } else {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => const MainShellScreen(),
-              settings: const RouteSettings(name: '/main'),
-            ),
-            (route) => false,
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to update subscription. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Purchase could not be completed. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   void _handleRestore() async {
     setState(() => _isLoading = true);
-    final isPremium = await SubscriptionService().restorePurchases();
 
-    if (mounted) {
-      setState(() => _isLoading = false);
-      if (isPremium) {
+    try {
+      final isPremium = await SubscriptionService().restorePurchases();
+
+      if (mounted) {
+        final activePlan = isPremium ? 'premium' : 'basic';
         setState(() {
-          _currentActivePlan = 'premium';
-          _selectedPlan = 'premium';
+          _currentActivePlan = activePlan;
+          _selectedPlan = activePlan;
+          _isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              '✨ Purchases successfully restored! Premium is active.',
+
+        if (isPremium) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '✨ Purchases successfully restored! Premium is active.',
+              ),
+              backgroundColor: Color(0xFFF59E0B),
             ),
-            backgroundColor: Color(0xFFF59E0B),
-          ),
-        );
-        if (widget.isFromSettings) {
-          Navigator.of(context).pop();
+          );
         } else {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => const MainShellScreen(),
-              settings: const RouteSettings(name: '/main'),
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No active premium subscription found to restore.'),
+              backgroundColor: Color(0xFF64748B),
             ),
-            (route) => false,
           );
         }
-      } else {
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No active premium subscription found to restore.'),
-            backgroundColor: Colors.grey,
+          SnackBar(
+            content: Text('Failed to restore purchases: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -161,7 +262,6 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Dynamic price lookup from backend plans
     final basicPlan = _plans.firstWhere(
       (p) => p['type'] == 'basic',
       orElse: () => {},
@@ -192,11 +292,27 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
           'Detailed Macro & Nutrient Reports',
         ];
 
-    // If there is no active premium plan, basic is the current active plan
-    final finalActivePlan = (_currentActivePlan == 'premium')
-        ? 'premium'
-        : 'basic';
-    final isSameAsCurrent = _selectedPlan == finalActivePlan;
+    final isSameAsCurrent = _selectedPlan == _currentActivePlan;
+
+    // Determine Confirm button text, action, and disabled state dynamically
+    String buttonText;
+    VoidCallback? buttonAction;
+    bool isButtonDisabled = false;
+
+    if (isSameAsCurrent) {
+      buttonText = 'Current Active Plan';
+      isButtonDisabled = true;
+      buttonAction = null;
+    } else if (_currentActivePlan == 'basic' && _selectedPlan == 'premium') {
+      buttonText = 'Upgrade to Premium';
+      isButtonDisabled = false;
+      buttonAction = _handleConfirmSelection;
+    } else {
+      // _currentActivePlan == 'premium' && _selectedPlan == 'basic'
+      buttonText = 'How to Downgrade';
+      isButtonDisabled = false;
+      buttonAction = _showDowngradeDialog;
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
@@ -250,229 +366,245 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               centerTitle: true,
             ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 10),
+        child: RefreshIndicator(
+          color: const Color(0xFFF59E0B),
+          backgroundColor: const Color(0xFF1E293B),
+          onRefresh: _fetchPlans,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 10),
 
-              // Header Logo & Badge
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFF59E0B).withOpacity(0.4),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.star_rounded,
-                        color: Color(0xFFF59E0B),
-                        size: 16,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        'GO CAL AI MEMBERSHIP',
-                        style: TextStyle(
-                          color: Color(0xFFF59E0B),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              const Text(
-                'Choose Your Plan',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              const Text(
-                'Unlock AI-powered calorie scanning, smart product analysis, and personalized workout routines.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFF94A3B8),
-                  fontSize: 13,
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 28),
-
-              // Premium Plan Card (Highlighted)
-              _buildPlanCard(
-                type: 'premium',
-                title: premiumPlan['name']?.toString() ?? 'Premium Plan',
-                price: premiumPrice,
-                billingCycle: '/monthly',
-                isCurrentPlan: finalActivePlan == 'premium',
-                badgeText: 'RECOMMENDED',
-                features: premiumFeatures,
-                accentColor: const Color(0xFFF59E0B),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Basic Plan Card
-              _buildPlanCard(
-                type: 'basic',
-                title: basicPlan['name']?.toString() ?? 'Basic Plan',
-                price: basicPrice,
-                billingCycle: '',
-                isCurrentPlan: finalActivePlan == 'basic',
-                features: basicFeatures,
-                accentColor: const Color(0xFF38BDF8),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Confirm Action Button
-              _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFF59E0B),
-                      ),
-                    )
-                  : Container(
-                      height: 54,
-                      decoration: BoxDecoration(
-                        gradient: isSameAsCurrent
-                            ? const LinearGradient(
-                                colors: [Color(0xFF334155), Color(0xFF1E293B)],
-                              )
-                            : _selectedPlan == 'premium'
-                            ? const LinearGradient(
-                                colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                              )
-                            : const LinearGradient(
-                                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                              ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: isSameAsCurrent
-                            ? []
-                            : [
-                                BoxShadow(
-                                  color:
-                                      (_selectedPlan == 'premium'
-                                              ? const Color(0xFFF59E0B)
-                                              : const Color(0xFF2563EB))
-                                          .withOpacity(0.35),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                      ),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: _handleConfirmSelection,
-                        child: Text(
-                          isSameAsCurrent
-                              ? 'Current Active Plan'
-                              : _selectedPlan == 'premium'
-                              ? 'Upgrade to Premium ($premiumPrice/mo)'
-                              : 'Switch to Basic Plan',
-                          style: TextStyle(
-                            color: isSameAsCurrent
-                                ? const Color(0xFF94A3B8)
-                                : _selectedPlan == 'premium'
-                                ? Colors.black
-                                : Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
-
-              if (!_isLoading) ...[
-                const SizedBox(height: 12),
+                // Header Logo & Badge
                 Center(
-                  child: TextButton(
-                    onPressed: _handleRestore,
-                    child: const Text(
-                      'Restore Purchases',
-                      style: TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                       ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star_rounded,
+                          color: Color(0xFFF59E0B),
+                          size: 16,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'GO CAL AI MEMBERSHIP',
+                          style: TextStyle(
+                            color: Color(0xFFF59E0B),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              const Text(
-                'Cancel or switch plans anytime. Secure connection.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
-              ),
-
-              const SizedBox(height: 8),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () => _openLink('https://getgocal.com/privacy'), // your real Privacy Policy URL
-                    child: const Text(
-                      'Privacy Policy',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, decoration: TextDecoration.underline),
-                    ),
+                const Text(
+                  'Choose Your Plan',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
                   ),
-                  const Text(' • ', style: TextStyle(color: Color(0xFF64748B), fontSize: 11)),
-                  TextButton(
-                    onPressed: () => _openLink('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
-                    child: const Text(
-                      'Terms of Use',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, decoration: TextDecoration.underline),
+                ),
+
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Unlock AI-powered calorie scanning, smart product analysis, and personalized workout routines.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                // Premium Plan Card
+                _buildPlanCard(
+                  type: 'premium',
+                  title: premiumPlan['name']?.toString() ?? 'Premium Plan',
+                  price: premiumPrice,
+                  billingCycle: '/monthly',
+                  isCurrentPlan: _currentActivePlan == 'premium',
+                  badgeText:
+                      _currentActivePlan == 'premium' ? null : 'RECOMMENDED',
+                  features: premiumFeatures,
+                  accentColor: const Color(0xFFF59E0B),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Basic Plan Card
+                _buildPlanCard(
+                  type: 'basic',
+                  title: basicPlan['name']?.toString() ?? 'Basic Plan',
+                  price: basicPrice,
+                  billingCycle: '',
+                  isCurrentPlan: _currentActivePlan == 'basic',
+                  features: basicFeatures,
+                  accentColor: const Color(0xFF38BDF8),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Dynamic Confirm Action Button
+                _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFF59E0B),
+                        ),
+                      )
+                    : Container(
+                        height: 54,
+                        decoration: BoxDecoration(
+                          gradient: isButtonDisabled
+                              ? const LinearGradient(
+                                  colors: [Color(0xFF334155), Color(0xFF1E293B)],
+                                )
+                              : _selectedPlan == 'premium'
+                              ? const LinearGradient(
+                                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                                )
+                              : const LinearGradient(
+                                  colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                                ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: isButtonDisabled
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: (_selectedPlan == 'premium'
+                                            ? const Color(0xFFF59E0B)
+                                            : const Color(0xFF2563EB))
+                                        .withValues(alpha: 0.35),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                        ),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: buttonAction,
+                          child: Text(
+                            buttonText,
+                            style: TextStyle(
+                              color: isButtonDisabled
+                                  ? const Color(0xFF94A3B8)
+                                  : _selectedPlan == 'premium'
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                if (!_isLoading) ...[
+                  const SizedBox(height: 12),
+                  Center(
+                    child: TextButton(
+                      onPressed: _handleRestore,
+                      child: const Text(
+                        'Restore Purchases',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ),
                 ],
-              ),
 
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+
+                const Text(
+                  'Cancel or switch plans anytime. Secure connection.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                ),
+
+                const SizedBox(height: 8),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () =>
+                          _openLink('https://getgocal.com/privacy'),
+                      child: const Text(
+                        'Privacy Policy',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      ' • ',
+                      style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                    ),
+                    TextButton(
+                      onPressed: () => _openLink(
+                        'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                      ),
+                      child: const Text(
+                        'Terms of Use',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
@@ -493,7 +625,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     final isSelected = _selectedPlan == type;
 
     return GestureDetector(
-      onTap: () => setState(() => _selectedPlan = type),
+      onTap: () => _onCardTapped(type),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -504,7 +636,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                 ? const Color(0xFF10B981)
                 : isSelected
                 ? accentColor
-                : Colors.white.withOpacity(0.12),
+                : Colors.white.withValues(alpha: 0.12),
             width: (isCurrentPlan || isSelected) ? 2.5 : 1,
           ),
           boxShadow: (isCurrentPlan || isSelected)
@@ -512,7 +644,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                   BoxShadow(
                     color:
                         (isCurrentPlan ? const Color(0xFF10B981) : accentColor)
-                            .withOpacity(0.25),
+                            .withValues(alpha: 0.25),
                     blurRadius: 16,
                     spreadRadius: 1,
                   ),
@@ -580,7 +712,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF10B981).withOpacity(0.4),
+                            color: const Color(0xFF10B981).withValues(alpha: 0.4),
                             blurRadius: 8,
                           ),
                         ],
@@ -656,7 +788,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
               ),
 
               const SizedBox(height: 16),
-              Divider(color: Colors.white.withOpacity(0.08)),
+              Divider(color: Colors.white.withValues(alpha: 0.08)),
               const SizedBox(height: 12),
 
               ...features.map(

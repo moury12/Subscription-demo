@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class SubscriptionService {
@@ -6,7 +7,7 @@ class SubscriptionService {
   factory SubscriptionService() => _instance;
   SubscriptionService._internal();
 
-  // Replace with your keys from RevenueCat Dashboard
+  // RevenueCat API keys
   static const _apiKeyApple = "appl_wbMGOljlImDhZbYcUtjMdAixMKX";
   static const _apiKeyGoogle = "goog_OWqKtkpAIdXrAEDNwDNNhidHOGc";
 
@@ -27,7 +28,7 @@ class SubscriptionService {
     try {
       await Purchases.logIn(userId);
     } catch (e) {
-      print("Error logging in user to RevenueCat: $e");
+      debugPrint("Error logging in user to RevenueCat: $e");
     }
   }
 
@@ -36,7 +37,7 @@ class SubscriptionService {
     try {
       await Purchases.logOut();
     } catch (e) {
-      print("Error logging out user from RevenueCat: $e");
+      debugPrint("Error logging out user from RevenueCat: $e");
     }
   }
 
@@ -49,49 +50,71 @@ class SubscriptionService {
         return offerings.current!.availablePackages;
       }
     } catch (e) {
-      print("Error fetching offerings: $e");
+      debugPrint("Error fetching offerings: $e");
     }
     return [];
   }
 
-  // Check if user has an active entitlement
+  /// Single source of truth for active subscription status
   Future<bool> isPremiumActive() async {
     try {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       // 'premium' is the Entitlement ID set in RevenueCat Dashboard
-      return customerInfo.entitlements.all['premium']?.isActive ?? false;
+      final entitlement = customerInfo.entitlements.all['premium'];
+      return entitlement?.isActive ?? false;
     } catch (e) {
+      debugPrint("Error checking premium status: $e");
       return false;
     }
   }
 
-  // Purchase a package
+  /// Purchase a package via RevenueCat
   Future<bool> purchasePackage(Package package) async {
     try {
-      // Create PurchaseParams with the package
       final PurchaseParams params = PurchaseParams.package(package);
-
-      // Use the new purchase() method
       PurchaseResult result = await Purchases.purchase(params);
       return result.customerInfo.entitlements.all['premium']?.isActive ?? false;
     } catch (e) {
-      // Handle cancellation or error
-      print("Purchase package error: $e");
+      debugPrint("Purchase package error: $e");
       return false;
     }
   }
 
-  // Restore purchases
+  /// Select plan: if 'premium', trigger purchase flow; if 'basic', no purchase required
+  Future<bool> selectPlan(String planId, {Package? package}) async {
+    if (planId == 'premium') {
+      Package? pkgToPurchase = package;
+      if (pkgToPurchase == null) {
+        final packages = await getOfferings();
+        if (packages.isEmpty) {
+          debugPrint("❌ ERROR: No packages found in RevenueCat offerings!");
+          return false;
+        }
+        pkgToPurchase = packages.firstWhere(
+          (pkg) =>
+              pkg.identifier == '\$rc_monthly' ||
+              pkg.packageType == PackageType.monthly,
+          orElse: () => packages.first,
+        );
+      }
+      return await purchasePackage(pkgToPurchase);
+    }
+    // Basic plan requires no purchase
+    return true;
+  }
+
+  /// Restore purchases
   Future<bool> restorePurchases() async {
     try {
       CustomerInfo customerInfo = await Purchases.restorePurchases();
       return customerInfo.entitlements.all['premium']?.isActive ?? false;
     } catch (e) {
+      debugPrint("Error restoring purchases: $e");
       return false;
     }
   }
 
-  // Get available plans mapped from RevenueCat/defaults
+  /// Get available plans mapped from RevenueCat/defaults
   Future<List<Map<String, dynamic>>> getPlans() async {
     final packages = await getOfferings();
     double premiumPriceVal = 4.99;
@@ -100,7 +123,6 @@ class SubscriptionService {
     Package? premiumPackage;
 
     if (packages.isNotEmpty) {
-      // We look for a package from 'default_offering' containing the premium product
       final package = packages.firstWhere(
         (pkg) =>
             pkg.identifier == '\$rc_monthly' ||
@@ -145,22 +167,9 @@ class SubscriptionService {
     ];
   }
 
-  // Get user's current subscription details
-  Future<Map<String, dynamic>?> getMySubscription() async {
+  /// Get user's current subscription details based on isPremiumActive()
+  Future<Map<String, dynamic>> getMySubscription() async {
     final active = await isPremiumActive();
     return {'currentPlan': active ? 'premium' : 'basic'};
-  }
-
-  Future<bool> selectPlan(String planId) async {
-    if (planId == 'premium') {
-      final packages = await getOfferings();
-      if (packages.isEmpty) {
-        print("❌ ERROR: No packages found in RevenueCat offerings!");
-        return false;
-      }
-      // প্রথম প্যাকেজটি পারচেজ করার চেষ্টা করুন
-      return await purchasePackage(packages.first);
-    }
-    return true;
   }
 }
