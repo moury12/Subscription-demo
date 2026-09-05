@@ -31,8 +31,12 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final _emailController = TextEditingController(text: kDebugMode?"tanzibamouri28@gmail.com":"");
-  final _passwordController = TextEditingController(text: kDebugMode?"123456":"");
+  final _emailController = TextEditingController(
+    text: kDebugMode ? "dihoja7950@slotbeer.com" : "",
+  );
+  final _passwordController = TextEditingController(
+    text: kDebugMode ? "12345678" : "",
+  );
   bool _isLoading = false;
 
   void _handleSignIn() async {
@@ -45,9 +49,9 @@ class _SignInScreenState extends State<SignInScreen> {
     }
 
     setState(() => _isLoading = true);
-    
+
     final success = await AuthService().login(email, password);
-    
+
     if (mounted) {
       if (success) {
         // Check for existing profile
@@ -55,9 +59,8 @@ class _SignInScreenState extends State<SignInScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           if (profile != null) {
-
             final userId = profile['_id'] ?? profile['id'];
-                       log(userId);
+            log(userId);
             if (userId != null) {
               await SubscriptionService().loginUser(userId.toString());
             }
@@ -65,7 +68,7 @@ class _SignInScreenState extends State<SignInScreen> {
           if (profile != null && profile['hasCompletedOnboarding'] == true) {
             AppSettings().syncFromProfile(profile);
             await UserDataSync.loadAll();
-            
+
             if (!mounted) return;
             // Sync language to provider so it updates the whole app UI
             final langCode = LocalizationService().currentLanguageCode;
@@ -74,7 +77,9 @@ class _SignInScreenState extends State<SignInScreen> {
             final hasSelectedSub = profile['hasSelectedSubscription'] == true;
             if (!hasSelectedSub) {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const SubscriptionPlanScreen(),
+                ),
                 (route) => false,
               );
             } else {
@@ -88,7 +93,8 @@ class _SignInScreenState extends State<SignInScreen> {
             }
           } else {
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()));
+              MaterialPageRoute(builder: (_) => const OnboardingFlowScreen()),
+            );
           }
         }
       } else {
@@ -108,7 +114,8 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     final l = context.watch<LanguageProvider>();
     return AuthScaffold(
-      child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         child: Column(
           children: [
             const SizedBox(height: 40),
@@ -134,25 +141,32 @@ class _SignInScreenState extends State<SignInScreen> {
               child: TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordScreen(),
+                    ),
+                  );
                 },
-                child: Text(l.getString('auth.forgot_password_q'), style: AppTextStyles.authHelp),
+                child: Text(
+                  l.getString('auth.forgot_password_q'),
+                  style: AppTextStyles.authHelp,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.authForgotToButton),
-            _isLoading 
-              ? const CircularProgressIndicator(color: Colors.white)
-              : PrimaryGlowButton(
-                  label: l.getString('auth.sign_in'),
-                  onPressed: _handleSignIn,
-                ),
+            _isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : PrimaryGlowButton(
+                    label: l.getString('auth.sign_in'),
+                    onPressed: _handleSignIn,
+                  ),
             const SizedBox(height: AppSpacing.lg),
             AuthCtaRow(
               label: l.getString('auth.no_account_label') + ' ',
               action: l.getString('auth.sign_up'),
               onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SignUpScreen()));
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const SignUpScreen()));
               },
             ),
             const SizedBox(height: 40),
