@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../controllers/product_scan_controller.dart';
 import 'label_ocr_scanner_screen.dart';
 import 'product_analysis_result_screen.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 
 class ManualBarcodeEntryScreen extends StatefulWidget {
   const ManualBarcodeEntryScreen({super.key});
@@ -64,9 +65,21 @@ class _ManualBarcodeEntryScreenState extends State<ManualBarcodeEntryScreen> {
         _isLoading = false;
       });
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if (e.toString().contains('LIMIT_REACHED')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✨ Daily free product scan limit reached. Upgrade to premium for unlimited scans!'),
+            backgroundColor: Color(0xFFF59E0B),
+          ),
+        );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 

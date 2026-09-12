@@ -11,16 +11,6 @@ class AiFoodService {
   static String get _baseUrl {
     // Deployed AWS Backend
     return 'https://backend.getgocal.com/api/ai';
-
-    /* Local Development fallbacks:
-    if (kReleaseMode) {
-      return 'https://backend.getgocal.com/api/ai';
-    }
-    if (defaultTargetPlatform == TargetPlatform.android && !kIsWeb) {
-      return 'http://10.0.2.2:5000/api/ai';
-    }
-    return 'http://localhost:5000/api/ai';
-    */
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -73,13 +63,15 @@ class AiFoodService {
         var responseData = await response.stream.bytesToString();
         var json = jsonDecode(responseData);
         return AiFoodAnalysisResult.fromJson(json);
+      } else if (response.statusCode == 402) {
+        throw Exception('LIMIT_REACHED');
       } else {
         debugPrint('Server error: ${response.statusCode}');
         return null;
       }
     } catch (e) {
       debugPrint('Network error: $e');
-      return null;
+      rethrow;
     }
   }
 }

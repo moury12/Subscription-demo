@@ -8,6 +8,7 @@ import '../../../core/providers/language_provider.dart';
 import '../widgets/nutrition_green_app_bar.dart';
 import 'ai_food_analysis_result_screen.dart';
 import '../controllers/ai_food_service.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 
 class AiFoodAnalysingScreen extends StatefulWidget {
   final String mealType;
@@ -43,34 +44,58 @@ class _AiFoodAnalysingScreenState extends State<AiFoodAnalysingScreen> {
     // Phase 2: Identifying (Trigger AI Call)
     setState(() => _currentStep = 2);
     
-    final result = await _aiService.analyzeFood(widget.imageFile, languageCode: languageCode);
+    try {
+      final result = await _aiService.analyzeFood(widget.imageFile, languageCode: languageCode);
 
-    if (result == null) {
-      if (mounted) {
-        final l10n = context.read<LanguageProvider>();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.getString('ai_food.failed_analysis'))),
-        );
-        Navigator.of(context).pop();
+      if (result == null) {
+        if (mounted) {
+          final l10n = context.read<LanguageProvider>();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.getString('ai_food.failed_analysis'))),
+          );
+          Navigator.of(context).pop();
+        }
+        return;
       }
-      return;
-    }
 
-    // Phase 3: Calculating
-    if (mounted) {
-      setState(() => _currentStep = 3);
-      await Future.delayed(const Duration(milliseconds: 800));
-    }
+      // Phase 3: Calculating
+      if (mounted) {
+        setState(() => _currentStep = 3);
+        await Future.delayed(const Duration(milliseconds: 800));
+      }
 
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => AiFoodAnalysisResultScreen(
-            mealType: widget.mealType,
-            analysisResult: result,
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => AiFoodAnalysisResultScreen(
+              mealType: widget.mealType,
+              analysisResult: result,
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('LIMIT_REACHED')) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✨ Daily free food scan limit reached. Upgrade to premium for unlimited scans!'),
+              backgroundColor: Color(0xFFF59E0B),
+            ),
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen()),
+          );
+        }
+      } else {
+        if (mounted) {
+          final l10n = context.read<LanguageProvider>();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.getString('ai_food.failed_analysis'))),
+          );
+          Navigator.of(context).pop();
+        }
+      }
     }
   }
 

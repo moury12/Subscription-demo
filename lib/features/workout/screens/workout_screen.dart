@@ -9,6 +9,7 @@ import '../models/ai_workout_plan.dart';
 import '../controllers/workout_controller.dart';
 import '../controllers/ai_workout_service.dart';
 import '../../../core/services/log_service.dart';
+import '../../subscription/screens/subscription_plan_screen.dart';
 import '../../profile/services/profile_service.dart';
 import 'single_workout_screen.dart';
 
@@ -688,12 +689,24 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
     } catch (e) {
       debugPrint('Error regenerating next week workout plan: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${l10n.getString('common.error')}: $e'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
+        if (e.toString().contains('PREMIUM_REQUIRED')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✨ Personalized AI Workout Plans require a Premium subscription. Upgrade now!'),
+              backgroundColor: Color(0xFFF59E0B),
+            ),
+          );
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const SubscriptionPlanScreen(isFromSettings: true)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${l10n.getString('common.error')}: $e'),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {

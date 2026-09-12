@@ -55,31 +55,39 @@ class NotificationService {
   // ──────────────────────── Channels ────────────────────────
 
   static const _waterChannel = AndroidNotificationChannel(
-    'water_reminders',
+    'water_reminders_v2',
     'Water Reminders',
     description: 'Hydration reminders throughout the day',
-    importance: Importance.high,
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   static const _mealChannel = AndroidNotificationChannel(
-    'meal_reminders',
+    'meal_reminders_v2',
     'Meal Reminders',
     description: 'Reminders to log your meals',
-    importance: Importance.high,
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   static const _workoutChannel = AndroidNotificationChannel(
-    'workout_reminders',
+    'workout_reminders_v2',
     'Workout Reminders',
     description: 'Reminders for your daily workout',
-    importance: Importance.high,
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   static const _broadcastChannel = AndroidNotificationChannel(
-    'broadcast_reminders',
+    'broadcast_reminders_v2',
     'Broadcast & Announcements',
     description: 'System announcements and broadcast updates',
     importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   // ──────────────────────── Init ────────────────────────
@@ -235,8 +243,10 @@ class NotificationService {
           _broadcastChannel.name,
           channelDescription: _broadcastChannel.description,
           importance: Importance.max,
-          priority: Priority.high,
+          priority: Priority.max,
           icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
@@ -271,9 +281,11 @@ class NotificationService {
           channel.id,
           channel.name,
           channelDescription: channel.description,
-          importance: channel.importance,
-          priority: Priority.high,
+          importance: Importance.max,
+          priority: Priority.max,
           icon: '@mipmap/ic_launcher',
+          playSound: true,
+          enableVibration: true,
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
@@ -281,7 +293,7 @@ class NotificationService {
           presentSound: true,
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
