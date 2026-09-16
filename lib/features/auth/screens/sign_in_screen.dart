@@ -32,10 +32,10 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController(
-    text: kDebugMode ? "dihoja7950@slotbeer.com" : "",
+    // text: kDebugMode ? "vaishutayi@gmail.com" : "",
   );
   final _passwordController = TextEditingController(
-    text: kDebugMode ? "12345678" : "",
+    // text: kDebugMode ? "Vaishu786%" : "",
   );
   bool _isLoading = false;
 
