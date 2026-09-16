@@ -61,6 +61,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
     settings.targetWeight = _data.targetWeight;
     settings.timezone = _data.timezone;
     settings.weekStartDay = _data.weekStartDay;
+    settings.valueType = _data.valueType;
 
     // Sync to backend
     await ProfileService().updateProfile(_data.toJson());
@@ -105,11 +106,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
             PhysicalStatsScreen(
               height: _data.height ?? 0,
               weight: _data.currentWeight ?? 0,
+              valueType: _data.valueType,
               onBack: _previousPage,
-              onContinue: (h, w) {
+              onContinue: (h, w, unit) {
                 setState(() {
                   _data.height = h;
                   _data.currentWeight = w;
+                  _data.valueType = unit;
                 });
                 _nextPage();
               },
@@ -177,6 +180,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
             TargetWeightScreen(
               currentWeight: _data.currentWeight ?? 70.0,
               targetWeight: _data.targetWeight ?? 0,
+              valueType: _data.valueType,
               onBack: _previousPage,
               onContinue: (tw) {
                 setState(() {

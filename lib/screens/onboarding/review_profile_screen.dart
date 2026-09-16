@@ -22,6 +22,15 @@ class ReviewProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.watch<LanguageProvider>();
+    final isMetric = data.valueType.toLowerCase() != 'imperial';
+    final heightText = isMetric
+        ? '${l10n.formatInteger((data.height ?? 0).toInt())} ${l10n.getString('onboarding.cm')}'
+        : '${data.height ?? 0} ${l10n.getString('onboarding.ft')}';
+    final weightUnit = isMetric ? l10n.getString('onboarding.kg') : l10n.getString('onboarding.lbs');
+    final timezoneTitle = l10n.localizationService.hasKey('onboarding.timezone')
+        ? l10n.getString('onboarding.timezone')
+        : 'Timezone';
+
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -73,7 +82,7 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildSummaryCard(
                       l10n.getString('onboarding.physical_stats'),
-                      '${l10n.formatInteger((data.height ?? 0).toInt())} ${l10n.getString('onboarding.cm')} • ${l10n.formatWeight(data.currentWeight ?? 0)} ${l10n.getString('onboarding.kg')}',
+                      '$heightText • ${l10n.formatWeight(data.currentWeight ?? 0)} $weightUnit',
                     ),
                     const SizedBox(height: 16),
                     _buildSummaryCard(l10n.getString('onboarding.fitness_goal'),
@@ -85,7 +94,7 @@ class ReviewProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _buildSummaryCard(
-                        l10n.getString('onboarding.timezone'), '${data.timezone}'),
+                        timezoneTitle, '${data.timezone}'),
                     const SizedBox(height: 16),
                     _buildSummaryCard(l10n.getString('onboarding.week_starts'),
                         l10n.getString('onboarding.${data.weekStartDay.toLowerCase()}')),
@@ -102,7 +111,7 @@ class ReviewProfileScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildSummaryCard(
                       l10n.getString('onboarding.target_weight'),
-                      '${l10n.formatWeight(data.targetWeight ?? 0)} ${l10n.getString('onboarding.kg')}',
+                      '${l10n.formatWeight(data.targetWeight ?? 0)} $weightUnit',
                     ),
                     const SizedBox(height: 48),
                     PrimaryGlowButton(

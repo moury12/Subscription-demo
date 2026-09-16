@@ -236,7 +236,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       children: [
         _buildStatCard(context, l10n.formatCalories(_nutritionController.totalCalories.toInt()), l10n.getString('progress.consumption')),
         const SizedBox(width: 12),
-        _buildStatCard(context, '${weightChange >= 0 ? '+' : ''}${l10n.formatWeight(weightChange)}', l10n.getString('progress.weight_change')),
+        _buildStatCard(context, '${weightChange >= 0 ? '+' : ''}${l10n.formatWeight(weightChange)} ${_settings.weightUnit}', l10n.getString('progress.weight_change')),
         const SizedBox(width: 12),
         _buildStatCard(context, l10n.formatCalories(_burnController.totalBurnedToday.toInt()), l10n.getString('progress.total_burn')),
       ],
@@ -430,10 +430,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final target = _settings.targetWeight;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF111111),
+        color: const Color(0xFF161616),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -451,7 +453,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ),
               if (current != null)
                 Text(
-                  l10n.formatWeight(current),
+                  '${l10n.formatWeight(current)} ${_settings.weightUnit}',
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -465,19 +467,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
             children: [
               _buildWeightStat(
                 l10n.getString('progress.start'),
-                entry != null ? l10n.formatWeight(entry) : '—',
+                entry != null ? '${l10n.formatWeight(entry)} ${_settings.weightUnit}' : '—',
                 Colors.blue.shade400,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
                 l10n.getString('progress.current'),
-                current != null ? l10n.formatWeight(current) : ' —',
+                current != null ? '${l10n.formatWeight(current)} ${_settings.weightUnit}' : ' —',
                 AppColors.progressOrange,
               ),
               const SizedBox(width: 16),
               _buildWeightStat(
                 l10n.getString('progress.goal'),
-                target != null ? l10n.formatWeight(target) : '—',
+                target != null ? '${l10n.formatWeight(target)} ${_settings.weightUnit}' : '—',
                 Colors.tealAccent.shade400,
               ),
             ],
@@ -497,7 +499,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             const SizedBox(height: 12),
             ...entries.take(5).map((e) {
               final changeStr = e.change != null
-                  ? '${e.change! >= 0 ? '+' : ''}${l10n.formatWeight(e.change!)}'
+                  ? '${e.change! >= 0 ? '+' : ''}${l10n.formatWeight(e.change!)} ${_settings.weightUnit}'
                   : l10n.getString('progress.initial');
               final isLoss = (e.change ?? 0) < 0;
               final isGain = (e.change ?? 0) > 0;
@@ -519,7 +521,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      l10n.formatWeight(e.weight),
+                      '${l10n.formatWeight(e.weight)} ${_settings.weightUnit}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,

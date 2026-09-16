@@ -46,44 +46,64 @@ class _CreatingPlanScreenState extends State<CreatingPlanScreen> {
     await Future.delayed(const Duration(seconds: 1));
     if (mounted) setState(() => _completedSteps = 1);
 
-    // Phase 2: Call AI API and set step 2
-    final plan = await _workoutService.generateMyPlan(widget.data.toJson());
-    if (mounted) setState(() => _completedSteps = 2);
+    try {
+      // Phase 2: Call AI API and set step 2
+      final plan = await _workoutService.generateMyPlan(widget.data.toJson());
+      if (mounted) setState(() => _completedSteps = 2);
 
-    // Phase 3 & 4: Fake delay for smooth UI
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) setState(() => _completedSteps = 3);
-    
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) setState(() => _completedSteps = 4);
+      // Phase 3 & 4: Fake delay for smooth UI
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) setState(() => _completedSteps = 3);
+      
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) setState(() => _completedSteps = 4);
 
-    // Done
-    if (mounted) {
-      if (plan == null) {
-        final l10n = context.read<LanguageProvider>();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.getString('common.error'))), // "Error" text localized
-        );
-      } else {
-        AppSettings().addWorkoutPlan(plan);
-        if (plan.nutritionalTargets != null) {
-          AppSettings().targetCalories = plan.nutritionalTargets!.dailyCalories;
-          AppSettings().targetProtein = plan.nutritionalTargets!.dailyProtein;
-          AppSettings().targetCarbs = plan.nutritionalTargets!.dailyCarbs;
-          AppSettings().targetFat = plan.nutritionalTargets!.dailyFat;
+      // Done
+      if (mounted) {
+        if (plan == null) {
+          final l10n = context.read<LanguageProvider>();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.getString('common.error'))), // "Error" text localized
+          );
+        } else {
+          AppSettings().addWorkoutPlan(plan);
+          if (plan.nutritionalTargets != null) {
+            AppSettings().targetCalories = plan.nutritionalTargets!.dailyCalories;
+            AppSettings().targetProtein = plan.nutritionalTargets!.dailyProtein;
+            AppSettings().targetCarbs = plan.nutritionalTargets!.dailyCarbs;
+            AppSettings().targetFat = plan.nutritionalTargets!.dailyFat;
 
-          // Persist nutritional targets to user profile
-          ProfileService().updateProfile({
-            'nutritionalTargets': {
-              'dailyCalories': plan.nutritionalTargets!.dailyCalories,
-              'dailyProtein': plan.nutritionalTargets!.dailyProtein,
-              'dailyCarbs': plan.nutritionalTargets!.dailyCarbs,
-              'dailyFat': plan.nutritionalTargets!.dailyFat,
-            }
-          });
+            // Persist nutritional targets to user profile
+            ProfileService().updateProfile({
+              'nutritionalTargets': {
+                'dailyCalories': plan.nutritionalTargets!.dailyCalories,
+                'dailyProtein': plan.nutritionalTargets!.dailyProtein,
+                'dailyCarbs': plan.nutritionalTargets!.dailyCarbs,
+                'dailyFat': plan.nutritionalTargets!.dailyFat,
+              }
+            });
+          }
         }
+        widget.onFinish();
       }
-      widget.onFinish();
+    } catch (e) {
+      debugPrint('Error generating workout plan during onboarding: $e');
+      if (mounted) {
+        setState(() => _completedSteps = _stepKeys.length);
+        final l10n = context.read<LanguageProvider>();
+        final isSubRequired = e.toString().contains('PREMIUM_REQUIRED');
+        final errorMsg = isSubRequired
+            ? 'Personalized AI workout generation requires a subscription.'
+            : '${l10n.getString('common.error')}: ${e.toString().replaceAll('Exception: ', '')}';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: isSubRequired ? const Color(0xFFF59E0B) : Colors.redAccent,
+          ),
+        );
+        widget.onFinish();
+      }
     }
   }
 

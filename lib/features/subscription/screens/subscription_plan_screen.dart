@@ -171,6 +171,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
         [
           '3 AI Food Scans per day',
           '2 Product scan per day (barcode+ocr)',
+          '14-day free AI Workout Plan trial',
           'Standard workout routines',
           'Basic calorie tracking',
         ];
@@ -180,7 +181,7 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
         [
           'Unlimited AI Food Scans',
           'Unlimited Product scan per day (barcode+ocr)',
-          'Personalized AI Workout Plans',
+          'Unlimited AI Workout Plans (continuous weekly regeneration)',
           'Detailed Macro & Nutrient Reports',
         ];
 

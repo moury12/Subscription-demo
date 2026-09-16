@@ -11,13 +11,15 @@ import '../../widgets/onboarding/step_header.dart';
 class PhysicalStatsScreen extends StatefulWidget {
   final double height;
   final double weight;
-  final Function(double, double) onContinue;
+  final String valueType;
+  final Function(double height, double weight, String valueType) onContinue;
   final VoidCallback onBack;
 
   const PhysicalStatsScreen({
     super.key,
     required this.height,
     required this.weight,
+    this.valueType = 'metric',
     required this.onContinue,
     required this.onBack,
   });
@@ -29,15 +31,58 @@ class PhysicalStatsScreen extends StatefulWidget {
 class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
   late TextEditingController _heightController;
   late TextEditingController _weightController;
-  bool _isMetric = true;
+  late bool _isMetric;
 
   @override
   void initState() {
     super.initState();
+    _isMetric = widget.valueType.toLowerCase() != 'imperial';
     _heightController = TextEditingController(
-        text: widget.height > 0 ? widget.height.toString() : '');
+        text: widget.height > 0
+            ? (_isMetric ? widget.height.toInt().toString() : widget.height.toString())
+            : '');
     _weightController = TextEditingController(
         text: widget.weight > 0 ? widget.weight.toString() : '');
+  }
+
+  @override
+  void dispose() {
+    _heightController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
+  void _switchUnit(bool toMetric) {
+    if (_isMetric == toMetric) return;
+
+    final currentH = double.tryParse(_heightController.text);
+    final currentW = double.tryParse(_weightController.text);
+
+    setState(() {
+      _isMetric = toMetric;
+
+      if (toMetric) {
+        // Imperial -> Metric (ft -> cm, lbs -> kg)
+        if (currentH != null && currentH > 0) {
+          final cm = (currentH * 30.48).round();
+          _heightController.text = cm.toString();
+        }
+        if (currentW != null && currentW > 0) {
+          final kg = double.parse((currentW / 2.20462).toStringAsFixed(1));
+          _weightController.text = kg.toString();
+        }
+      } else {
+        // Metric -> Imperial (cm -> ft, kg -> lbs)
+        if (currentH != null && currentH > 0) {
+          final ft = double.parse((currentH / 30.48).toStringAsFixed(1));
+          _heightController.text = ft.toString();
+        }
+        if (currentW != null && currentW > 0) {
+          final lbs = double.parse((currentW * 2.20462).toStringAsFixed(1));
+          _weightController.text = lbs.toString();
+        }
+      }
+    });
   }
 
   @override
@@ -83,13 +128,13 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
                             child: _buildUnitToggle(
                                 l10n.getString('onboarding.metric'),
                                 _isMetric,
-                                () => setState(() => _isMetric = true)),
+                                () => _switchUnit(true)),
                           ),
                           Expanded(
                             child: _buildUnitToggle(
                                 l10n.getString('onboarding.imperial'),
                                 !_isMetric,
-                                () => setState(() => _isMetric = false)),
+                                () => _switchUnit(false)),
                           ),
                         ],
                       ),
@@ -120,11 +165,13 @@ class _PhysicalStatsScreenState extends State<PhysicalStatsScreen> {
                     PrimaryGlowButton(
                       label: l10n.getString('onboarding.continue'),
                       onPressed: () {
+                        final defaultH = _isMetric ? 170.0 : 5.6;
+                        final defaultW = _isMetric ? 70.0 : 154.0;
                         final h =
-                            double.tryParse(_heightController.text) ?? 170.0;
+                            double.tryParse(_heightController.text) ?? defaultH;
                         final w =
-                            double.tryParse(_weightController.text) ?? 70.0;
-                        widget.onContinue(h, w);
+                            double.tryParse(_weightController.text) ?? defaultW;
+                        widget.onContinue(h, w, _isMetric ? 'metric' : 'imperial');
                       },
                     ),
                   ],

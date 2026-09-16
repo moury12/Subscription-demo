@@ -11,6 +11,7 @@ import '../../widgets/onboarding/step_header.dart';
 class TargetWeightScreen extends StatefulWidget {
   final double currentWeight;
   final double targetWeight;
+  final String valueType;
   final Function(double) onContinue;
   final VoidCallback onBack;
 
@@ -18,6 +19,7 @@ class TargetWeightScreen extends StatefulWidget {
     super.key,
     required this.currentWeight,
     required this.targetWeight,
+    this.valueType = 'metric',
     required this.onContinue,
     required this.onBack,
   });
@@ -28,6 +30,7 @@ class TargetWeightScreen extends StatefulWidget {
 
 class _TargetWeightScreenState extends State<TargetWeightScreen> {
   late TextEditingController _targetWeightController;
+  bool get _isMetric => widget.valueType.toLowerCase() != 'imperial';
 
   @override
   void initState() {
@@ -38,8 +41,16 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
   }
 
   @override
+  void dispose() {
+    _targetWeightController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = context.watch<LanguageProvider>();
+    final weightUnit = _isMetric ? l10n.getString('onboarding.kg') : l10n.getString('onboarding.lbs');
+
     return Scaffold(
       body: OnboardingBackground(
         child: Column(
@@ -78,17 +89,17 @@ class _TargetWeightScreenState extends State<TargetWeightScreen> {
                         border: Border.all(color: AppColors.inputBorder),
                       ),
                       child: Text(
-                        '${l10n.formatWeight(widget.currentWeight)} ${l10n.getString('onboarding.kg')}',
+                        '${l10n.formatWeight(widget.currentWeight)} $weightUnit',
                         style: AppTextStyles.inputText,
                       ),
                     ),
                     const SizedBox(height: 32),
                     Text(
-                        '${l10n.getString('onboarding.target_weight')} (${l10n.getString('onboarding.kg')})',
+                        '${l10n.getString('onboarding.target_weight')} ($weightUnit)',
                         style: AppTextStyles.labelMedium),
                     const SizedBox(height: 12),
                     AppTextInput(
-                      hint: l10n.getString('onboarding.enter_target_weight'),
+                      hint: _isMetric ? 'e.g., 65' : 'e.g., 145',
                       controller: _targetWeightController,
                       keyboardType:
                           const TextInputType.numberWithOptions(decimal: true),
