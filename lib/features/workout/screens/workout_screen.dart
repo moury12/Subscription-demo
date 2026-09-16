@@ -605,18 +605,26 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
     try {
       final profile = await ProfileService().getProfile() ?? {};
       final settings = AppSettings();
+      final valueType = profile['valueType']?.toString() ?? settings.valueType;
+      final isMetric = valueType.toLowerCase() != 'imperial';
+      final heightVal = profile['height'] ?? settings.height ?? (isMetric ? 175 : 5.7);
+      final weightVal = profile['currentWeight'] ?? settings.currentWeight ?? (isMetric ? 70 : 154);
+      final targetWeightVal = profile['targetWeight'] ?? settings.targetWeight ?? (isMetric ? 75 : 165);
+
       final profileData = <String, dynamic>{
         'age': profile['age'] ?? settings.age ?? 25,
         'gender': profile['gender'] ?? settings.gender ?? 'Male',
-        'height': profile['height'] ?? settings.height ?? 175,
-        'currentWeight': profile['currentWeight'] ?? settings.currentWeight ?? 70,
+        'height': '$heightVal ${isMetric ? "cm" : "ft"}',
+        'currentWeight': '$weightVal ${isMetric ? "kg" : "lbs"}',
+        'weight': '$weightVal ${isMetric ? "kg" : "lbs"}',
+        'targetWeight': '$targetWeightVal ${isMetric ? "kg" : "lbs"}',
+        'valueType': valueType,
         'goal': profile['goal'] ?? settings.goal ?? 'Gain Muscle',
         'activityLevel': profile['activityLevel'] ?? settings.activityLevel ?? 'Moderately Active',
         'workoutSchedule': profile['workoutSchedule'] ?? {
           'daysPerWeek': settings.workoutDays,
         },
         'dietaryPreference': profile['dietaryPreference'] ?? settings.dietPreference ?? 'Everything',
-        'targetWeight': profile['targetWeight'] ?? settings.targetWeight ?? 75,
       };
 
       final rawPlan = await _workoutService.generateMyPlan(profileData);
@@ -692,7 +700,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> with TickerProviderStateM
         if (e.toString().contains('PREMIUM_REQUIRED')) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('✨ Personalized AI Workout Plans require a Premium subscription. Upgrade now!'),
+              content: Text('✨ Your 14-day free workout trial has ended. Upgrade to Premium to regenerate and customize workout plans!'),
               backgroundColor: Color(0xFFF59E0B),
             ),
           );

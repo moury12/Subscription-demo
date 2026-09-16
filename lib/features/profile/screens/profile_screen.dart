@@ -249,9 +249,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildQuickStat(context, _l10n.formatWeight(_settings.currentWeight ?? 0), 'kg'),
+                _buildQuickStat(context, _l10n.formatWeight(_settings.currentWeight ?? 0), _settings.weightUnit),
                 _buildStatDivider(),
-                _buildQuickStat(context, _l10n.formatInteger((_settings.height ?? 0).toInt()), 'cm'),
+                _buildQuickStat(context, _settings.isMetric ? _l10n.formatInteger((_settings.height ?? 0).toInt()) : '${_settings.height ?? 0}', _settings.heightUnit),
                 _buildStatDivider(),
                 _buildQuickStat(context, _l10n.formatInteger(_settings.age ?? 0), 'years'),
               ],
@@ -413,7 +413,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_l10n.formatWeight(_settings.currentWeight ?? 0)} kg',
+                      '${_l10n.formatWeight(_settings.currentWeight ?? 0)} ${_settings.weightUnit}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -438,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_l10n.formatWeight(_settings.entryWeight ?? _settings.currentWeight ?? 0)} kg',
+                      '${_l10n.formatWeight(_settings.entryWeight ?? _settings.currentWeight ?? 0)} ${_settings.weightUnit}',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.95),
                         fontSize: 22,
@@ -483,7 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                _l10n.getString('profile.current_weight').toUpperCase(),
+                '${_l10n.getString('profile.current_weight')} (${_settings.weightUnit})'.toUpperCase(),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.35),
                   fontSize: 10,
@@ -517,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                _l10n.getString('profile.entry_weight').toUpperCase(),
+                '${_l10n.getString('profile.entry_weight')} (${_settings.weightUnit})'.toUpperCase(),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.35),
                   fontSize: 10,
@@ -706,12 +706,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputLabel(_l10n.getString('profile.height_cm').toUpperCase()),
+                    _buildInputLabel('${_l10n.getString('onboarding.height')} (${_settings.heightUnit})'.toUpperCase()),
                     _buildTextField(_heightController),
                   ],
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          _buildInputLabel('UNIT SYSTEM'),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _settings.valueType = 'metric';
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _settings.isMetric ? AppColors.brandPrimary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('Metric (kg, cm)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _settings.valueType = 'imperial';
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: !_settings.isMetric ? AppColors.brandPrimary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('Imperial (lbs, ft)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           _buildDoneButton(
@@ -728,6 +779,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'name': _settings.userName,
                 'age': _settings.age,
                 'height': _settings.height,
+                'valueType': _settings.valueType,
               });
             },
           ),
@@ -848,7 +900,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }),
           const SizedBox(height: 8),
-          _buildInputLabel(_l10n.getString('profile.target_weight_kg').toUpperCase()),
+          _buildInputLabel('${_l10n.getString('onboarding.target_weight')} (${_settings.weightUnit})'.toUpperCase()),
           _buildTextField(_targetWeightController),
           const SizedBox(height: 24),
           _buildDoneButton(

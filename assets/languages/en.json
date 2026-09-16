@@ -254,6 +254,7 @@
     "pescatarian": "Pescatarian",
     "keto": "Keto",
     "paleo": "Paleo",
+    "timezone": "Timezone",
     "select_timezone": "Select Timezone",
     "sync_schedule": "This helps us sync your schedule and reminders.",
     "search_timezones": "Search timezones...",

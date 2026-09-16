@@ -21,6 +21,11 @@ class AppSettings {
   String? timezone;
   String language = 'English';
   String weekStartDay = 'Monday';
+  String valueType = 'metric';
+
+  bool get isMetric => valueType.toLowerCase() != 'imperial';
+  String get weightUnit => isMetric ? 'kg' : 'lbs';
+  String get heightUnit => isMetric ? 'cm' : 'ft';
   int targetCalories = 2000;
   int targetProtein = 150;
   int targetCarbs = 200;
@@ -58,6 +63,7 @@ class AppSettings {
     timezone = json['timezone'];
     language = json['language'] ?? 'English';
     weekStartDay = json['weekStart'] ?? 'Monday';
+    valueType = json['valueType']?.toString() ?? valueType;
 
     // Restore AI-generated nutritional targets
     final nt = json['nutritionalTargets'];

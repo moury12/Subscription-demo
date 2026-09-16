@@ -100,6 +100,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  Future<void> _launchLegalUrl(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri);
+      }
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.watch<LanguageProvider>();
@@ -164,7 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => launchUrl(Uri.parse('https://github.com')),
+                        ..onTap = () => _launchLegalUrl('https://getgocal.com/terms'),
                     ),
                     TextSpan(text: ' ' + l.getString('auth.and') + ' '),
                     TextSpan(
@@ -174,7 +187,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                       recognizer: TapGestureRecognizer()
-                        ..onTap = () => launchUrl(Uri.parse('https://github.com')),
+                        ..onTap = () => _launchLegalUrl('https://getgocal.com/privacy'),
                     ),
                   ],
                 ),

@@ -166,6 +166,7 @@ Future<void> logoutUser() async {
         'features': [
           '3 AI Food Scans per day',
           '2 Product scan per day (barcode+ocr)',
+          '14-day free AI Workout Plan trial',
           'Standard workout routines',
           'Basic calorie tracking',
         ],
@@ -179,7 +180,7 @@ Future<void> logoutUser() async {
         'features': [
           'Unlimited AI Food Scans',
           'Unlimited Product scan per day (barcode+ocr)',
-          'Personalized AI Workout Plans',
+          'Unlimited AI Workout Plans (continuous weekly regeneration)',
           'Detailed Macro & Nutrient Reports',
         ],
       },

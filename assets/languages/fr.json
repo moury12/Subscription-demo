@@ -223,6 +223,7 @@
     "pescatarian": "Pescatarien",
     "keto": "Cétogène",
     "paleo": "Paléo",
+    "timezone": "Fuseau horaire",
     "select_timezone": "Sélectionner le fuseau horaire",
     "sync_schedule": "Cela nous aide à synchroniser votre emploi du temps et vos rappels.",
     "search_timezones": "Rechercher des fuseaux horaires...",
