@@ -59,11 +59,13 @@ platform :ios do
     )
 
     # 4. Build the Flutter App (No codesign phase in Flutter build)
-    # We run the build from the project root directory
-    cocoapods(use_bundle_exec: false)
+    # Clean previous artifacts to avoid simulator slices contaminating release builds
     Dir.chdir("../..") do
+      sh("flutter", "clean")
+      sh("flutter", "pub", "get")
       sh("flutter", "build", "ios", "--release", "--no-codesign")
     end
+    cocoapods(use_bundle_exec: false)
 
     # 5. Build and Package IPA using gym (fastlane's build_app)
     # This signs the app using the provision profiles fetched by match
